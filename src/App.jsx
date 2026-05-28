@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Container, Box, Image, Button } from '@chakra-ui/react';
 import { useLocation } from 'react-router-dom';
 import Nav from './components/Nav/nav';
@@ -79,27 +80,40 @@ function App() {
           <Route path="/play/minas" element={<Diamantes />} />
         </Routes>
         {shouldShowFooter && <Footer />}
-        {showWelcomeGift && currentUser?.id && (
-          <Box
-            position="fixed"
-            top="50%"
-            left="50%"
-            transform="translate(-50%, -50%)"
-            bg="white"
-            p="30px"
-            boxShadow="2xl"
-            borderRadius="15px"
-            width="400px"
-            textAlign="center"
-            zIndex="10"
+        {showWelcomeGift && currentUser?.id && createPortal(
+          <div
+            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4"
+            onClick={handleCloseGift}
           >
-            <Image src={regaloBienvenida} alt="Regalo de bienvenida" mb={4} />
-            <Box fontSize="2xl" fontWeight="bold">¡Felicidades!</Box>
-            <Box>Has ganado 1,000,000 de fichas por ser uno de los primeros 100 usuarios.</Box>
-            <Button mt={4} colorScheme="teal" onClick={handleCloseGift}>
-              ¡Gracias!
-            </Button>
-          </Box>
+            <div
+              className="glass-card rounded-xl p-8 shadow-2xl relative max-w-sm w-full text-center space-y-6 border border-[#1A1A26] select-none"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Atmospheric background spot */}
+              <div className="bg-glow-spot -top-20 -left-20 pointer-events-none"></div>
+
+              <img
+                src={regaloBienvenida}
+                alt="Regalo de bienvenida"
+                className="w-48 h-auto mx-auto object-contain drop-shadow-[0_0_20px_rgba(201,168,76,0.35)]"
+              />
+
+              <div className="space-y-2 relative z-10">
+                <h2 className="font-headline-md text-headline-md text-white">¡Felicidades!</h2>
+                <p className="font-body-sm text-body-sm text-on-surface-variant">
+                  Has ganado 1,000,000 de fichas por ser uno de los primeros 100 usuarios.
+                </p>
+              </div>
+
+              <button
+                onClick={handleCloseGift}
+                className="gold-gradient gold-glow gold-glow-hover w-full py-3.5 px-4 rounded-lg font-headline-sm text-headline-sm text-[#0A0A0F] uppercase tracking-wider transition-all duration-300 transform active:scale-[0.98] cursor-pointer relative z-10"
+              >
+                ¡Gracias!
+              </button>
+            </div>
+          </div>,
+          document.body
         )}
       </AuthProvider>
     </Container>
