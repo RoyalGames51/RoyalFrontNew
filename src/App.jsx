@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Container, Box, Image, Button } from '@chakra-ui/react';
 import { useLocation } from 'react-router-dom';
 import Nav from './components/Nav/nav';
+import SideNavBar from './components/Nav/sideNavBar';
 import Footer from './components/footer/footer';
 import { Route, Routes } from 'react-router-dom';
 import Home from './components/Home/home';
@@ -65,21 +66,24 @@ function App() {
       p={0}
     >
       <AuthProvider>
-        <Nav />
-        <Routes>
-          <Route path="/" element={<Home />} />
-        
-        <Route path="/perfil" element={<Perfil />} /> {/* Perfil propio */}
-        <Route path="/perfil/:userNick" element={<Perfil isPublic={true} />} /> {/* Perfil público */}
-          <Route path="/juegos" element={<GameGrid />} />
-          <Route path="/chips" element={<BuyChips />} />
-          <Route path="/logout" element={<LogOut />} />
-          <Route path="/panel" element={<Panel />} />
-          <Route path="/noticias" element={<News />} />
-          <Route path="/terminos-y-condiciones" element={<TermsAndConditions />} />
-          <Route path="/play/minas" element={<Diamantes />} />
-        </Routes>
-        {shouldShowFooter && <Footer />}
+        {currentUser?.id && <SideNavBar />}
+        <div className={`transition-all duration-300 min-h-screen flex flex-col ${currentUser?.id ? 'md:ml-[220px] pb-20 md:pb-0' : ''}`}>
+          <Nav />
+          <Routes>
+            <Route path="/" element={<Home />} />
+          
+            <Route path="/perfil" element={<Perfil />} /> {/* Perfil propio */}
+            <Route path="/perfil/:userNick" element={<Perfil isPublic={true} />} /> {/* Perfil público */}
+            <Route path="/juegos" element={<GameGrid />} />
+            <Route path="/chips" element={<BuyChips />} />
+            <Route path="/logout" element={<LogOut />} />
+            <Route path="/panel" element={<Panel />} />
+            <Route path="/noticias" element={<News />} />
+            <Route path="/terminos-y-condiciones" element={<TermsAndConditions />} />
+            <Route path="/play/minas" element={<Diamantes />} />
+          </Routes>
+          {shouldShowFooter && <Footer />}
+        </div>
         {showWelcomeGift && currentUser?.id && createPortal(
           <div
             className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4"

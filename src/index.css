@@ -55,6 +55,13 @@
     white-space: nowrap;
     letter-spacing: -0.05em;
   }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none !important;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
 }
 
 @keyframes float {
