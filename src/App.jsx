@@ -22,6 +22,10 @@ import axios from 'axios';
 import Diamantes from './components/Juegos/Diamantes/diamantes';
 import API_URL from './api/rutaApi';
 
+import PaymentSuccess from './components/PaymentStatus/PaymentSuccess';
+import PaymentFailure from './components/PaymentStatus/PaymentFailure';
+import PaymentPending from './components/PaymentStatus/PaymentPending';
+
 function App() {
   const [showWelcomeGift, setShowWelcomeGift] = useState(false);
   const { currentUser } = useSelector((state) => state);
@@ -81,6 +85,11 @@ function App() {
             <Route path="/noticias" element={<News />} />
             <Route path="/terminos-y-condiciones" element={<TermsAndConditions />} />
             <Route path="/play/minas" element={<Diamantes />} />
+            
+            {/* MercadoPago Status Routes */}
+            <Route path="/mercadopago/success" element={<PaymentSuccess />} />
+            <Route path="/mercadopago/failure" element={<PaymentFailure />} />
+            <Route path="/mercadopago/pending" element={<PaymentPending />} />
           </Routes>
           {shouldShowFooter && <Footer />}
         </div>
