@@ -42,7 +42,8 @@ const chipOptions = [
 export default function BuyChips() {
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state);
-  const [country, setCountry] = useState("Estados Unidos");
+  // Country is taken from the user's profile; if missing, purchases are blocked
+  const userCountry = currentUser?.country || null;
   const [selectedChip, setSelectedChip] = useState(chipOptions[0]);
   
   // Navigation tabs state: "deposit", "withdraw", "history"
@@ -69,16 +70,26 @@ export default function BuyChips() {
   const [ccExpiry, setCcExpiry] = useState("");
   const [ccCvv, setCcCvv] = useState("");
 
-  const { currency, exchangeRate, symbol } = countryConfig[country] || countryConfig["Estados Unidos"];
+  // Resolve currency/exchange/symbol from user's profile country
+  const resolvedKeyForUser = Object.keys(countryConfig).find((k) => {
+    if (!userCountry) return false;
+    return (
+      k.toLowerCase() === userCountry.toLowerCase() ||
+      countryConfig[k].name.toLowerCase().startsWith(userCountry.toLowerCase())
+    );
+  });
+  const resolvedConfigForUser = resolvedKeyForUser ? countryConfig[resolvedKeyForUser] : null;
+  const { currency, exchangeRate, symbol } = resolvedConfigForUser || countryConfig["Estados Unidos"];
 
   // Automatically update active payment methods based on country/currency configuration
   useEffect(() => {
-    if (currency === "MXN" || currency === "ARS" || currency === "COP") {
+    if (!resolvedConfigForUser) return; // can't decide gateway without country
+    if (resolvedConfigForUser.currency === "MXN" || resolvedConfigForUser.currency === "ARS" || resolvedConfigForUser.currency === "COP") {
       setPaymentMethod("mercadopago");
     } else {
       setPaymentMethod("paypal");
     }
-  }, [country, currency]);
+  }, [resolvedConfigForUser]);
 
   // Fetch real transaction history from backend
   useEffect(() => {
@@ -101,17 +112,29 @@ export default function BuyChips() {
     fetchHistory();
   }, [activeTab, currentUser]);
 
+  // country selection removed — country must be set in user profile
   const handleCountryChange = (e) => {
-    setCountry(e.target.value);
+    // no-op: kept for compatibility
   };
 
   // Mercado Pago order checkout redirection
-  const createOrder = async () => {
+  const createOrder = async (method) => {
     if (!currentUser?.id) {
       Swal.fire({
         icon: "warning",
         title: "Sesión requerida",
         text: "Debes iniciar sesión para comprar fichas.",
+        confirmButtonColor: "#C9A84C",
+      });
+      return;
+    }
+
+    // Block purchases if user hasn't set country in profile
+    if (!userCountry) {
+      Swal.fire({
+        icon: "warning",
+        title: "País no configurado",
+        text: "Debes configurar tu país en tu perfil antes de realizar compras.",
         confirmButtonColor: "#C9A84C",
       });
       return;
@@ -137,12 +160,6 @@ export default function BuyChips() {
       currency,
     };
 
-    // Determine the route according to the selected currency
-    let apiUrl = `${API_URL}/mepago/create-order`;
-    if (currency === "MXN") {
-      apiUrl = `${API_URL}/mepago/create-order/mx`;
-    }
-
     try {
       Swal.fire({
         title: "Creando orden en Mercado Pago...",
@@ -152,7 +169,7 @@ export default function BuyChips() {
           Swal.showLoading();
         }
       });
-      const response = await axios.post(apiUrl, payload);
+      const response = await axios.post(`${API_URL}/mepago/create-order`, payload);
       
       // Spec Requirement: redirect frontend user to initPoint
       if (response.data && response.data.initPoint) {
@@ -418,27 +435,28 @@ export default function BuyChips() {
                 {/* Left Side: Configuration & Grid (Col-Span 7) */}
                 <div className="lg:col-span-7 space-y-8 text-left">
                   
-                  {/* Step 1: Select Country */}
+                  {/* Step 1: Country comes from user profile */}
                   <div>
                     <label className="font-label-lg text-label-lg text-primary mb-3 block uppercase tracking-wider">
-                      1. Selecciona tu País de Residencia
+                      1. País de Residencia (Perfil)
                     </label>
-                    <div className="relative w-full max-w-sm">
-                      <select
-                        onChange={handleCountryChange}
-                        value={country}
-                        className="w-full bg-[#0A0A0F] border border-outline-variant/30 rounded-xl py-4 px-4 text-body-md text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all cursor-pointer appearance-none"
-                      >
-                        {Object.keys(countryConfig).map((key) => (
-                          <option key={key} value={key} className="bg-[#0A0A0F] text-white">
-                            {countryConfig[key].name} ({countryConfig[key].currency})
-                          </option>
-                        ))}
-                      </select>
-                      <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-primary">
-                        <span className="material-symbols-outlined">expand_more</span>
+                    {!currentUser?.country ? (
+                      <div className="relative w-full max-w-sm p-4 bg-[#0A0A0F] border border-outline-variant/30 rounded-xl">
+                        <p className="text-sm text-on-surface-variant mb-3">No has configurado tu país en tu perfil. Debes actualizarlo para poder comprar fichas.</p>
+                        <button
+                          onClick={() => navigate('/perfil')}
+                          className="px-4 py-2 royal-gold-gradient rounded-lg text-[#0A0A0F] font-bold"
+                        >
+                          Actualizar Perfil
+                        </button>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="relative w-full max-w-sm">
+                        <div className="w-full bg-[#0A0A0F] border border-outline-variant/30 rounded-xl py-4 px-4 text-body-md text-white">
+                          {currentUser.country} ({resolvedConfigForUser ? resolvedConfigForUser.currency : 'USD'})
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Step 2: Select Chip Package */}
