@@ -290,7 +290,7 @@ export default function BuyChips() {
   return (
     <PayPalScriptProvider
       options={{
-        "client-id": "Ae36OchhdN8RQxByUJu4LH2G8wKlT0Ps3Id2Eky_7KdMk3ADh1aTzEuqzLowplxWkXMFVNumhm7TUMOC",
+        "client-id": import.meta.env.VITE_PAYPAL_CLIENT_ID || "Ae36OchhdN8RQxByUJu4LH2G8wKlT0Ps3Id2Eky_7KdMk3ADh1aTzEuqzLowplxWkXMFVNumhm7TUMOC",
         currency: "USD",
       }}
     >
