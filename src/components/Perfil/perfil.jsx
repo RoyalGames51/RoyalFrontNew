@@ -5,6 +5,16 @@ import Swal from "sweetalert2";
 import GameGrid from "./../Juegos/juegos";
 import { fetchFavoriteGames, fetchPublicFavorites, viewedUserProfile, updateUserProfile } from "./../../redux/actions/index";
 
+const countryOptions = [
+  { value: "argentina", label: "Argentina (ARS)" },
+  { value: "brasil", label: "Brasil (BRL)" },
+  { value: "colombia", label: "Colombia (COP)" },
+  { value: "Estados Unidos", label: "Estados Unidos (USD)" },
+  { value: "espana", label: "España (EUR)" },
+  { value: "mexico", label: "México (MXN)" },
+  { value: "resto del mundo", label: "Resto del Mundo (USD)" },
+];
+
 const Perfil = ({ isPublic = false }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -308,13 +318,19 @@ const Perfil = ({ isPublic = false }) => {
 
                   <div className="space-y-2">
                     <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Country / País</label>
-                    <input
+                    <select
                       className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
-                      type="text"
                       name="country"
                       value={formData.country}
                       onChange={handleInputChange}
-                    />
+                    >
+                      <option value="">Selecciona un país</option>
+                      {countryOptions.map((country) => (
+                        <option key={country.value} value={country.value}>
+                          {country.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="space-y-2">
