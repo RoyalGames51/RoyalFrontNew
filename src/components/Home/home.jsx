@@ -14,6 +14,7 @@ import juegoMinas from "../../assets/minas.png";
 import casinoBanner from "../../assets/casino_banner.png";
 import sportsBanner from "../../assets/sports_banner.png";
 import tournamentBanner from "../../assets/tournament_banner.png";
+import bannercelu from "../../assets/bannercelu.png"
 
 // Import auth triggers to open login/register modals
 import Login from "../Login/login";
@@ -334,7 +335,7 @@ export default function Home() {
                 <img 
                   alt="Pragmatic Drops Banner" 
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                  src={tournamentBanner} 
+                  src={bannercelu} 
                 />
                 <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent p-6 flex flex-col justify-end text-left">
                   <h3 className="font-headline-sm text-headline-sm text-primary">Premios de Pragmatic</h3>
