@@ -9,6 +9,7 @@ import juegoLoteria from "../../assets/IMG_4119.png";
 import juegoRuleta from "../../assets/ruleta.png";
 import juegoBingo from "../../assets/bingoproxi.png";
 import juegoMinas from "../../assets/minas.png";
+import banner1 from "../../assets/banner1.jpg";
 
 // Generated Banners
 import casinoBanner from "../../assets/casino_banner.png";
@@ -301,14 +302,9 @@ export default function Home() {
               <img 
                 alt="Banner Welcome" 
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                src={casinoBanner} 
+                src={banner1} 
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-8 flex flex-col justify-end text-left">
-                <span className="bg-primary text-on-primary px-3 py-1 rounded text-label-md font-label-md w-max mb-3">PAQUETE DE BIENVENIDA</span>
-                <h2 className="font-display-lg text-display-lg-mobile md:text-display-lg text-white mb-2 leading-tight">100% Hasta $1,000</h2>
-                <p className="text-on-surface-variant max-w-md font-body-md text-body-md mb-6 hidden sm:block">Únete al rango élite de jugadores de RGAMES hoy mismo. Comienza tu viaje con un gran impulso en tus tres primeros depósitos.</p>
-                <button className="gold-gradient w-max px-8 py-3 rounded-lg text-on-primary font-bold hover:scale-105 transition-transform cursor-pointer border-0">Claim Now</button>
-              </div>
+            
             </div>
 
             {/* Secondary promo slides/widgets */}
@@ -350,7 +346,7 @@ export default function Home() {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">history</span>
-                <h2 className="font-headline-sm text-headline-sm text-white">Seguir Jugando</h2>
+                <h2 className="font-headline-sm text-headline-sm text-white">Ultimos juegos</h2>
               </div>
               <button 
                 onClick={() => navigate('/juegos')}
