@@ -8,8 +8,9 @@ import logoImg from "../../assets/logo.png";
 import juegoLoteria from "../../assets/IMG_4119.png";
 import juegoRuleta from "../../assets/ruleta.png";
 import juegoBingo from "../../assets/bingoproxi.png";
-import juegoMinas from "../../assets/minas.png";
+import juegoMinas from "../../assets/minas2.png";
 import banner1 from "../../assets/banner1.jpg";
+import rj from "../../assets/rj.png";
 
 // Generated Banners
 import casinoBanner from "../../assets/casino_banner.png";
@@ -40,13 +41,13 @@ export default function Home() {
 
   // Featured games configuration
   const featuredGames = [
-    {
-      id: "slot-royal",
-      title: "Lotería Real",
-      category: "Premium Slot",
-      src: juegoLoteria,
-      path: "/loteria-instantanea",
-    },
+   //{
+     // id: "slot-royal",
+     // title: "Lotería Real",
+      //category: "Premium Slot",
+      //src: juegoLoteria,
+     // path: "/loteria-instantanea",
+    //},
     {
       id: "poker-elite",
       title: "Elite Poker",
@@ -54,13 +55,13 @@ export default function Home() {
       src: "https://lh3.googleusercontent.com/aida-public/AB6AXuCpCcNDDLhupT0iOwy1efwVKGf6ATUKCy6U7q50kyjk86DZ0ESSWDYB3IrG_VbQ2nLajCDmLvXOct59w89ERq7kJydta4x2rtj18hF3ffoEPNHFxRiAJHXOp4-joRLAss2GIpXRWXEpfCcn17eLUjcdKtMQDo4p-lNCzppHIIyPmM_WXToorkNt3NbXKLAfPkWDm4ln0gxkOhUv8fxWHOTdBFnPxsnTABAi2RPFBg9hCCwRzQGJ6YIBJ6Bvk8_pA9vPVUZpUJk60PQ",
       path: null,
     },
-    {
-      id: "ruleta-vip",
-      title: "VIP Roulette",
-      category: "Table Games",
-      src: juegoRuleta,
-      path: "/ruleta",
-    },
+    // {
+    //   id: "ruleta-vip",
+    //   title: "VIP Roulette",
+    //   category: "Table Games",
+    //   src: juegoRuleta,
+    //   path: "/ruleta",
+    // },
     {
       id: "bingo-royal",
       title: "Bingo",
@@ -267,7 +268,7 @@ export default function Home() {
     return (
       <div className="bg-background text-on-background font-body-md overflow-x-hidden min-h-screen select-none pb-24 md:pb-12">
         {/* Sticky Balance Bar (Below Navbar) */}
-        <div className="sticky top-16 z-40 bg-surface-container-low border-b border-outline-variant/10 px-4 md:px-margin-desktop py-2 flex items-center justify-between">
+        {/* <div className="sticky top-16 z-40 bg-surface-container-low border-b border-outline-variant/10 px-4 md:px-margin-desktop py-2 flex items-center justify-between">
           <div className="flex gap-4 md:gap-8 overflow-x-auto no-scrollbar py-1">
             <div className="flex flex-col text-left">
               <span className="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest">Balance Real</span>
@@ -288,7 +289,7 @@ export default function Home() {
           >
             Depositar
           </button>
-        </div>
+        </div> */}
 
         {/* Dashboard Main Content */}
         <main className="pt-6 px-4 md:px-margin-desktop max-w-container-max mx-auto space-y-12 pb-16">
@@ -301,7 +302,7 @@ export default function Home() {
             >
               <img 
                 alt="Banner Welcome" 
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                className="absolute inset-0 w-full h-full object-contain object-center transition-transform duration-700" 
                 src={banner1} 
               />
             
@@ -358,7 +359,7 @@ export default function Home() {
             
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {/* Game Item 1: Lotería Real */}
-              <div 
+              {/* <div 
                 onClick={() => handlePlayGame('/loteria-instantanea', 'Lotería Real')}
                 className="group relative rounded-lg overflow-hidden border border-outline-variant/20 aspect-[4/3] cursor-pointer bg-surface-container"
               >
@@ -373,10 +374,10 @@ export default function Home() {
                 <div className="absolute bottom-0 w-full p-2 bg-gradient-to-t from-black to-transparent text-left">
                   <p className="text-[12px] font-bold text-white truncate">Lotería Real</p>
                 </div>
-              </div>
+              </div> */}
 
               {/* Game Item 2: VIP Roulette */}
-              <div 
+              {/* <div 
                 onClick={() => handlePlayGame('/ruleta', 'VIP Roulette')}
                 className="group relative rounded-lg overflow-hidden border border-outline-variant/20 aspect-[4/3] cursor-pointer bg-surface-container"
               >
@@ -391,37 +392,41 @@ export default function Home() {
                 <div className="absolute bottom-0 w-full p-2 bg-gradient-to-t from-black to-transparent text-left">
                   <p className="text-[12px] font-bold text-white truncate">VIP Roulette</p>
                 </div>
-              </div>
+              </div> */}
 
               {/* Game Item 3: Bingo */}
-              <div 
-                onClick={() => handlePlayGame('/bingo', 'Bingo')}
-                className="group relative rounded-lg overflow-hidden border border-outline-variant/20 aspect-[4/3] cursor-pointer bg-surface-container"
+              <div
+                onClick={() => handlePlayGame('/royaljoker', 'Royal Joker')}
+                className="group relative rounded-lg overflow-hidden border border-outline-variant/20 aspect-[4/3] cursor-pointer"
               >
-                <img 
-                  className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" 
-                  src={juegoBingo} 
-                  alt="Bingo" 
-                />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 backdrop-blur-[2px]">
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-tr from-[#121212] to-[#1b1b1b]">
+                  <img
+                    className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                    src={rj}
+                    alt="Royal Joker"
+                  />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px]">
                   <span className="material-symbols-outlined text-primary text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>play_circle</span>
                 </div>
                 <div className="absolute bottom-0 w-full p-2 bg-gradient-to-t from-black to-transparent text-left">
-                  <p className="text-[12px] font-bold text-white truncate">Bingo</p>
+                  <p className="text-[12px] font-bold text-white truncate">Royal Joker</p>
                 </div>
               </div>
 
               {/* Game Item 4: Minas */}
-              <div 
+              <div
                 onClick={() => handlePlayGame('/play/minas', 'Minas')}
-                className="group relative rounded-lg overflow-hidden border border-outline-variant/20 aspect-[4/3] cursor-pointer bg-surface-container"
+                className="group relative rounded-lg overflow-hidden border border-outline-variant/20 aspect-[4/3] cursor-pointer"
               >
-                <img 
-                  className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" 
-                  src={juegoMinas} 
-                  alt="Minas" 
-                />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 backdrop-blur-[2px]">
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-tr from-[#0f1115] to-[#17181b]">
+                  <img
+                    className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                    src={juegoMinas}
+                    alt="Minas"
+                  />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px]">
                   <span className="material-symbols-outlined text-primary text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>play_circle</span>
                 </div>
                 <div className="absolute bottom-0 w-full p-2 bg-gradient-to-t from-black to-transparent text-left">

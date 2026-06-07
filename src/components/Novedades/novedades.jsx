@@ -53,10 +53,10 @@ export default function Novedades() {
               borderRadius="10px"
               w="100%"
               h="auto"
-              objectFit="cover"
+              objectFit="contain"
               src={banner.src}
               alt={banner.alt}
-              boxShadow="0px 4px 10px rgba(0, 0, 0, 0.15)" // Aplica un sombreado predefinido (puedes ajustarlo)
+              boxShadow="0px 4px 10px rgba(0, 0, 0, 0.15)"
             />
           </Box>
         ))}
