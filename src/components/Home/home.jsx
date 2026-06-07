@@ -15,7 +15,7 @@ import banner1 from "../../assets/banner1.jpg";
 import casinoBanner from "../../assets/casino_banner.png";
 import sportsBanner from "../../assets/sports_banner.png";
 import tournamentBanner from "../../assets/tournament_banner.png";
-import bannercelu from "../../assets/bannercelu.png"
+import bannercelu from "../../assets/bannercelu.png";
 
 // Import auth triggers to open login/register modals
 import Login from "../Login/login";
