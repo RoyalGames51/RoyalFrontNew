@@ -13,7 +13,7 @@ const Diamantes = () => {
   return (
     <Box
       w="100vw"
-      h="calc(100vh - 60px)" // Asegúrate de que esto reste exactamente la altura de la Navbar
+      h="calc(100vh - 260px)" // Asegúrate de que esto reste exactamente la altura de la Navbar
       bg="gray.900"
       display="flex"
       flexDirection="column"
