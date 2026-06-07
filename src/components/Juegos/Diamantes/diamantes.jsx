@@ -8,7 +8,7 @@ const Diamantes = () => {
   const jugadorID = currentUser?.id || "default-id"; // Valor por defecto si no hay usuario
 
   // URL del juego con el jugadorID
-  const gameURL = `https://html-classic.itch.zone/html/17835802/minas261/index.html?jugadorID=${jugadorID}`;
+  const gameURL = `https://minas2royal.s3.us-east-2.amazonaws.com/minas261/index.html?jugadorID=${jugadorID}`;
 
   return (
     <Box
