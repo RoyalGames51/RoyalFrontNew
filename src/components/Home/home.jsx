@@ -14,7 +14,7 @@ import rj from "../../assets/rj.png";
 
 // Generated Banners
 import casinoBanner from "../../assets/casino_banner.png";
-import sportsBanner from "../../assets/sports_banner.png";
+import sportsBanner from "../../assets/b1.jpg";
 import tournamentBanner from "../../assets/tournament_banner.png";
 import bannercelu from "../../assets/bannercelu.png";
 
@@ -319,10 +319,10 @@ export default function Home() {
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                   src={sportsBanner} 
                 />
-                <div className="absolute inset-0 bg-black/40 p-6 flex flex-col justify-end text-left">
+                {/* <div className="absolute inset-0 bg-black/40 p-6 flex flex-col justify-end text-left">
                   <h3 className="font-headline-sm text-headline-sm text-white">Recarga Semanal</h3>
                   <p className="text-on-surface-variant text-body-sm font-body-sm">Mejora tus fines de semana con un bono del 50%.</p>
-                </div>
+                </div> */}
               </div>
 
               <div 
@@ -334,10 +334,10 @@ export default function Home() {
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                   src={bannercelu} 
                 />
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent p-6 flex flex-col justify-end text-left">
+                {/* <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent p-6 flex flex-col justify-end text-left">
                   <h3 className="font-headline-sm text-headline-sm text-primary">Premios de Pragmatic</h3>
                   <p className="text-white text-body-sm font-body-sm">Ganancias diarias en todos tus favoritos.</p>
-                </div>
+                </div> */}
               </div>
             </div>
           </section>
@@ -346,7 +346,7 @@ export default function Home() {
           <section>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">history</span>
+                <span className="material-symbols-outlined text-primary">star</span>
                 <h2 className="font-headline-sm text-headline-sm text-white">Ultimos juegos</h2>
               </div>
               <button 
