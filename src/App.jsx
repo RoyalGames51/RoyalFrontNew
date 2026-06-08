@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Container, Box, Image, Button } from '@chakra-ui/react';
 import { useLocation } from 'react-router-dom';
 import Nav from './components/Nav/nav';
-import SideNavBar from './components/Nav/sideNavBar';
+// SideNavBar removed — no side navigation
 import Footer from './components/footer/footer';
 import { Route, Routes } from 'react-router-dom';
 import Home from './components/Home/home';
@@ -71,8 +71,7 @@ function App() {
       p={0}
     >
       <AuthProvider>
-        {currentUser?.id && <SideNavBar />}
-        <div className={`transition-all duration-300 min-h-screen flex flex-col ${currentUser?.id ? 'md:ml-[220px] pb-20 md:pb-0' : ''}`}>
+        <div className={`transition-all duration-300 min-h-screen flex flex-col pb-20`}>
           <Nav />
           <Routes>
             <Route path="/" element={<Home />} />

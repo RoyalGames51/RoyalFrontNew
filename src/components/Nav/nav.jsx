@@ -57,9 +57,7 @@ export default function Navbar() {
   }).format(currentUser?.chips ?? 0);
 
   return (
-    <header className={`fixed top-0 right-0 left-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm h-16 transition-all duration-300 ${
-      currentUser?.id ? 'md:left-[220px]' : 'left-0'
-    }`}>
+    <header className={`fixed top-0 right-0 left-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm h-16 transition-all duration-300 left-0`}>
       <div className="flex justify-between items-center h-16 px-4 md:px-margin-desktop w-full">
         {/* Left Section: Logo & Nav Links */}
         <div className="flex items-center gap-6">
