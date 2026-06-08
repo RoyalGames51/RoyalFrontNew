@@ -65,6 +65,7 @@ export default function Navbar() {
         <div className="flex items-center gap-6">
          
           <img src={rgamesLogo} className="h-8 md:h-10 w-auto object-contain" alt="RGAMES" />
+            <img src={rgamesLogo} alt="RGAMES" className="hidden md:inline-block w-8 h-8 mr-3 object-contain" style={{ transform: 'scale(1.2)', transformOrigin: 'left center' }} />
           {currentUser?.id ? (
             <>
               {/* Mobile Logo Only when Logged In */}
