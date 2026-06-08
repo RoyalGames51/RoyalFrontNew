@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import logo from '../../assets/logo.png';
+import rgamesLogo from '../../assets/rgames.png';
 import chips from '../../assets/chips.png';
 import { useSelector, useDispatch } from "react-redux";
 import Login from "../Login/login";
@@ -80,6 +81,7 @@ export default function Navbar() {
                     }`
                   }
                 >
+                  <img src={rgamesLogo} alt="RGAMES" className="inline-block w-5 h-5 mr-2 object-contain" />
                   Lobby
                 </NavLink>
 
@@ -148,6 +150,7 @@ export default function Navbar() {
                     }`
                   }
                 >
+                  <img src={rgamesLogo} alt="RGAMES" className="inline-block w-5 h-5 mr-2 object-contain" />
                   Lobby
                 </NavLink>
 
