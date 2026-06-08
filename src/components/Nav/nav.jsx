@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import logo from '../../assets/logo.png';
+import chips from '../../assets/chips.png';
 import { useSelector, useDispatch } from "react-redux";
 import Login from "../Login/login";
 import RegistroForm from "../Register/register";
@@ -51,10 +52,10 @@ export default function Navbar() {
     });
   };
 
-  const formattedChips = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(currentUser?.chips ?? 0);
+  const formattedChips = (() => {
+    const value = typeof currentUser?.chips === 'string' ? Number(currentUser.chips) : (currentUser?.chips ?? 0);
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Number.isFinite(value) ? value : 0);
+  })();
 
   return (
     <header className={`fixed top-0 right-0 left-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm h-16 transition-all duration-300 left-0`}>
@@ -201,6 +202,7 @@ export default function Navbar() {
             <div className="flex items-center gap-4">
               {/* Balance Pill */}
               <div className="hidden sm:flex items-center bg-surface-container rounded-full px-4 py-1.5 border border-outline-variant/20">
+                <img src={chips} alt="Chips" className="w-4 h-4 mr-2" />
                 <span className="text-primary font-bold text-label-lg font-label-lg">{formattedChips}</span>
               </div>
 

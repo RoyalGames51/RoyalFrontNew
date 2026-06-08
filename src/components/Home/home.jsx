@@ -249,10 +249,10 @@ export default function Home() {
 
   // 1. Authenticated User Lobby Dashboard
   if (currentUser?.id) {
-    const formattedChips = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(currentUser?.chips ?? 0);
+    const formattedChips = (() => {
+      const value = typeof currentUser?.chips === 'string' ? Number(currentUser.chips) : (currentUser?.chips ?? 0);
+      return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Number.isFinite(value) ? value : 0);
+    })();
 
     let vipLevel = "Bronce I";
     if (currentUser?.chips >= 1000000) {
