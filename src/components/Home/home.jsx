@@ -9,7 +9,7 @@ import juegoLoteria from "../../assets/IMG_4119.png";
 import juegoRuleta from "../../assets/ruleta.png";
 import juegoBingo from "../../assets/bingoproxi.png";
 import juegoMinas from "../../assets/minas2.png";
-import banner1 from "../../assets/banner1.jpg";
+import banner1 from "../../assets/banner1.png";
 import rj from "../../assets/rj.png";
 
 // Generated Banners
