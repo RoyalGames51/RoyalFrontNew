@@ -63,7 +63,8 @@ export default function Navbar() {
       <div className="flex justify-between items-center h-16 px-4 md:px-margin-desktop w-full">
         {/* Left Section: Logo & Nav Links */}
         <div className="flex items-center gap-6">
-          <img src={rgamesLogo} alt="RGAMES" className="hidden md:inline-block w-8 h-8 mr-3 object-contain" />
+         
+          <img src={rgamesLogo} className="h-8 md:h-10 w-auto object-contain" alt="RGAMES" />
           {currentUser?.id ? (
             <>
               {/* Mobile Logo Only when Logged In */}
@@ -133,7 +134,8 @@ export default function Navbar() {
               {/* Logo & Nav Links when Not Logged In */}
               <Link to="/" className="flex items-center">
                 {logo ? (
-                  <img src={rgamesLogo} className="h-8 md:h-10 w-auto object-contain" alt="RGAMES" />
+                  <h>
+                  </h>
                 ) : (
                   <span className="text-headline-md font-headline-md font-bold text-primary tracking-tighter">RGAMES</span>
                 )}
