@@ -20,6 +20,7 @@ import TermsAndConditions from './components/termsyConds/terminosYCondiciones';
 import axios from 'axios';
 
 import Diamantes from './components/Juegos/Diamantes/diamantes';
+import RoyalJoker from './components/Juegos/RoyalJoker/royaljoker';
 import API_URL from './api/rutaApi';
 
 import PaymentSuccess from './components/PaymentStatus/PaymentSuccess';
@@ -61,7 +62,7 @@ function App() {
     <Container
       bg="#16130d"
       color="#e9e1d7"
-      className="bg-background text-on-background min-h-screen"
+      className="bg-background text-on-background min-h-screen pt-16"
       maxW="100%"
       w="100%"
       maxH="100%"
@@ -85,6 +86,7 @@ function App() {
             <Route path="/noticias" element={<News />} />
             <Route path="/terminos-y-condiciones" element={<TermsAndConditions />} />
             <Route path="/play/minas" element={<Diamantes />} />
+            <Route path="/royaljoker" element={<RoyalJoker />} />
             
             {/* MercadoPago Status Routes */}
             <Route path="/mercadopago/success" element={<PaymentSuccess />} />
