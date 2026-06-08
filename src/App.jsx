@@ -62,7 +62,7 @@ function App() {
     <Container
       bg="#16130d"
       color="#e9e1d7"
-      className="bg-background text-on-background min-h-screen pt-16"
+      className="bg-background text-on-background min-h-screen"
       maxW="100%"
       w="100%"
       maxH="100%"
