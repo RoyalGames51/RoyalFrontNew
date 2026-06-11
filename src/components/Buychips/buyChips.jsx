@@ -435,34 +435,10 @@ export default function BuyChips() {
                 {/* Left Side: Configuration & Grid (Col-Span 7) */}
                 <div className="lg:col-span-7 space-y-8 text-left">
                   
-                  {/* Step 1: Country comes from user profile */}
+                  {/* Step 1: Select Chip Package */}
                   <div>
                     <label className="font-label-lg text-label-lg text-primary mb-3 block uppercase tracking-wider">
-                      1. País de Residencia (Perfil)
-                    </label>
-                    {!currentUser?.country ? (
-                      <div className="relative w-full max-w-sm p-4 bg-[#0A0A0F] border border-outline-variant/30 rounded-xl">
-                        <p className="text-sm text-on-surface-variant mb-3">No has configurado tu país en tu perfil. Debes actualizarlo para poder comprar fichas.</p>
-                        <button
-                          onClick={() => navigate('/perfil')}
-                          className="px-4 py-2 royal-gold-gradient rounded-lg text-[#0A0A0F] font-bold"
-                        >
-                          Actualizar Perfil
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="relative w-full max-w-sm">
-                        <div className="w-full bg-[#0A0A0F] border border-outline-variant/30 rounded-xl py-4 px-4 text-body-md text-white">
-                          {currentUser.country} ({resolvedConfigForUser ? resolvedConfigForUser.currency : 'USD'})
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Step 2: Select Chip Package */}
-                  <div>
-                    <label className="font-label-lg text-label-lg text-primary mb-3 block uppercase tracking-wider">
-                      2. Selecciona un Paquete de Fichas
+                      1. Selecciona un Paquete de Fichas
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                       {chipOptions.map((chip) => {
@@ -507,10 +483,10 @@ export default function BuyChips() {
                     </div>
                   </div>
 
-                  {/* Step 3: Select Payment Method */}
+                  {/* Step 2: Select Payment Method */}
                   <div>
                     <label className="font-label-lg text-label-lg text-primary mb-3 block uppercase tracking-wider">
-                      3. Método de Pago Disponible
+                      2. Método de Pago Disponible
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                       
@@ -530,19 +506,17 @@ export default function BuyChips() {
                       )}
 
                       {/* Mercado Pago Button */}
-                      {(currency === "MXN" || currency === "USD" || currency === "ARS") && (
-                        <button
-                          onClick={() => setPaymentMethod("mercadopago")}
-                          className={`glass-card p-4 rounded-xl flex flex-col items-center justify-center gap-2 border transition-all ${
-                            paymentMethod === "mercadopago"
-                              ? "border-primary bg-primary/5 shadow-md"
-                              : "border-outline-variant/30 hover:border-primary/45"
-                          }`}
-                        >
-                          <span className="material-symbols-outlined text-primary text-[28px]">qr_code_scanner</span>
-                          <span className="text-xs font-bold text-white">Mercado Pago</span>
-                        </button>
-                      )}
+                      <button
+                        onClick={() => setPaymentMethod("mercadopago")}
+                        className={`glass-card p-4 rounded-xl flex flex-col items-center justify-center gap-2 border transition-all ${
+                          paymentMethod === "mercadopago"
+                            ? "border-primary bg-primary/5 shadow-md"
+                            : "border-outline-variant/30 hover:border-primary/45"
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-primary text-[28px]">qr_code_scanner</span>
+                        <span className="text-xs font-bold text-white">Mercado Pago</span>
+                      </button>
 
                       {/* Visa / MasterCard */}
                       <button

@@ -2,6 +2,7 @@ import { useContext, createContext, useState, useEffect } from "react";
 import { authService } from "../services/authService";
 import { getUserByEmail } from "../redux/actions";
 import { useDispatch } from "react-redux";
+import axios from "axios";
 
 /**
  * Contexto de autenticación
@@ -39,6 +40,8 @@ export function AuthProvider({ children }) {
         const userEmail = localStorage.getItem('userEmail');
         
         if (token && userEmail) {
+            // ✅ Configurar axios.defaults con el token guardado
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             setIsAuthenticated(true);
             // Cargar usuario desde Redux para poblar currentUser
             dispatch(getUserByEmail(userEmail));
