@@ -24,6 +24,8 @@ import RoyalJoker from './components/Juegos/RoyalJoker/royaljoker';
 import API_URL from './api/rutaApi';
 import AboutUs from './components/AboutUs/aboutUs';
 import UserManagement from './components/AdminPanel/UserManagement/userManagement';
+import AdminDashboard from './components/AdminPanel/AdminDashboard/adminDashboard';
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
 import PaymentSuccess from './components/PaymentStatus/PaymentSuccess';
 import PaymentFailure from './components/PaymentStatus/PaymentFailure';
@@ -84,7 +86,8 @@ function App() {
             <Route path="/chips" element={<BuyChips />} />
             <Route path="/logout" element={<LogOut />} />
             <Route path="/panel" element={<Panel />} />
-            <Route path="/admin/users" element={<UserManagement />} />
+            <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
+            <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="/noticias" element={<News />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/terminos-y-condiciones" element={<TermsAndConditions />} />
