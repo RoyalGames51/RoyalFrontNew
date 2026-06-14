@@ -21,6 +21,7 @@ import axios from 'axios';
 
 import Diamantes from './components/Juegos/Diamantes/diamantes';
 import RoyalJoker from './components/Juegos/RoyalJoker/royaljoker';
+import RoyalPachinka from './components/Juegos/royalpachinka/royalpachinka';
 import API_URL from './api/rutaApi';
 import AboutUs from './components/AboutUs/aboutUs';
 import UserManagement from './components/AdminPanel/UserManagement/userManagement';
@@ -92,7 +93,8 @@ function App() {
             <Route path="/about" element={<AboutUs />} />
             <Route path="/terminos-y-condiciones" element={<TermsAndConditions />} />
             <Route path="/play/minas" element={<Diamantes />} />
-            <Route path="/royaljoker" element={<RoyalJoker />} />
+            <Route path="/play/royaljoker" element={<RoyalJoker />} />
+            <Route path="/play/royalpachinka" element={<RoyalPachinka />} />
             
             {/* MercadoPago Status Routes */}
             <Route path="/mercadopago/success" element={<PaymentSuccess />} />

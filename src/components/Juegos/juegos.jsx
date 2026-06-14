@@ -15,6 +15,8 @@ const GAMES = [
   { id: "a438f824-2f97-492d-89ba-73e213930ecb", src: juego2, path: "/ruleta", alt: "Ruleta" },
   { id: "02814291-c075-4b77-8105-10b912f9dd31", src: juego3, path: "/bingo", alt: "Bingo" },
   { id: "501ffe04-71e2-44c9-a06a-f97df1babd0a", src: juego4, path: "/play/minas", alt: "Minas" },
+  // Nuevo juego: Royal Pachinka
+  { id: "d9c2b8f0-7e6a-4c9a-9a2b-1f3e5a2b6c7d", src: juego1, path: "/play/royalpachinka", alt: "Royal Pachinka" },
 ];
 
 export default function GameGrid({ onlyFavorites = false, isPublicProfile = false }) {
@@ -44,7 +46,16 @@ export default function GameGrid({ onlyFavorites = false, isPublicProfile = fals
   }, [favoriteGames, onlyFavorites]);
 
   const handleGameClick = (gamePath) => {
-    navigate(gamePath);
+    try {
+      if (typeof gamePath === 'string' && (gamePath.startsWith('http://') || gamePath.startsWith('https://'))) {
+        // Abrir enlaces externos en nueva pestaña
+        window.open(gamePath, '_blank', 'noopener,noreferrer');
+      } else {
+        navigate(gamePath);
+      }
+    } catch (err) {
+      console.error('Error navigating to game:', err);
+    }
   };
 
 
