@@ -67,16 +67,19 @@ function App() {
     <Container
       bg="#16130d"
       color="#e9e1d7"
-      className="bg-background text-on-background min-h-screen"
+      className="bg-background text-on-background"
       maxW="100%"
       w="100%"
-      maxH="100%"
-      h="100%"
+      maxH="100vh"
+      h="100vh"
       mt={0}
       p={0}
+      overflow="hidden"
+      display="flex"
+      flexDirection="column"
     >
       <AuthProvider>
-        <div className={`transition-all duration-300 min-h-screen flex flex-col pb-20`}>
+        <div className={`transition-all duration-300 flex flex-col flex-1 overflow-hidden`}>
           <Nav />
           <Routes>
             <Route path="/" element={<Home />} />

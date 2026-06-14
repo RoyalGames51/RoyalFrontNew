@@ -26,9 +26,10 @@ export default function FavoriteButton({  gameId, isFavorite }) {
       aria-label="Toggle favorite"
       icon={isFavorite ? <FaHeart color="red" /> : <FaRegHeart />}
       position="absolute"
-      top="10px"
-      right="10px"
+      top={{ base: "6px", md: "10px" }}
+      right={{ base: "6px", md: "10px" }}
       bg="white"
+      size={{ base: "sm", md: "md" }}
       _hover={{ bg: "gray.100" }}
       onClick={(e) => {
         e.stopPropagation();

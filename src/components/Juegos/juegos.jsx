@@ -61,37 +61,64 @@ export default function GameGrid({ onlyFavorites = false, isPublicProfile = fals
 
 
   return (
-    <Box w="90%" m="0 auto" p="20px">
-      <Text fontSize="2xl" fontWeight="bold" textAlign="center" mb="20px" bgColor="gray.200" borderTopRadius="15px">
+    <Box w={{ base: "95%", sm: "90%", md: "85%", lg: "80%" }} m="0 auto" p={{ base: "12px", sm: "16px", md: "20px" }}>
+      <Text 
+        fontSize={{ base: "lg", sm: "xl", md: "2xl" }} 
+        fontWeight="bold" 
+        textAlign="center" 
+        mb={{ base: "16px", md: "20px" }} 
+        bgColor="gray.200" 
+        borderTopRadius="15px"
+        py={{ base: "10px", md: "12px" }}
+      >
         {onlyFavorites ? "Juegos Favoritos" : "Todos los Juegos"}
       </Text>
 
       {isLoading ? (
         <Box display="flex" justifyContent="center" alignItems="center" minH="300px">
-          <Spinner size="xl" />
+          <Spinner size={{ base: "md", md: "xl" }} />
         </Box>
       ) : filteredGames.length > 0 ? (
-        <Grid templateColumns="repeat(auto-fit, minmax(230px, 1fr))" gap="30px">
+        <Grid 
+          templateColumns={{
+            base: "repeat(2, 1fr)",
+            sm: "repeat(2, 1fr)",
+            md: "repeat(3, 1fr)",
+            lg: "repeat(4, 1fr)",
+          }}
+          gap={{ base: "12px", sm: "16px", md: "20px", lg: "30px" }}
+        >
           {filteredGames.map((game) => (
             <Box
               key={game.id}
               position="relative"
               overflow="hidden"
-              borderRadius="15px"
+              borderRadius={{ base: "10px", md: "15px" }}
               boxShadow="0 4px 10px rgba(0, 0, 0, 0.2)"
               cursor="pointer"
               transition="transform 0.3s, box-shadow 0.3s"
               _hover={{ transform: "scale(1.05)", boxShadow: "0 8px 20px rgba(0, 0, 0, 0.3)" }}
+              aspectRatio="1/1"
             >
               <Image
                 src={game.src}
                 alt={game.alt}
                 objectFit="contain"
                 w="100%"
-                h="225px"
+                h="100%"
                 onClick={() => handleGameClick(game.path)}
               />
-              <Box position="absolute" bottom="0" w="100%" bg="rgba(0, 0, 0, 0.5)" color="white" textAlign="center" py="10px">
+              <Box 
+                position="absolute" 
+                bottom="0" 
+                w="100%" 
+                bg="rgba(0, 0, 0, 0.5)" 
+                color="white" 
+                textAlign="center" 
+                py={{ base: "8px", md: "10px" }}
+                fontSize={{ base: "12px", md: "14px" }}
+                fontWeight="500"
+              >
                 {game.alt}
               </Box>
 
