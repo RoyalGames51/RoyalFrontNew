@@ -23,7 +23,7 @@ const RoyalPachinka = () => {
           bg="gray.800"
           overflow="hidden"
         >
-          <iframe
+          {/* <iframe
             src={gameURL}
             title="Royal Pachinka"
             style={{
@@ -34,7 +34,16 @@ const RoyalPachinka = () => {
               height: "calc(100% - 60px)",
               border: "none",
             }}
-          />
+          /> */}
+          <iframe
+    src={gameURL}
+    title="Royal Pachinka"
+    style={{
+        width: "100%",
+        height: "100%",
+        border: "none"
+    }}
+/>
         </Box>
       ) : (
         <Center h="100%">
