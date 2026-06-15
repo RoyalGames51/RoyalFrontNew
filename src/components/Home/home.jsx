@@ -11,6 +11,7 @@ import juegoBingo from "../../assets/bingoproxi.png";
 import juegoMinas from "../../assets/minas2.png";
 import banner1 from "../../assets/banner1.png";
 import rj from "../../assets/rj.png";
+import rpachinka from "../../assets/rpachinka.png";
 
 // Generated Banners
 import casinoBanner from "../../assets/casino_banner.png";
@@ -359,22 +360,22 @@ export default function Home() {
             
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {/* Game Item 1: Lotería Real */}
-              {/* <div 
-                onClick={() => handlePlayGame('/loteria-instantanea', 'Lotería Real')}
+              <div 
+                onClick={() => handlePlayGame('/play/royalpachinka', 'Royal Pachinka')}
                 className="group relative rounded-lg overflow-hidden border border-outline-variant/20 aspect-[4/3] cursor-pointer bg-surface-container"
               >
                 <img 
                   className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" 
-                  src={juegoLoteria} 
-                  alt="Lotería Real" 
+                  src={rpachinka} 
+                  alt="Royal Pachinka" 
                 />
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 backdrop-blur-[2px]">
                   <span className="material-symbols-outlined text-primary text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>play_circle</span>
                 </div>
                 <div className="absolute bottom-0 w-full p-2 bg-gradient-to-t from-black to-transparent text-left">
-                  <p className="text-[12px] font-bold text-white truncate">Lotería Real</p>
+                  <p className="text-[12px] font-bold text-white truncate">Royal Pachinka</p>
                 </div>
-              </div> */}
+              </div>
 
               {/* Game Item 2: VIP Roulette */}
               {/* <div 
@@ -396,7 +397,7 @@ export default function Home() {
 
               {/* Game Item 3: Bingo */}
               <div
-                onClick={() => handlePlayGame('/royaljoker', 'Royal Joker')}
+                onClick={() => handlePlayGame('/play/royaljoker', 'Royal Joker')}
                 className="group relative rounded-lg overflow-hidden border border-outline-variant/20 aspect-[4/3] cursor-pointer"
               >
                 <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-tr from-[#121212] to-[#1b1b1b]">
