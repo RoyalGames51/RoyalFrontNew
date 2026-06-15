@@ -9,17 +9,23 @@ const RoyalJoker = () => {
 
   return (
     <Box
-      w="100vw"
-      h="calc(100vh - 60px)"
+      w="100%"
+      h="100vh"
       bg="gray.900"
       display="flex"
       flexDirection="column"
+      position="fixed"
+      top="0"
+      left="0"
+      right="0"
+      overflow="hidden"
     >
       {jugadorID ? (
         <Box
           flex="1"
           position="relative"
           w="100%"
+          h="100%"
           bg="gray.800"
           overflow="hidden"
         >
@@ -27,18 +33,16 @@ const RoyalJoker = () => {
             src={gameURL}
             title="Royal Joker"
             style={{
-              position: "absolute",
-              top: "60px",
-              left: 0,
               width: "100%",
-              height: "calc(100% - 60px)",
+              height: "100%",
               border: "none",
+              display: "block",
             }}
           />
         </Box>
       ) : (
         <Center h="100%">
-          <Spinner size="xl" color="teal.300" />
+          <Spinner size={{ base: "md", md: "xl" }} color="teal.300" />
         </Center>
       )}
     </Box>

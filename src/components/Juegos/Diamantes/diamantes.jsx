@@ -13,18 +13,23 @@ const Diamantes = () => {
 
   return (
     <Box
-      w="100vw"
-      h="calc(100vh - 60px)" // Asegúrate de que esto reste exactamente la altura de la Navbar
+      w="100%"
+      h="100vh"
       bg="gray.900"
       display="flex"
       flexDirection="column"
+      position="fixed"
+      top="0"
+      left="0"
+      right="0"
+      overflow="hidden"
     >
-      {/* Contenedor del juego */}
       {jugadorID ? (
         <Box
-          flex="1" // Ocupa el espacio restante considerando la Navbar
+          flex="1"
           position="relative"
           w="100%"
+          h="100%"
           bg="gray.800"
           overflow="hidden"
         >
@@ -32,18 +37,16 @@ const Diamantes = () => {
             src={gameURL}
             title="Juego Minas"
             style={{
-              position: "absolute",
-              top: "60px",
-              left: 0,
               width: "100%",
-              height: "calc(100% - 60px)",
+              height: "100%",
               border: "none",
+              display: "block",
             }}
           />
         </Box>
       ) : (
         <Center h="100%">
-          <Spinner size="xl" color="teal.300" />
+          <Spinner size={{ base: "md", md: "xl" }} color="teal.300" />
         </Center>
       )}
     </Box>
