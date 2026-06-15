@@ -11,7 +11,7 @@ import juegoBingo from "../../assets/bingoproxi.png";
 import juegoMinas from "../../assets/minas2.png";
 import banner1 from "../../assets/banner1.png";
 import rj from "../../assets/rj.png";
-import rpachinka from "../../assets/rpachinka.png";
+import rpachinka from "../../assets/rpachinka2.png";
 
 // Generated Banners
 import casinoBanner from "../../assets/casino_banner.png";
