@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import API_URL from '../../../api/rutaApi';
+import UserDetailModal from './UserDetailModal';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -10,6 +11,8 @@ const UserManagement = () => {
   const [kycFilter, setKycFilter] = useState('all');
   const [countryFilter, setCountryFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch usuarios desde la API
   useEffect(() => {
@@ -78,8 +81,9 @@ const UserManagement = () => {
     );
   };
 
-  const handleActionView = (userId) => {
-    console.log('View user:', userId);
+  const handleActionView = (user) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
   };
 
   const handleActionEdit = (userId) => {
@@ -88,6 +92,26 @@ const UserManagement = () => {
 
   const handleActionBlock = (userId, currentStatus) => {
     console.log('Toggle block user:', userId, currentStatus);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  const handleUserUpdate = async () => {
+    // Recargar usuarios después de una acción
+    try {
+      const response = await axios.get(`${API_URL}/getUsers`);
+      setUsers(response.data);
+      // Actualizar el usuario seleccionado con los datos nuevos
+      const updatedUser = response.data.find(u => u.id === selectedUser.id);
+      if (updatedUser) {
+        setSelectedUser(updatedUser);
+      }
+    } catch (err) {
+      console.error('Error reloading users:', err);
+    }
   };
 
   if (loading) {
@@ -308,8 +332,9 @@ const UserManagement = () => {
                         <td className="px-6 py-5 text-right">
                           <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button 
-                              onClick={() => handleActionView(user.id)}
+                              onClick={() => handleActionView(user)}
                               className="p-2 text-on-surface-variant hover:text-primary transition-colors"
+                              title="Ver detalles"
                             >
                               <span className="material-symbols-outlined text-[20px]">visibility</span>
                             </button>
@@ -359,6 +384,14 @@ const UserManagement = () => {
           )}
         </div>
       </div>
+
+      {/* User Detail Modal */}
+      <UserDetailModal 
+        user={selectedUser} 
+        isOpen={isModalOpen} 
+        onClose={handleCloseModal}
+        onUserUpdate={handleUserUpdate}
+      />
     </div>
   );
 };
