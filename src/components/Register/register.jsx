@@ -102,22 +102,19 @@ const RegistroForm = ({ className, children }) => {
             );
             console.log("Signup y login exitosos", signupResponse);
 
-            const id = signupResponse?.id;
-            if (countUsers < 1000 && id) {
-                await axios.put(`${API_URL}/add/chips`, {
-                    userId: id,
-                    amount: 1000000,
-                });
-            } else if (countUsers >= 1000 && id) {
-                await axios.put(`${API_URL}/add/chips`, {
-                    userId: id,
-                    amount: 10000,
-                });
-            }
-
             await dispatch(getUserByEmail(input.email));
 
-            Swal.fire("¡Éxito!", "Tu cuenta ha sido creada exitosamente", "success");
+            // Show appropriate message based on whether they received first chips
+            if (signupResponse?.firstChipsReceived) {
+                Swal.fire(
+                    "¡Felicidades!",
+                    "¡Ganaste 1,000,000 de fichas por ser uno de los primeros 100 usuarios!",
+                    "success"
+                );
+            } else {
+                Swal.fire("¡Éxito!", "Tu cuenta ha sido creada exitosamente", "success");
+            }
+
             setIsRegisterOpen(false);
             navigate('/');
         } catch (error) {
