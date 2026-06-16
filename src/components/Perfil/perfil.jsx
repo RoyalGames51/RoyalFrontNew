@@ -444,21 +444,6 @@ const Perfil = ({ isPublic = false }) => {
         {/* Right Column: Secondary Info Cards */}
         <div className="lg:col-span-4 flex flex-col gap-gutter">
           
-          {/* Verification Status */}
-          <div className="glass-card p-6 rounded-xl border-l-4 border-l-primary">
-            <div className="flex items-center gap-4 mb-4">
-              <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>verified_user</span>
-              <h4 className="font-headline-sm text-headline-sm text-white">Verification</h4>
-            </div>
-            <p className="text-on-surface-variant font-body-sm text-body-sm mb-6 leading-relaxed">
-              Your account is fully verified. You have unlimited access to all VIP features and withdrawal limits.
-            </p>
-            <div className="flex items-center gap-2 text-primary font-label-md text-label-md">
-              <span className="material-symbols-outlined text-sm">check_circle</span>
-              <span>Level 3 KYC Complete</span>
-            </div>
-          </div>
-
           {/* VIP Card */}
           <div className="glass-card p-6 rounded-xl relative overflow-hidden group">
             <div className="absolute -right-8 -bottom-8 w-32 h-32 royal-gold-gradient opacity-10 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>

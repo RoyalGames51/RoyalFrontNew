@@ -70,16 +70,14 @@ function App() {
       className="bg-background text-on-background"
       maxW="100%"
       w="100%"
-      maxH="100vh"
-      h="100vh"
       mt={0}
       p={0}
-      overflow="hidden"
       display="flex"
       flexDirection="column"
+      minH="100vh"
     >
       <AuthProvider>
-        <div className={`transition-all duration-300 flex flex-col flex-1 overflow-hidden`}>
+        <div className={`transition-all duration-300 flex flex-col flex-1`}>
           <Nav />
           <Routes>
             <Route path="/" element={<Home />} />
