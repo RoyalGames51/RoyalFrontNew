@@ -36,19 +36,41 @@ export function AuthProvider({ children }) {
      * Si existe token, también carga los datos del usuario
      */
     useEffect(() => {
-        const token = authService.getToken();
-        const userEmail = localStorage.getItem('userEmail');
-        
-        if (token && userEmail) {
-            // ✅ Configurar axios.defaults con el token guardado
+        const restoreSession = async () => {
+            const token = authService.getToken();
+            const userEmail = localStorage.getItem('userEmail');
+
+            if (!token || !userEmail) {
+                authService.clearSession();
+                setIsAuthenticated(false);
+                setUser(null);
+                setLoading(false);
+                return;
+            }
+
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+            const isValid = await authService.validateStoredSession();
+            if (!isValid) {
+                setIsAuthenticated(false);
+                setUser(null);
+                setLoading(false);
+                return;
+            }
+
             setIsAuthenticated(true);
-            // Cargar usuario desde Redux para poblar currentUser
-            dispatch(getUserByEmail(userEmail));
-        } else {
-            setIsAuthenticated(false);
-        }
-        setLoading(false);
+            try {
+                const refreshedUser = await dispatch(getUserByEmail(userEmail));
+                setUser(refreshedUser || null);
+            } catch (error) {
+                authService.clearSession();
+                setIsAuthenticated(false);
+                setUser(null);
+            }
+            setLoading(false);
+        };
+
+        restoreSession();
     }, [dispatch]);
 
     /**

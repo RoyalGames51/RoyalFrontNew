@@ -94,4 +94,26 @@ export const authService = {
     localStorage.removeItem('userEmail');
     delete axios.defaults.headers.common['Authorization'];
   },
+
+  validateStoredSession: async () => {
+    const token = localStorage.getItem('token');
+    const userEmail = localStorage.getItem('userEmail');
+
+    if (!token || !userEmail) {
+      authService.clearSession();
+      return false;
+    }
+
+    try {
+      await axios.get(`${API_URL}/user-email?email=${encodeURIComponent(userEmail)}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return true;
+    } catch (error) {
+      authService.clearSession();
+      return false;
+    }
+  },
 };
