@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import GameGrid from "./../Juegos/juegos";
+import API_URL from "../../api/rutaApi";
 import { fetchFavoriteGames, fetchPublicFavorites, viewedUserProfile, updateUserProfile } from "./../../redux/actions/index";
 
 const countryOptions = [
@@ -54,6 +55,8 @@ const Perfil = ({ isPublic = false }) => {
       dispatch(fetchFavoriteGames(currentUser.id));
     }
   }, [dispatch, isPublic, currentUser?.id]);
+
+  const avatarSrc = user?.id ? `${API_URL}/user/${user.id}/avatar-image` : null;
 
   useEffect(() => {
     if (user) {
@@ -162,12 +165,23 @@ const Perfil = ({ isPublic = false }) => {
         <div className="flex flex-col md:flex-row items-center md:items-end gap-8">
           
           <div className="relative group">
-            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-primary/20 p-1 flex items-center justify-center relative gold-glow overflow-hidden bg-[#12121A]">
-              {user.image || user.avatar ? (
+            <div className="w-44 h-44 md:w-52 md:h-52 rounded-full border-4 border-primary/20 p-1 flex items-center justify-center relative gold-glow overflow-hidden bg-[#12121A]">
+              {avatarSrc ? (
                 <img
                   alt="User Avatar"
                   className="w-full h-full rounded-full object-cover"
-                  src={user.image || user.avatar}
+                  src={avatarSrc}
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    target.onerror = null;
+                    target.src = user.image || "https://via.placeholder.com/300";
+                  }}
+                />
+              ) : user.image ? (
+                <img
+                  alt="User Avatar"
+                  className="w-full h-full rounded-full object-cover"
+                  src={user.image}
                 />
               ) : (
                 <div className="w-full h-full rounded-full royal-gold-gradient flex items-center justify-center text-surface-container-lowest font-display-lg text-display-lg font-bold">

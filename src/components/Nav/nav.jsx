@@ -227,13 +227,18 @@ export default function Navbar() {
 
               {/* User Avatar */}
               <div
-                className="w-8 h-8 rounded-full overflow-hidden border border-primary/30 cursor-pointer hover:border-primary transition-colors"
+                className="w-12 h-12 rounded-full overflow-hidden border border-primary/30 cursor-pointer hover:border-primary transition-colors"
                 onClick={() => navigate('/perfil')}
               >
                 <img
                   alt="User Avatar"
                   className="w-full h-full object-cover"
                   src={avatarSrc}
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    target.onerror = null;
+                    target.src = currentUser.image || "https://via.placeholder.com/150";
+                  }}
                 />
               </div>
 
