@@ -165,11 +165,11 @@ const Perfil = ({ isPublic = false }) => {
         <div className="flex flex-col md:flex-row items-center md:items-end gap-8">
           
           <div className="relative group">
-            <div className="w-44 h-44 md:w-52 md:h-52 rounded-full border-4 border-primary/20 p-1 flex items-center justify-center relative gold-glow overflow-hidden bg-[#12121A]">
+            <div className="w-44 h-44 md:w-52 md:h-52 flex items-center justify-center relative bg-transparent overflow-visible">
               {avatarSrc ? (
                 <img
                   alt="User Avatar"
-                  className="w-full h-full rounded-full object-cover"
+                  className="w-full h-full object-contain"
                   src={avatarSrc}
                   onError={(e) => {
                     const target = e.currentTarget;
@@ -180,7 +180,7 @@ const Perfil = ({ isPublic = false }) => {
               ) : user.image ? (
                 <img
                   alt="User Avatar"
-                  className="w-full h-full rounded-full object-cover"
+                  className="w-full h-full object-contain"
                   src={user.image}
                 />
               ) : (
