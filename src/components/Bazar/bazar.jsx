@@ -1,28 +1,51 @@
-import { useEffect } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Box, Spinner, Center } from "@chakra-ui/react";
 
 const Bazar = () => {
-  const { currentUser } = useSelector((state) => state);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!currentUser?.id) {
-      navigate("/");
-      return;
-    }
-
-    // Redireccionar al bazar con el parámetro jugadorID
-    const bazarUrl = `https://baazaar.s3.us-east-2.amazonaws.com/bazar/index.html?jugadorID=${currentUser.id}`;
-    window.location.href = bazarUrl;
-  }, [currentUser, navigate]);
+  const currentUser = useSelector((state) => state.currentUser);
+  const jugadorID = currentUser?.id || "default-id";
+  const bazarURL = `https://baazaar.s3.us-east-2.amazonaws.com/bazar/index.html?jugadorID=${jugadorID}`;
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <div className="text-center">
-        <p className="text-on-surface font-body-lg">Redireccionando al Bazar...</p>
-      </div>
-    </div>
+    <Box
+      w="100%"
+      h="100vh"
+      bg="gray.900"
+      display="flex"
+      flexDirection="column"
+      position="fixed"
+      top="0"
+      left="0"
+      right="0"
+      overflow="hidden"
+    >
+      {jugadorID ? (
+        <Box
+          flex="1"
+          position="relative"
+          w="100%"
+          h="100%"
+          bg="gray.800"
+          overflow="hidden"
+        >
+          <iframe
+            src={bazarURL}
+            title="Bazar"
+            style={{
+              width: "100%",
+              height: "100%",
+              border: "none",
+              display: "block",
+            }}
+          />
+        </Box>
+      ) : (
+        <Center h="100%">
+          <Spinner size={{ base: "md", md: "xl" }} color="teal.300" />
+        </Center>
+      )}
+    </Box>
   );
 };
 
