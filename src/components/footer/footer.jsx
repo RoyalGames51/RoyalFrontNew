@@ -37,13 +37,8 @@ function Footer() {
 
         {/* Col 3: Payment Methods & Copyright */}
         <div className="flex flex-col gap-4">
-          <h5 className="text-white font-bold mb-1">Métodos de Pago</h5>
-          <div className="flex flex-wrap gap-3 opacity-50">
-            <div className="w-12 h-8 bg-surface-variant rounded flex items-center justify-center font-bold text-[10px] text-white">VISA</div>
-            <div className="w-12 h-8 bg-surface-variant rounded flex items-center justify-center font-bold text-[10px] text-white">MC</div>
-            <div className="w-12 h-8 bg-surface-variant rounded flex items-center justify-center font-bold text-[10px] text-white">BTC</div>
-            <div className="w-12 h-8 bg-surface-variant rounded flex items-center justify-center font-bold text-[10px] text-white">ETH</div>
-          </div>
+         
+         
           <p className="text-on-surface-variant font-body-sm mt-4">
             © 2024 RGAMES. Todos los derechos reservados. Licenciado y regulado.
           </p>
