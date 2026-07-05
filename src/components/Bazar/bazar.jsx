@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { useSelector, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const Bazar = () => {
   const { currentUser } = useSelector((state) => state);
