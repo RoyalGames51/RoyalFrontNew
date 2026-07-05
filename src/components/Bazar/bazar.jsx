@@ -5,7 +5,8 @@ import { Box, Spinner, Center } from "@chakra-ui/react";
 const Bazar = () => {
   const currentUser = useSelector((state) => state.currentUser);
   const jugadorID = currentUser?.id || "default-id";
-  const bazarURL = `https://baazaar.s3.us-east-2.amazonaws.com/bazar/index.html?jugadorID=${jugadorID}`;
+  const token = localStorage.getItem("token") || "";
+  const bazarURL = `https://baazaar.s3.us-east-2.amazonaws.com/bazar/index.html?jugadorID=${jugadorID}&token=${encodeURIComponent(token)}`;
 
   return (
     <Box
