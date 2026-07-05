@@ -31,6 +31,7 @@ import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import PaymentSuccess from './components/PaymentStatus/PaymentSuccess';
 import PaymentFailure from './components/PaymentStatus/PaymentFailure';
 import PaymentPending from './components/PaymentStatus/PaymentPending';
+import Bazar from './components/Bazar/bazar';
 
 function App() {
   const [showWelcomeGift, setShowWelcomeGift] = useState(false);
@@ -96,6 +97,7 @@ function App() {
             <Route path="/play/minas" element={<Diamantes />} />
             <Route path="/play/royaljoker" element={<RoyalJoker />} />
             <Route path="/play/royalpachinka" element={<RoyalPachinka />} />
+            <Route path="/bazar" element={<Bazar />} />
             
             {/* MercadoPago Status Routes */}
             <Route path="/mercadopago/success" element={<PaymentSuccess />} />

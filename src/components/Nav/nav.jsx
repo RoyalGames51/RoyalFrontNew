@@ -225,21 +225,23 @@ export default function Navbar() {
                 <span className="material-symbols-outlined">notifications</span>
               </button>
 
-              {/* User Avatar */}
-              <div
-                className="w-12 h-12 rounded-full overflow-hidden border border-primary/30 cursor-pointer hover:border-primary transition-colors"
-                onClick={() => navigate('/perfil')}
-              >
-                <img
-                  alt="User Avatar"
-                  className="w-full h-full object-cover"
-                  src={avatarSrc}
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    target.onerror = null;
-                    target.src = currentUser.image || "https://via.placeholder.com/150";
-                  }}
-                />
+              {/* User Avatar & Nick */}
+              <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/bazar')}>
+                <div className="w-12 h-12 rounded-full overflow-hidden border border-primary/30 hover:border-primary transition-colors">
+                  <img
+                    alt="User Avatar"
+                    className="w-full h-full object-cover"
+                    src={avatarSrc}
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      target.onerror = null;
+                      target.src = currentUser.image || "https://via.placeholder.com/150";
+                    }}
+                  />
+                </div>
+                <span className="hidden sm:block text-on-surface font-body-md text-body-md">
+                  {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "User"}
+                </span>
               </div>
 
               {/* Logout button */}
