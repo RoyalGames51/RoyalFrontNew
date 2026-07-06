@@ -211,25 +211,11 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           {currentUser?.id ? (
             <div className="flex items-center gap-4">
-              {/* Balance Pill */}
-              <div className="hidden sm:flex items-center bg-surface-container rounded-full px-4 py-1.5 border border-outline-variant/20">
-                <img src={chips} alt="Chips" className="w-4 h-4 mr-2" />
-                <span className="text-primary font-bold text-label-lg font-label-lg">{formattedChips}</span>
-              </div>
-
-              {/* Notification Bell */}
-              <button
-                onClick={handleNotificationAlert}
-                className="text-on-surface-variant hover:opacity-80 transition-opacity bg-transparent border-0 cursor-pointer flex items-center p-1"
-              >
-                <span className="material-symbols-outlined">notifications</span>
-              </button>
-
-              <div className="hidden sm:flex items-center gap-3 bg-blue-800/95 border border-blue-500/20 rounded-full px-3 py-2 shadow-xl shadow-blue-900/20">
+              <div className="hidden sm:flex items-center gap-3 bg-[#17203b] border border-blue-500/15 rounded-full px-3 py-2 shadow-[0_10px_25px_rgba(12,25,60,0.35)] max-w-[19rem]">
                 <button
                   type="button"
                   onClick={() => navigate('/bazar')}
-                  className="w-14 h-14 rounded-full overflow-hidden border border-blue-400/30 hover:border-blue-200 transition-colors focus:outline-none"
+                  className="w-14 h-14 rounded-full overflow-hidden border border-blue-400/20 hover:border-blue-200 transition-all duration-200 focus:outline-none"
                 >
                   <img
                     alt="User Avatar"
@@ -242,16 +228,18 @@ export default function Navbar() {
                     }}
                   />
                 </button>
-                <div className="flex flex-col min-w-[120px]">
-                  <span
-                    className="text-white font-semibold text-sm cursor-pointer hover:text-blue-200"
+                <div className="flex-1 min-w-0">
+                  <button
+                    type="button"
                     onClick={() => navigate('/perfil')}
+                    className="w-full text-left text-white font-semibold text-sm truncate hover:text-blue-100"
                   >
                     {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "User"}
-                  </span>
-                  <span className="text-blue-100 text-xs leading-none">
-                    {formattedChips} fichas
-                  </span>
+                  </button>
+                  <div className="inline-flex items-center gap-2 text-blue-100 text-[11px] tracking-[0.08em] uppercase">
+                    <img src={chips} alt="Chips" className="w-3.5 h-3.5" />
+                    <span>{formattedChips} fichas</span>
+                  </div>
                 </div>
               </div>
 
