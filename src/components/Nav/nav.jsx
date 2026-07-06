@@ -227,7 +227,7 @@ export default function Navbar() {
 
               {/* User Avatar & Nick */}
               <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/bazar')}>
-                <div className="w-12 h-12 rounded-full overflow-hidden">
+                <div className="w-14 h-14  overflow-hidden">
                   <img
                     alt="User Avatar"
                     className="w-full h-full object-cover"
@@ -239,7 +239,10 @@ export default function Navbar() {
                     }}
                   />
                 </div>
-                <span className="hidden sm:block text-on-surface font-body-md text-body-md">
+                <span
+                  className="hidden sm:block text-on-surface font-body-md text-body-md hover:text-primary transition-colors"
+                  onClick={() => navigate('/perfil')}
+                >
                   {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "User"}
                 </span>
               </div>
