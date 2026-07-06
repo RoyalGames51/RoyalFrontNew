@@ -210,8 +210,8 @@ export default function Navbar() {
         {/* Right Section: Notification, Buy Chips / User Profile / Login */}
         <div className="flex items-center gap-4">
           {currentUser?.id ? (
-            <div className="flex items-center gap-4">
-              <div className="hidden sm:flex items-center gap-3 bg-[#34363B] border border-blue-500/15 rounded-full px-3 py-2 shadow-[0_10px_25px_rgba(12,25,60,0.35)] max-w-[19rem]">
+            <div className="flex items-center gap-4" margin-top="0.5rem">
+              <div className="hidden sm:flex items-center gap-3 bg-[#222326] border border-blue-500/15 rounded-full px-3 py-2 shadow-[0_10px_25px_rgba(12,25,60,0.35)] max-w-[19rem]">
                 <button
                   type="button"
                   onClick={() => navigate('/bazar')}
