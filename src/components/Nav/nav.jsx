@@ -64,7 +64,7 @@ export default function Navbar() {
     : "https://lh3.googleusercontent.com/aida-public/AB6AXuCpCcNDDLhupT0iOwy1efwVKGf6ATUKCy6U7q50kyjk86DZ0ESSWDYB3IrG_VbQ2nLajCDmLvXOct59w89ERq7kJydta4x2rtj18hF3ffoEPNHFxRiAJHXOp4-joRLAss2GIpXRWXEpfCcn17eLUjcdKtMQDo4p-lNCzppHIIyPmM_WXToorkNt3NbXKLAfPkWDm4ln0gxkOhUv8fxWHOTdBFnPxsnTABAi2RPFBg9hCCwRzQGJ6YIBJ6Bvk8_pA9vPVUZpUJk60PQ";
 
   return (
-    <header className={`sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm h-20 transition-all duration-300`}>
+    <header className={`sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm h-20 transition-all duration-300 p-4` }>
       <div className="flex justify-between items-center h-16 px-4 md:px-margin-desktop w-full">
         {/* Left Section: Logo & Nav Links */}
         <div className="flex items-center gap-6">
@@ -208,7 +208,7 @@ export default function Navbar() {
         </div>
 
         {/* Right Section: Notification, Buy Chips / User Profile / Login */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4" mt-3>
           {currentUser?.id ? (
             <div className="flex items-center gap-4" mt-3>
               <div className="hidden sm:flex items-center gap-3 bg-[#222326] border border-blue-500/15 rounded-full px-3 py-2 shadow-[0_10px_25px_rgba(12,25,60,0.35)] max-w-[19rem] mt-3">
