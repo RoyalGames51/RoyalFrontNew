@@ -211,7 +211,7 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           {currentUser?.id ? (
             <div className="flex items-center gap-4" >
-              <div className="hidden sm:flex items-center gap-3 bg-[#222326] border border-blue-500/15 rounded-full px-3 py-2 shadow-[0_10px_25px_rgba(12,25,60,0.35)] max-w-[19rem] mt-1">
+              <div className="hidden sm:flex items-center gap-3 bg-[#222326] border border-blue-500/15 rounded-full px-3 py-2 shadow-[0_10px_25px_rgba(12,25,60,0.35)] max-w-[19rem] mt-3">
                 <button
                   type="button"
                   onClick={() => navigate('/bazar')}
@@ -236,7 +236,7 @@ export default function Navbar() {
                   >
                     {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "User"}
                   </button>
-                  <div className="inline-flex items-center gap-2 text-blue-100 text-[11px] tracking-[0.08em] uppercase">
+                  <div className="inline-flex items-center gap-2 text-blue-100 text-[11px] tracking-[0.08em] uppercase mt-1">
                     <img src={chips} alt="Chips" className="w-3.5 h-3.5" />
                     <span>{formattedChips} fichas</span>
                   </div>
