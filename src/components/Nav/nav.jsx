@@ -211,11 +211,11 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           {currentUser?.id ? (
             <div className="flex items-center gap-4">
-              <div className="hidden sm:flex items-center gap-3 bg-[#17203b] border border-blue-500/15 rounded-full px-3 py-2 shadow-[0_10px_25px_rgba(12,25,60,0.35)] max-w-[19rem]">
+              <div className="hidden sm:flex items-center gap-3 bg-[#354257] border border-blue-500/15 rounded-full px-3 py-2 shadow-[0_10px_25px_rgba(12,25,60,0.35)] max-w-[19rem]">
                 <button
                   type="button"
                   onClick={() => navigate('/bazar')}
-                  className="w-14 h-14 rounded-full overflow-hidden border border-blue-400/20 hover:border-blue-200 transition-all duration-200 focus:outline-none"
+                  className="w-14 h-14 rounded-full overflow-hidden border  transition-all duration-200 focus:outline-none"
                 >
                   <img
                     alt="User Avatar"
