@@ -225,9 +225,12 @@ export default function Navbar() {
                 <span className="material-symbols-outlined">notifications</span>
               </button>
 
-              {/* User Avatar & Nick */}
-              <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/bazar')}>
-                <div className="w-14 h-14  overflow-hidden">
+              <div className="hidden sm:flex items-center gap-3 bg-blue-800/95 border border-blue-500/20 rounded-full px-3 py-2 shadow-xl shadow-blue-900/20">
+                <button
+                  type="button"
+                  onClick={() => navigate('/bazar')}
+                  className="w-14 h-14 rounded-full overflow-hidden border border-blue-400/30 hover:border-blue-200 transition-colors focus:outline-none"
+                >
                   <img
                     alt="User Avatar"
                     className="w-full h-full object-cover"
@@ -238,13 +241,18 @@ export default function Navbar() {
                       target.src = currentUser.image || "https://via.placeholder.com/150";
                     }}
                   />
+                </button>
+                <div className="flex flex-col min-w-[120px]">
+                  <span
+                    className="text-white font-semibold text-sm cursor-pointer hover:text-blue-200"
+                    onClick={() => navigate('/perfil')}
+                  >
+                    {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "User"}
+                  </span>
+                  <span className="text-blue-100 text-xs leading-none">
+                    {formattedChips} fichas
+                  </span>
                 </div>
-                <span
-                  className="hidden sm:block text-on-surface font-body-md text-body-md hover:text-primary transition-colors"
-                  onClick={() => navigate('/perfil')}
-                >
-                  {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "User"}
-                </span>
               </div>
 
               {/* Logout button */}
