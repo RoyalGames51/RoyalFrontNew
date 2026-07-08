@@ -57,15 +57,21 @@ export const authService = {
         token: googleToken,
       });
       const { access_token, user } = response.data;
-      
+
       localStorage.setItem('token', access_token);
+      if (user && user.email) {
+        localStorage.setItem('userEmail', user.email);
+      } else {
+        console.warn("El objeto user o user.email no vino en la respuesta del backend:", user);
+      }
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      
-      return { access_token, user };
+
+      return response.data; // Retornamos todo el response.data para tener access_token, user y firstChipsReceived
     } catch (error) {
       throw error.response?.data || error.message;
     }
   },
+
 
   /**
    * Logout - limpia los datos locales

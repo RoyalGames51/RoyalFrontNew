@@ -25,6 +25,27 @@ export const useAuth = () => {
  * Proveedor del contexto de autenticación
  * Proporciona funciones de autenticación a todos los componentes
  */
+// Helper para decodificar payloads de JWT de forma segura
+const decodeJwt = (token) => {
+    try {
+        if (!token) return null;
+        const parts = token.split('.');
+        if (parts.length < 2) return null;
+        const base64Url = parts[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split('')
+                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        console.error("Error decodificando JWT:", e);
+        return null;
+    }
+};
+
 export function AuthProvider({ children }) {
     const dispatch = useDispatch();
     const [user, setUser] = useState(null);
@@ -38,14 +59,30 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const restoreSession = async () => {
             const token = authService.getToken();
-            const userEmail = localStorage.getItem('userEmail');
+            let userEmail = localStorage.getItem('userEmail');
 
-            if (!token || !userEmail) {
+            // Si el token es inválido o no existe, limpiar sesión
+            if (!token) {
                 authService.clearSession();
                 setIsAuthenticated(false);
                 setUser(null);
                 setLoading(false);
                 return;
+            }
+
+            // Fallback robusto: si el email es nulo o el string "undefined", lo extraemos del JWT
+            if (!userEmail || userEmail === "undefined") {
+                const payload = decodeJwt(token);
+                if (payload?.email) {
+                    userEmail = payload.email;
+                    localStorage.setItem('userEmail', userEmail);
+                } else {
+                    authService.clearSession();
+                    setIsAuthenticated(false);
+                    setUser(null);
+                    setLoading(false);
+                    return;
+                }
             }
 
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -107,23 +144,40 @@ export function AuthProvider({ children }) {
     };
 
     /**
-     * Login con Google (implementar cuando el backend soporte)
+     * Login con Google
      */
     const loginWithGoogle = async (googleToken) => {
         try {
-            const { access_token, user: userData } = await authService.loginWithGoogle(googleToken);
+            const { access_token, user: userData, firstChipsReceived } = await authService.loginWithGoogle(googleToken);
             setIsAuthenticated(true);
-            
-            // Cargar datos del usuario en Redux y usar el perfil actualizado
-            const refreshedUser = await dispatch(getUserByEmail(userData.email));
+
+            // Obtener email con fallback robusto (userData -> localStorage -> JWT decoding)
+            let email = userData?.email;
+            if (!email || email === "undefined") {
+                email = localStorage.getItem('userEmail');
+            }
+            if (!email || email === "undefined") {
+                const payload = decodeJwt(access_token);
+                email = payload?.email;
+            }
+
+            if (!email || email === "undefined") {
+                throw new Error('No se pudo extraer el email del token de Google o del backend');
+            }
+
+            // Aseguramos que quede bien guardado en localStorage
+            localStorage.setItem('userEmail', email);
+
+            const refreshedUser = await dispatch(getUserByEmail(email));
             setUser(refreshedUser || userData);
-            
-            return { access_token, user: refreshedUser || userData };
+
+            return { access_token, firstChipsReceived, user: refreshedUser || userData };
         } catch (error) {
-            console.error("Error al iniciar sesión con Google:", error);
+            console.error('Error al iniciar sesión con Google:', error);
             throw error;
         }
     };
+
 
     /**
      * Cierra la sesión del usuario
