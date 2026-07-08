@@ -85,10 +85,14 @@ export default function Login({ className, children }) {
             callback: async (response) => {
                 try {
                     Swal.fire({ title: "Iniciando sesión con Google...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                    await auth.loginWithGoogle(response.credential);
+                    const result = await auth.loginWithGoogle(response.credential);
                     setIsLoginOpen(false);
                     navigate('/');
-                    Swal.fire({ position: "center", icon: "success", title: "¡Inicio de sesión exitoso!", showConfirmButton: false, timer: 2500 });
+                    if (result?.firstChipsReceived) {
+                        Swal.fire("¡Felicidades!", "¡Ganaste 1,000,000 de fichas por ser uno de los primeros 100 usuarios!", "success");
+                    } else {
+                        Swal.fire({ position: "center", icon: "success", title: "¡Inicio de sesión exitoso!", showConfirmButton: false, timer: 2500 });
+                    }
                 } catch (error) {
                     Swal.fire({ icon: "error", title: "Error con Google", text: error?.message || "No se pudo completar el inicio de sesión.", confirmButtonColor: "#C9A84C" });
                 }
@@ -99,7 +103,15 @@ export default function Login({ className, children }) {
     // 2) Renderiza el botón oficial de Google cuando el modal abre
     //    (el div ref solo existe en el DOM cuando isLoginOpen = true)
     useEffect(() => {
-        if (!isLoginOpen || !googleBtnRef.current || !window.google?.accounts?.id) return;
+        if (!isLoginOpen) return;
+        
+        const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+        if (!googleBtnRef.current || !window.google?.accounts?.id) {
+            console.warn("[GSI Diagnostic] El contenedor del botón o el SDK de Google no están listos.");
+            return;
+        }
+
         window.google.accounts.id.renderButton(googleBtnRef.current, {
             theme: "outline",
             size: "large",
@@ -107,6 +119,7 @@ export default function Login({ className, children }) {
             text: "continue_with",
         });
     }, [isLoginOpen]);
+
 
     const handleRegister = (e) => {
         e.preventDefault();
