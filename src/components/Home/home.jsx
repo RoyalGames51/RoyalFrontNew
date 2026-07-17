@@ -913,7 +913,7 @@ export default function Home() {
                 className="bg-surface-container rounded-xl p-6 border border-outline-variant/20 flex items-center gap-4 relative overflow-hidden group cursor-pointer text-left"
               >
                 <div className="relative z-10 flex-1">
-                  <h4 className="font-bold text-headline-sm text-headline-sm text-white">VIP Daily Spin</h4>
+                  <h4 className="font-bold text-headline-sm text-white">VIP Daily Spin</h4>
                   <p className="text-on-surface-variant text-body-sm font-body-sm">Tu regalo diario está listo para reclamar.</p>
                 </div>
                 <span className="material-symbols-outlined text-primary text-5xl relative z-10 group-hover:scale-110 transition-transform">redeem</span>
