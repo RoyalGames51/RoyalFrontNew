@@ -79,7 +79,7 @@ function App() {
     >
       <AuthProvider>
         <div className={`transition-all duration-300 flex flex-col flex-1`}>
-          <Nav />
+          {location.pathname !== "/" && <Nav />}
           <Routes>
             <Route path="/" element={<Home />} />
           

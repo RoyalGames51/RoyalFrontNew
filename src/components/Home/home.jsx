@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
+import * as THREE from 'three';
 
 // Import local assets for Vite bundling
 import logoImg from "../../assets/logo.png";
@@ -22,11 +23,15 @@ import bannercelu from "../../assets/bannercelu.png";
 // Import auth triggers to open login/register modals
 import Login from "../Login/login";
 import RegistroForm from "../Register/register";
+import { ShaderAnimation } from "../ui/shader-animation";
 
 export default function Home() {
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state);
   const particlesContainerRef = useRef(null);
+  const shaderCanvasRef = useRef(null);
+  const threeDChipRef = useRef(null);
+  const chipSpinSpeedRef = useRef(0.015);
 
   // Countdown timer state for the live tournament widget
   const [timeLeft, setTimeLeft] = useState({ days: 2, hours: 14, minutes: 55, seconds: 0 });
@@ -40,104 +45,354 @@ export default function Home() {
     { user: "PlayerOne", amount: "$450.00", game: "Roulette" },
   ];
 
-  // Featured games configuration
+  // Featured games configuration matching the new design layout
   const featuredGames = [
-   //{
-     // id: "slot-royal",
-     // title: "Lotería Real",
-      //category: "Premium Slot",
-      //src: juegoLoteria,
-     // path: "/loteria-instantanea",
-    //},
     {
-      id: "poker-elite",
-      title: "Elite Poker",
-      category: "Live Table",
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuCpCcNDDLhupT0iOwy1efwVKGf6ATUKCy6U7q50kyjk86DZ0ESSWDYB3IrG_VbQ2nLajCDmLvXOct59w89ERq7kJydta4x2rtj18hF3ffoEPNHFxRiAJHXOp4-joRLAss2GIpXRWXEpfCcn17eLUjcdKtMQDo4p-lNCzppHIIyPmM_WXToorkNt3NbXKLAfPkWDm4ln0gxkOhUv8fxWHOTdBFnPxsnTABAi2RPFBg9hCCwRzQGJ6YIBJ6Bvk8_pA9vPVUZpUJk60PQ",
+      id: "empire-roulette",
+      title: "Empire Roulette",
+      category: "Premium",
+      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuD_XM-5gOSoZ-Nx1kEgMkizy64GDZGL-n51pbx110tNwTaaALceWNPAKH2DmbTkFmop_Av2OK236264M85GHmnhvnoJNqWGmZUGWJ0xRwql7JtvwFWeCJ7l6UEWanE7jXShjftw2_TfvOyCUfiMtBum84AibwaKyA9ezimQhliCUy-CJyxpfKOp0itrJYE6AW3sEcW-5l_4KaZHUPf8Qi5oOqnLQpe5p4dnzkV-SvdCmcbO22XaIshl",
       path: null,
-    },
-    // {
-    //   id: "ruleta-vip",
-    //   title: "VIP Roulette",
-    //   category: "Table Games",
-    //   src: juegoRuleta,
-    //   path: "/ruleta",
-    // },
-    {
-      id: "bingo-royal",
-      title: "Bingo",
-      category: "Slots",
-      src: juegoBingo,
-      path: "/bingo",
+      actionText: "Join Table",
+      subActionText: "Spectate",
     },
     {
-      id: "minas-royal",
-      title: "Minas",
-      category: "Live Dealer",
-      src: juegoMinas,
+      id: "midnight-poker",
+      title: "Midnight Poker",
+      category: "Exclusive",
+      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuB5rNtRzJR2KsWje6yXo4bqDyBhlZ9A1Q_ts_KdpHxSGIFhxUqX9UawI2pg6yEi7BNugsGHCQ5l0eLDPPOmH3S0a6gtrEthJH9yxoYIQIqBrivGdM0n9BiY_2RtYUFOjWbcBrEUlFh_4KOIGO_UtWkAWo3jgjP7XR2mnu0KWvt-jf3fYtu8Jnf3_duMyJ9ID5r8wJQn70TBPFTt32lJQkkQB07UTe85Nk5xbQp68f7F4jJLjO73wysp",
+      path: null,
+      actionText: "Join Table",
+      subActionText: "Spectate",
+    },
+    {
+      id: "royal-baccarat",
+      title: "Royal Baccarat",
+      category: "Legacy",
+      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuDB39KZuadJcJPpam6nUfIj5qRO-xDXqrO-ePAYczj3bvNGfH1ucEKvfr1mcz8rxjwdIhvKayjq4P5HIJp86uMT1Lsa2wn40XeAjR47spehrACItvJc_EAr2la7TrB40BxL4NI96Vk23iF9xRvnwZnKs8vs9LzLLCpSsbeaiAj2ez5CtA204-bZ76-jUFozh_iemlQcjvEJ7GiOcJ_He-mWKYxSlyBCg-pvQs1lNGfc_EM8MUHAF_3z",
+      path: null,
+      actionText: "Join Table",
+      subActionText: "Spectate",
+    },
+    {
+      id: "grand-slots",
+      title: "Grand Slots",
+      category: "Featured",
+      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuB8WoEOn9qEXeg8cSyJceGPMIkCSO3wS4WCtbabeF7cG7cgOUHQwI8sguXKp-RdH82oLK1Dqq9n5PgNwpUopMsxTulKNlbxk991MkyhPjc7deP80d82_HSr6NVaqsaTDax8ADKHYz9minCkrRRId-zpnvzyXBp7W-XfJ0Du5SZvSydCyebjSvhfIUGB82rs2pSXUv7XBGi3POMCx1TGVcHGed54eMBVOFTU_1vENfIJLfhmi73sTlG-",
+      path: "/play/royalpachinka",
+      actionText: "Spin Now",
+      subActionText: "Free Play",
+    },
+    {
+      id: "neon-blackjack",
+      title: "Neon Blackjack",
+      category: "Live",
+      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuDNA4WUrDQGa5zpBBkrA4GuHzRMiyQ8QtktL8ImimFsM_X6GwK36SahiAVMNAmggQ-Xf9E6YPR7EcDUn6dFl4cgV_6TMkDn6_YOlu0NIPzexb_-C0-m5681ui-S7UM40qhXhovjlCtEfk9zsPFMtc5CmtPO1xT4hRu7tqIDsfnojJN63k3qyIT9djmqpMGls6tBxFFG8yPzsF3i3dB9VCOcYTVLpMayhnPIpDhBdoNuze5DFgnMlGjx",
+      path: "/play/royaljoker",
+      actionText: "Join Table",
+      subActionText: "Spectate",
+    },
+    {
+      id: "gold-dice",
+      title: "Gold Dice",
+      category: "New",
+      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuC9wuspkm5e8dzW_u5shrePV2VGwWiJ0rEdM9ZFxMi6ZXwRVkUIylGoUNKZqIFZdJH7wMqj__d9OiKb3pgzI4s-qP2T04A9GRTP0tV7xW3jtzBKoRkGqlO8IWkF-h2MnlzO0JR_GV_qq6pOiaRUlEWobz6CafYSC_FOBINc2M0w6kYmT5ucqsQUSClrrkYJzmo47tUW4cs4ENBpp4FunLui8RckkebgLKfsQU9WuElRlrT0XcxzA-qI",
       path: "/play/minas",
-    },
-    {
-      id: "sports-stakes",
-      title: "Champion Stakes",
-      category: "Sports",
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuCpCcNDDLhupT0iOwy1efwVKGf6ATUKCy6U7q50kyjk86DZ0ESSWDYB3IrG_VbQ2nLajCDmLvXOct59w89ERq7kJydta4x2rtj18hF3ffoEPNHFxRiAJHXOp4-joRLAss2GIpXRWXEpfCcn17eLUjcdKtMQDo4p-lNCzppHIIyPmM_WXToorkNt3NbXKLAfPkWDm4ln0gxkOhUv8fxWHOTdBFnPxsnTABAi2RPFBg9hCCwRzQGJ6YIBJ6Bvk8_pA9vPVUZpUJk60PQ",
-      path: null,
+      actionText: "Roll Dice",
+      subActionText: "Free Play",
     },
   ];
 
-  // Unauthenticated particles effect
+  // WebGL shader background effect
   useEffect(() => {
-    if (currentUser?.id) return; // Only run on guest landing
+    if (currentUser?.id) return;
 
-    const container = particlesContainerRef.current;
-    if (!container) return;
-    container.innerHTML = "";
+    const canvas = shaderCanvasRef.current;
+    if (!canvas) return;
 
-    const particleCount = 25;
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement("div");
-      particle.classList.add("particle");
-
-      const size = Math.random() * 40 + 10;
-      const left = Math.random() * 100;
-      const top = Math.random() * 100;
-      const delay = Math.random() * 10;
-      const duration = Math.random() * 10 + 10;
-
-      particle.style.width = `${size}px`;
-      particle.style.height = `${size}px`;
-      particle.style.left = `${left}%`;
-      particle.style.top = `${top}%`;
-      particle.style.animationDelay = `${delay}s`;
-      particle.style.animationDuration = `${duration}s`;
-
-      const isOutline = Math.random() > 0.5;
-      if (isOutline) {
-        particle.style.border = `1px solid rgba(201, 168, 76, 0.3)`;
-      } else {
-        particle.style.background = `rgba(201, 168, 76, 0.1)`;
-      }
-
-      if (Math.random() > 0.5) {
-        particle.style.borderRadius = "50%";
-      } else {
-        particle.style.clipPath = "polygon(50% 0%, 0% 100%, 100% 100%)";
-      }
-
-      container.appendChild(particle);
+    const gl = canvas.getContext("webgl");
+    if (!gl) {
+      console.warn("WebGL not supported on this browser.");
+      return;
     }
 
-    const handleMouseMove = (e) => {
-      const x = e.clientX / window.innerWidth;
-      const y = e.clientY / window.innerHeight;
+    const vertexShaderSource = `
+        attribute vec2 position;
+        varying vec2 v_texCoord;
+        void main() {
+            v_texCoord = position * 0.5 + 0.5;
+            v_texCoord.y = 1.0 - v_texCoord.y;
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    `;
 
-      const particles = container.querySelectorAll(".particle");
-      particles.forEach((p) => {
-        const speed = parseFloat(p.style.width) / 100;
-        const shiftX = (x - 0.5) * 50 * speed;
-        const shiftY = (y - 0.5) * 50 * speed;
-        p.style.transform = `translate(${shiftX}px, ${shiftY}px)`;
+    const fragmentShaderSource = `
+        precision highp float;
+        uniform float u_time;
+        uniform vec2 u_resolution;
+        uniform vec2 u_mouse;
+        varying vec2 v_texCoord;
+
+        void main() {
+            vec2 uv = v_texCoord;
+            vec2 mouse = u_mouse / u_resolution;
+            
+            float t = u_time * 0.2;
+            float noise = sin(uv.x * 10.0 + t) * cos(uv.y * 10.0 - t);
+            noise += sin(uv.x * 20.0 - t * 1.5) * cos(uv.y * 15.0 + t * 0.8) * 0.5;
+            
+            float dist = distance(uv, mouse);
+            float pulse = smoothstep(0.4, 0.0, dist) * 0.2;
+            
+            vec3 color1 = vec3(0.04, 0.03, 0.02); // Deeper black-gold for noir feel
+            vec3 color2 = vec3(0.79, 0.66, 0.30); // Royal Gold (#c9a84c)
+            vec3 color3 = vec3(1.0, 0.95, 0.8);   // Highlight gold
+            
+            float mixFactor = smoothstep(-1.0, 1.0, noise + pulse);
+            vec3 finalColor = mix(color1, color2, mixFactor * 0.4); // Subtle mix
+            
+            float highlight = pow(max(0.0, noise + pulse), 8.0);
+            finalColor += color3 * highlight * 0.3;
+            
+            float vignette = 1.0 - smoothstep(0.3, 1.2, length(uv - 0.5));
+            finalColor *= vignette;
+
+            gl_FragColor = vec4(finalColor, 1.0);
+        }
+    `;
+
+    function createShader(gl, type, source) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error("Shader compile error:", gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+      }
+      return shader;
+    }
+
+    const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+    const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+
+    if (!vertexShader || !fragmentShader) return;
+
+    const program = gl.createProgram();
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.error("Program link error:", gl.getProgramInfoLog(program));
+      return;
+    }
+
+    gl.useProgram(program);
+
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+
+    const positionLocation = gl.getAttribLocation(program, "position");
+    gl.enableVertexAttribArray(positionLocation);
+    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+    const timeLoc = gl.getUniformLocation(program, "u_time");
+    const resLoc = gl.getUniformLocation(program, "u_resolution");
+    const mouseLoc = gl.getUniformLocation(program, "u_mouse");
+
+    let mouseX = 0;
+    let mouseY = 0;
+    const handleMouseMove = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+
+    let animationFrameId;
+    function render(time) {
+      if (!canvas || !gl) return;
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+
+      gl.uniform1f(timeLoc, time * 0.001);
+      gl.uniform2f(resLoc, canvas.width, canvas.height);
+      gl.uniform2f(mouseLoc, mouseX, canvas.height - mouseY);
+
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      animationFrameId = requestAnimationFrame(render);
+    }
+
+    animationFrameId = requestAnimationFrame(render);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("mousemove", handleMouseMove);
+      if (gl) {
+        gl.deleteBuffer(positionBuffer);
+        gl.deleteProgram(program);
+        gl.deleteShader(vertexShader);
+        gl.deleteShader(fragmentShader);
+      }
+    };
+  }, [currentUser]);
+
+  // Three.js 3D Chip Animation
+  useEffect(() => {
+    if (currentUser?.id) return;
+
+    const container = threeDChipRef.current;
+    if (!container) return;
+
+    const width = container.clientWidth || 192;
+    const height = container.clientHeight || 192;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio || 1);
+    renderer.setSize(width, height);
+    renderer.setClearColor(0x000000, 0);
+    container.appendChild(renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    const pointLight = new THREE.PointLight(0xc9a84c, 2, 40);
+    pointLight.position.set(4, 4, 4);
+    scene.add(pointLight);
+
+    const group = new THREE.Group();
+    const geometry = new THREE.CylinderGeometry(1, 1, 0.2, 64);
+    const material = new THREE.MeshPhongMaterial({
+      color: 0xc9a84c,
+      shininess: 120,
+      specular: 0xffffff,
+    });
+
+    const chip = new THREE.Mesh(geometry, material);
+    chip.rotation.x = Math.PI / 2;
+    group.add(chip);
+
+    const ringGeo = new THREE.TorusGeometry(0.7, 0.05, 16, 100);
+    const ringMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.1 });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.position.z = 0.11;
+    group.add(ring);
+
+    scene.add(group);
+    camera.position.z = 5;
+
+    let animFrameId;
+    let mouseX = 0;
+    let mouseY = 0;
+
+    const handleMouseMove = (event) => {
+      mouseX = (event.clientX / window.innerWidth) - 0.5;
+      mouseY = (event.clientY / window.innerHeight) - 0.5;
+    };
+
+    const handleContainerMouseMove = (event) => {
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const radius = Math.min(rect.width, rect.height) * 0.45;
+      const dx = x - rect.width / 2;
+      const dy = y - rect.height / 2;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      chipSpinSpeedRef.current = distance <= radius ? 0.4 : 0.1;
+    };
+
+    const handleContainerMouseLeave = () => {
+      chipSpinSpeedRef.current = 0.1;
+    };
+
+    const canvasElement = renderer.domElement;
+    canvasElement.style.pointerEvents = 'auto';
+    canvasElement.addEventListener('mousemove', handleContainerMouseMove);
+    canvasElement.addEventListener('mouseleave', handleContainerMouseLeave);
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    function animate3D() {
+      animFrameId = requestAnimationFrame(animate3D);
+      group.rotation.y += chipSpinSpeedRef.current + mouseX * 0.02;
+      group.rotation.x += (mouseY * 0.4 - group.rotation.x) * 0.06;
+      group.position.y = Math.sin(Date.now() * 0.0018) * 0.18;
+      renderer.render(scene, camera);
+    }
+    animate3D();
+
+    const handleResize = () => {
+      if (!container) return;
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      cancelAnimationFrame(animFrameId);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (renderer && renderer.domElement) {
+        renderer.domElement.removeEventListener('mousemove', handleContainerMouseMove);
+        renderer.domElement.removeEventListener('mouseleave', handleContainerMouseLeave);
+      }
+      if (container && renderer.domElement) {
+        container.removeChild(renderer.domElement);
+      }
+      geometry.dispose();
+      material.dispose();
+      ringGeo.dispose();
+      ringMat.dispose();
+      renderer.dispose();
+    };
+  }, [currentUser]);
+
+  // Scroll reveal animation observer
+  useEffect(() => {
+    if (currentUser?.id) return;
+
+    const observerOptions = {
+      threshold: 0.1,
+    };
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("active");
+        }
+      });
+    }, observerOptions);
+
+    const elements = document.querySelectorAll(".reveal");
+    elements.forEach((el) => revealObserver.observe(el));
+
+    return () => {
+      elements.forEach((el) => revealObserver.unobserve(el));
+    };
+  }, [currentUser]);
+
+  // Parallax effect for cards
+  useEffect(() => {
+    if (currentUser?.id) return;
+
+    const handleMouseMove = (e) => {
+      const cards = document.querySelectorAll(".glass-card-hover");
+      const mouseX = e.clientX / window.innerWidth - 0.5;
+      const mouseY = e.clientY / window.innerHeight - 0.5;
+
+      cards.forEach((card, index) => {
+        const factor = (index + 1) * 10;
+        card.style.transform = `translate(${mouseX * factor}px, ${mouseY * factor}px) translateY(-8px)`;
       });
     };
 
@@ -658,7 +913,7 @@ export default function Home() {
                 className="bg-surface-container rounded-xl p-6 border border-outline-variant/20 flex items-center gap-4 relative overflow-hidden group cursor-pointer text-left"
               >
                 <div className="relative z-10 flex-1">
-                  <h4 className="font-bold text-headline-sm text-headline-sm text-white">VIP Daily Spin</h4>
+                  <h4 className="font-bold text-headline-sm text-white">VIP Daily Spin</h4>
                   <p className="text-on-surface-variant text-body-sm font-body-sm">Tu regalo diario está listo para reclamar.</p>
                 </div>
                 <span className="material-symbols-outlined text-primary text-5xl relative z-10 group-hover:scale-110 transition-transform">redeem</span>
@@ -709,208 +964,200 @@ export default function Home() {
   return (
     <div className="bg-background text-on-background font-body-md overflow-x-hidden min-h-screen">
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex flex-col items-center justify-center text-center px-4 overflow-hidden pt-12">
-        {/* Background Particles */}
-        <div ref={particlesContainerRef} className="absolute inset-0 z-0" id="particles-container">
-          {/* Injected programmatically by React hook */}
-        </div>
+      <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden hero-section">
+        <ShaderAnimation />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background z-[1] pointer-events-none"></div>
+        <div className="relative z-10 max-w-6xl w-full px-6 flex flex-col items-center justify-center">
+          <div className="text-center reveal" style={{ transitionDelay: "0.2s" }}>
+            <h1 className="text-6xl md:text-8xl font-extrabold tracking-tighter mb-6 leading-tight text-white">
+              <span className="gold-shimmer italic" translate="no">RoyalGames</span>
+            </h1>
+            <h1 className="text-6xl md:text-8xl font-extrabold tracking-tighter mb-6 leading-tight text-white inline-flex items-center justify-center gap-4">
+              <span>Play.</span>
+              <span className="inline-flex items-center gap-3">
+                <span>Win.</span>
+                <span className="relative block w-40 h-40 xl:w-51 xl:h-51">
+                  <div ref={threeDChipRef} id="three-d-chip" className="absolute inset-0 w-full h-full pointer-events-auto" />
+                </span>
+              </span>
+            </h1>
+            <p className="text-on-surface-variant text-lg md:text-xl font-light tracking-tight max-w-2xl mx-auto mb-12 leading-relaxed">
+              Elevate your gaming experience in an exclusive lounge designed for those who demand the finest in high-stakes entertainment.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 relative">
+              <RegistroForm className="px-14 py-5 rounded-full gold-gradient text-black font-bold text-sm uppercase tracking-[0.2em] shadow-2xl btn-hover-glow transition-all cursor-pointer border-0">
+                Create Account
+              </RegistroForm>
 
-        <div className="relative z-10 max-w-3xl flex flex-col items-center mt-8">
-          <div className="mb-8 transform hover:scale-105 transition-transform duration-700">
-            <img
-              alt="RGAMES Logo"
-              className="w-48 md:w-64 h-auto drop-shadow-[0_0_30px_rgba(201,168,76,0.35)] object-contain"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHr-YQO4wKiXJtqdrnY1tLOA8UPOXYPqIbRXCK-1-vuteuSZikDVC8FBXHR-pAFuG5y3VxEBQYu7LqhUkcSfzOLn6xj3uqxHMpYnPB2TmffszrRqjue0hTy6QUwn2KWUiTRSeAdiK0QmMWKVTL2JTWmyb8yALFHLyEwpCDhYLLxX6bLA_M5RbZyzfBpiFp_0zsNFwNGXU7gYVIsYGOzdupLCs3tA_0265ckLs3QoNmrIg4DiaZajsomBZpi7IHPae0NSdNge9Csf8"
-            />
+              <button
+                onClick={() => window.dispatchEvent(new Event('open-login-modal'))}
+                className="px-14 py-5 rounded-full border-2 border-primary/50 text-primary font-bold text-sm uppercase tracking-[0.2em] hover:bg-primary/5 transition-all cursor-pointer bg-transparent"
+              >
+                Login
+              </button>
+            </div>
           </div>
-          <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-4 text-white tracking-tight">
-            Play. Win. <span className="text-primary italic">Royal.</span>
-          </h1>
-          <p className="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-xl">
-            Experimenta la cima del entretenimiento de altas apuestas en nuestro exclusivo salón digital.
-          </p>
-
-          <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto z-20">
-            <RegistroForm className="px-10 py-4 rounded-xl gold-gradient text-on-primary font-bold text-headline-sm hover:scale-105 transition-all shadow-xl gold-glow text-center cursor-pointer border-0">
-              Crear Cuenta
-            </RegistroForm>
-            <Login className="px-10 py-4 rounded-xl border-2 border-primary text-primary font-bold text-headline-sm hover:bg-primary/10 transition-all text-center cursor-pointer bg-transparent">
-              Iniciar sesión
-            </Login>
-          </div>
         </div>
-
-        {/* Bottom Fade */}
-        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background to-transparent pointer-events-none"></div>
       </section>
 
-      {/* Winners Ticker */}
-      <div className="bg-surface-container-low py-3 border-y border-outline-variant/10 overflow-hidden relative">
+      {/* Live Winners Ticker */}
+      <div className="bg-surface border-y border-white/5 py-5 overflow-hidden reveal">
         <div className="animate-ticker">
-          {/* Repeat items twice for a seamless loop */}
-          {[...tickerItems, ...tickerItems].map((item, i) => (
-            <div key={i} className="flex gap-12 items-center px-6">
-              <div className="flex items-center gap-2 whitespace-nowrap">
-                <span className="text-primary font-bold">{item.user}</span>
-                <span className="text-on-surface-variant font-bold">won</span>
-                <span className="text-primary font-bold">{item.amount}</span>
-                <span className="text-outline text-xs">on {item.game}</span>
+          <div className="flex gap-16 items-center px-8">
+            {tickerItems.map((item, i) => (
+              <div key={i} className="flex items-center gap-4 whitespace-nowrap">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span className="text-on-surface-variant font-medium">Player <span className="text-primary font-bold">{item.user}</span> won</span>
+                <span className="text-white font-bold bg-white/5 px-3 py-1 rounded border border-white/10">{item.amount}</span>
+                <span className="text-on-surface-variant/80 text-xs">on {item.game}</span>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+          <div className="flex gap-16 items-center px-8">
+            {tickerItems.map((item, i) => (
+              <div key={`dup-${i}`} className="flex items-center gap-4 whitespace-nowrap">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span className="text-on-surface-variant font-medium">Player <span className="text-primary font-bold">{item.user}</span> won</span>
+                <span className="text-white font-bold bg-white/5 px-3 py-1 rounded border border-white/10">{item.amount}</span>
+                <span className="text-on-surface-variant/80 text-xs">on {item.game}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Welcome Bonus Banner */}
-      <section className="px-margin-mobile md:px-margin-desktop py-16 max-w-container-max mx-auto">
-        <div className="gold-gradient rounded-full p-[1px] shadow-2xl">
-          <div className="bg-surface-container rounded-full px-8 md:px-16 py-10 md:py-12 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group">
-            <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary to-transparent"></div>
-            <div className="text-center md:text-left z-10">
-              <span className="text-primary font-label-lg text-label-lg uppercase tracking-widest mb-2 block font-bold">
-                Oferta de Bienvenida
-              </span>
-              <h2 className="font-display-lg-mobile md:font-headline-lg text-white mb-2">
-                100% hasta <span className="text-primary">$500</span> + 50 Giros Gratis
-              </h2>
-              <p className="text-on-surface-variant font-body-md">
-                Comienza tu viaje real con una ventaja premium de fichas.
-              </p>
+      {/* Category Grid */}
+      <section className="py-32 px-6 max-w-container-max mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div
+            onClick={() => scrollToSection("featured-games")}
+            className="glass-card glass-card-hover p-10 flex flex-col items-center text-center reveal cursor-pointer"
+            style={{ transitionDelay: "0.1s" }}
+          >
+            <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mb-6 shadow-xl">
+              <span className="material-symbols-outlined text-black text-3xl">casino</span>
             </div>
-            <RegistroForm className="z-10 px-8 py-4 bg-white text-background font-bold rounded-xl hover:bg-primary hover:text-on-primary transition-colors duration-300 shadow-lg text-center cursor-pointer border-0">
-              Reclamar Bono
-            </RegistroForm>
+            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Classic Slots</h3>
+            <p className="text-on-surface-variant text-sm font-light">Experience the timeless thrill of mechanical elegance.</p>
+          </div>
+
+          <div
+            onClick={() => scrollToSection("featured-games")}
+            className="glass-card glass-card-hover p-10 flex flex-col items-center text-center reveal cursor-pointer"
+            style={{ transitionDelay: "0.2s" }}
+          >
+            <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mb-6 shadow-xl">
+              <span className="material-symbols-outlined text-black text-3xl">person_play</span>
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Live Casino</h3>
+            <p className="text-on-surface-variant text-sm font-light">Real-time action with our world-class croupiers.</p>
+          </div>
+
+          <div
+            onClick={() => scrollToSection("featured-games")}
+            className="glass-card glass-card-hover p-10 flex flex-col items-center text-center reveal cursor-pointer"
+            style={{ transitionDelay: "0.3s" }}
+          >
+            <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mb-6 shadow-xl">
+              <span className="material-symbols-outlined text-black text-3xl">table_restaurant</span>
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">High Tables</h3>
+            <p className="text-on-surface-variant text-sm font-light">Exclusive stakes for the discerning poker enthusiast.</p>
+          </div>
+
+          <div
+            onClick={() => scrollToSection("featured-games")}
+            className="glass-card glass-card-hover p-10 flex flex-col items-center text-center reveal cursor-pointer"
+            style={{ transitionDelay: "0.4s" }}
+          >
+            <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mb-6 shadow-xl">
+              <span className="material-symbols-outlined text-black text-3xl">sports_soccer</span>
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Royal Sports</h3>
+            <p className="text-on-surface-variant text-sm font-light">Elite sportsbook coverage on global events.</p>
           </div>
         </div>
       </section>
 
-      {/* Category Icons */}
-      <section className="px-margin-mobile md:px-margin-desktop py-12 max-w-container-max mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          <div
-            onClick={() => scrollToSection("featured-games")}
-            className="bg-surface-container p-6 rounded-xl border border-outline-variant/20 hover:border-primary transition-all group text-center cursor-pointer"
-          >
-            <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-              <span className="material-symbols-outlined text-background text-3xl">casino</span>
+      {/* Featured Games */}
+      <section id="featured-games" className="py-32 bg-surface/30 px-6">
+        <div className="max-w-container-max mx-auto">
+          <div className="flex justify-between items-end mb-16 reveal">
+            <div className="text-left">
+              <h2 className="text-4xl font-extrabold text-white tracking-tighter mb-2 uppercase">Curated Favorites</h2>
+              <p className="text-on-surface-variant font-light">A selection of premium titles hand-picked for our elite community.</p>
             </div>
-            <span className="font-headline-sm text-white">Slots</span>
-          </div>
-
-          <div
-            onClick={() => scrollToSection("featured-games")}
-            className="bg-surface-container p-6 rounded-xl border border-outline-variant/20 hover:border-primary transition-all group text-center cursor-pointer"
-          >
-            <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-              <span className="material-symbols-outlined text-background text-3xl">person_play</span>
-            </div>
-            <span className="font-headline-sm text-white">Casino en Vivo</span>
-          </div>
-
-          <div
-            onClick={() => scrollToSection("featured-games")}
-            className="bg-surface-container p-6 rounded-xl border border-outline-variant/20 hover:border-primary transition-all group text-center cursor-pointer"
-          >
-            <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-              <span className="material-symbols-outlined text-background text-3xl">table_restaurant</span>
-            </div>
-            <span className="font-headline-sm text-white">Juegos de Mesa</span>
-          </div>
-
-          <div
-            onClick={() => scrollToSection("featured-games")}
-            className="bg-surface-container p-6 rounded-xl border border-outline-variant/20 hover:border-primary transition-all group text-center cursor-pointer"
-          >
-            <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-              <span className="material-symbols-outlined text-background text-3xl">sports_soccer</span>
-            </div>
-            <span className="font-headline-sm text-white">Deportes</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Games Grid */}
-      <section id="featured-games" className="px-margin-mobile md:px-margin-desktop py-16 max-w-container-max mx-auto">
-        <div className="flex justify-between items-end mb-8">
-          <div className="text-left">
-            <h3 className="font-headline-lg text-headline-lg text-white mb-2">Juegos Destacados</h3>
-            <p className="text-on-surface-variant">Títulos de primer nivel elegidos para los entusiastas de límites altos.</p>
-          </div>
-          <button
-            onClick={() => navigate("/juegos")}
-            className="text-primary font-label-lg text-label-lg flex items-center gap-2 hover:underline bg-transparent border-0 cursor-pointer"
-          >
-            Ver Todos <span className="material-symbols-outlined text-sm">arrow_forward</span>
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-          {featuredGames.map((game) => (
-            <div
-              key={game.id}
-              className="relative group aspect-[3/4] rounded-xl overflow-hidden bg-surface-container-high border border-outline-variant/20 flex flex-col justify-between"
+            <button
+              onClick={() => navigate("/juegos")}
+              className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest hover:translate-x-2 transition-transform bg-transparent border-0 cursor-pointer"
             >
-              <img
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                src={game.src}
-                alt={game.title}
-              />
-              <div className="absolute inset-0 game-card-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-3 p-4">
-                <button
-                  onClick={() => handlePlayGame(game.path, game.title)}
-                  className="w-full py-3 gold-gradient text-[#0A0A0F] font-bold rounded-lg text-label-lg uppercase hover:opacity-90 transition-opacity cursor-pointer border-0"
-                >
-                  Jugar Ahora
-                </button>
-                <button
-                  onClick={() => handlePlayGame(game.path, game.title)}
-                  className="w-full py-3 bg-white/10 backdrop-blur-md text-white font-bold rounded-lg text-label-lg uppercase border border-white/20 hover:bg-white/20 transition-all cursor-pointer"
-                >
-                  Demo
-                </button>
+              View Entire Lounge <span className="material-symbols-outlined text-sm">arrow_forward</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-8 reveal" style={{ transitionDelay: "0.2s" }}>
+            {featuredGames.map((game) => (
+              <div
+                key={game.id}
+                className="group relative aspect-[3/4] overflow-hidden rounded shadow-2xl border border-white/5 hover:border-primary/50 transition-all bg-surface-container-high"
+              >
+                <img
+                  className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110"
+                  src={game.src}
+                  alt={game.title}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80"></div>
+                <div className="absolute bottom-0 left-0 p-6 w-full translate-y-4 group-hover:translate-y-0 transition-transform text-left">
+                  <p className="text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-1">
+                    {game.category}
+                  </p>
+                  <h4 className="text-white font-bold text-lg">{game.title}</h4>
+                </div>
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-6 gap-3">
+                  <button
+                    onClick={() => handlePlayGame(game.path, game.title)}
+                    className="w-full py-3 gold-gradient text-black font-black text-[10px] uppercase tracking-widest rounded-sm cursor-pointer border-0"
+                  >
+                    {game.actionText}
+                  </button>
+                  <button
+                    onClick={() => handlePlayGame(game.path, game.title)}
+                    className="w-full py-3 border border-white/20 text-white font-black text-[10px] uppercase tracking-widest rounded-sm bg-transparent cursor-pointer hover:bg-white/5"
+                  >
+                    {game.subActionText}
+                  </button>
+                </div>
               </div>
-              <div className="absolute bottom-4 left-4 z-10 pointer-events-none text-left">
-                <p className="text-white font-bold text-label-lg">{game.title}</p>
-                <p className="text-primary text-[10px] font-bold uppercase tracking-widest">{game.category}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Trust Row */}
-      <section className="bg-surface-container-lowest py-16">
-        <div className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="flex flex-col items-center text-center gap-4">
-              <div className="w-12 h-12 flex items-center justify-center text-primary">
-                <span className="material-symbols-outlined text-5xl">verified_user</span>
-              </div>
-              <h4 className="font-headline-sm text-white">Licencia Oficial & Regulado</h4>
-              <p className="text-on-surface-variant text-body-sm font-body-sm">
-                Operando bajo los estándares globales más estrictos para garantizar un juego transparente.
-              </p>
-            </div>
+      {/* Trust & Licensing */}
+      <section className="py-32 px-6 border-t border-white/5">
+        <div className="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-3 gap-20">
+          <div className="text-center reveal" style={{ transitionDelay: "0.1s" }}>
+            <span className="material-symbols-outlined text-primary text-5xl mb-6">verified_user</span>
+            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Globally Certified</h4>
+            <p className="text-on-surface-variant font-light text-sm leading-relaxed">
+              Adhering to the most stringent international standards for fair play and operational excellence.
+            </p>
+          </div>
 
-            <div className="flex flex-col items-center text-center gap-4">
-              <div className="w-12 h-12 flex items-center justify-center text-primary">
-                <span className="material-symbols-outlined text-5xl">lock</span>
-              </div>
-              <h4 className="font-headline-sm text-white">Conexión SSL Segura</h4>
-              <p className="text-on-surface-variant text-body-sm font-body-sm">
-                Tus datos y transacciones están totalmente encriptados con seguridad de grado militar.
-              </p>
-            </div>
+          <div className="text-center reveal" style={{ transitionDelay: "0.2s" }}>
+            <span className="material-symbols-outlined text-primary text-5xl mb-6">security</span>
+            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Fortified Security</h4>
+            <p className="text-on-surface-variant font-light text-sm leading-relaxed">
+              Your assets and data are protected by state-of-the-art encryption and continuous monitoring.
+            </p>
+          </div>
 
-            <div className="flex flex-col items-center text-center gap-4">
-              <div className="w-12 h-12 flex items-center justify-center text-primary">
-                <span className="material-symbols-outlined text-5xl">support_agent</span>
-              </div>
-              <h4 className="font-headline-sm text-white">Soporte 24/7 de Élite</h4>
-              <p className="text-on-surface-variant text-body-sm font-body-sm">
-                Un conserje real dedicado y disponible las 24 horas del día para ayudarte.
-              </p>
-            </div>
+          <div className="text-center reveal" style={{ transitionDelay: "0.3s" }}>
+            <span className="material-symbols-outlined text-primary text-5xl mb-6">workspace_premium</span>
+            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Elite Support</h4>
+            <p className="text-on-surface-variant font-light text-sm leading-relaxed">
+              A personal concierge team available 24/7 to cater to your every request with absolute discretion.
+            </p>
           </div>
         </div>
       </section>
@@ -918,7 +1165,7 @@ export default function Home() {
       {/* BottomNavBar (Mobile Only for Guest) */}
       <nav className="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface-container dark:bg-surface-container border-t border-outline-variant/30 shadow-lg flex justify-around items-center h-16 px-4 md:hidden">
         <button
-          onClick={() => scrollToSection("particles-container")}
+          onClick={() => scrollToSection("hero-shader-canvas")}
           className="text-primary flex flex-col items-center gap-1 text-[11px] active:scale-90 transition-transform duration-200 bg-transparent border-0 cursor-pointer"
         >
           <span className="material-symbols-outlined">home</span>

@@ -1,49 +1,85 @@
 import { Link } from 'react-router-dom';
+import rgamesLogo from '../../assets/rgames.png';
 
 function Footer() {
   return (
-    <footer className="w-full py-12 bg-surface-container-low border-t border-outline-variant/10 text-on-surface">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
-        
-        {/* Col 1: Brand & Info */}
-        <div className="flex flex-col gap-4">
-          <span className="text-headline-sm font-headline-sm text-primary font-bold">RGAMES</span>
-          <p className="text-on-surface-variant font-body-sm max-w-xs">
-            El destino de élite para el juego en línea. Ofrecemos una plataforma segura, justa y lujosa para jugadores de todo el mundo.
+    <footer className="bg-surface py-20 px-6 border-t border-white/5 text-on-surface select-none">
+      <div className="max-w-container-max mx-auto flex flex-col md:flex-row justify-between gap-12 text-left">
+        {/* Left column: Brand information */}
+        <div className="max-w-xs">
+          <img
+            alt="RGAMES"
+            className="h-10 w-auto mb-8 grayscale brightness-200 object-contain"
+            src={rgamesLogo}
+          />
+          <p className="text-on-surface-variant text-sm font-light leading-relaxed mb-6">
+            The pinnacle of digital luxury gaming. Providing a secure, fair, and sophisticated platform for the world's most elite players.
           </p>
-          <div className="flex gap-4 mt-2">
-            <a href="mailto:royalgames2025@gmail.com" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1">
-              <span className="material-symbols-outlined text-xl">mail</span>
-              <span className="text-xs">royalgames2025@gmail.com</span>
+          <div className="flex gap-4">
+            <a
+              className="w-10 h-10 rounded border border-white/10 flex items-center justify-center hover:bg-white/5 hover:text-primary transition-all"
+              href="#"
+            >
+              <span className="material-symbols-outlined text-on-surface-variant text-lg">public</span>
+            </a>
+            <a
+              className="w-10 h-10 rounded border border-white/10 flex items-center justify-center hover:bg-white/5 hover:text-primary transition-all"
+              href="#"
+            >
+              <span className="material-symbols-outlined text-on-surface-variant text-lg">share</span>
             </a>
           </div>
         </div>
 
-        {/* Col 2: Navigation Links */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col gap-3">
-            <h5 className="text-white font-bold mb-1">Compañía</h5>
-            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-sm" to="/about">Sobre Nosotros</Link>
-            <a className="text-on-surface-variant hover:text-primary transition-colors font-body-sm" href="#">Juego Responsable</a>
-            <a className="text-on-surface-variant hover:text-primary transition-colors font-body-sm" href="#">Afiliados</a>
+        {/* Links grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-12 text-sm uppercase tracking-widest font-bold">
+          <div className="flex flex-col gap-4">
+            <h5 className="text-white mb-2 font-black">Heritage</h5>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/about">
+              Our Story
+            </Link>
+            <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="#">
+              Responsible Play
+            </a>
+            <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="#">
+              VIP Lounge
+            </a>
           </div>
-          <div className="flex flex-col gap-3">
-            <h5 className="text-white font-bold mb-1">Legal</h5>
-            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-sm" to="/terminos-y-condiciones">Términos y Condiciones</Link>
-            <a className="text-on-surface-variant hover:text-primary transition-colors font-body-sm" href="#">Política de Privacidad</a>
-            <a className="text-on-surface-variant hover:text-primary transition-colors font-body-sm" href="#">Reglas de Juego</a>
+          <div className="flex flex-col gap-4">
+            <h5 className="text-white mb-2 font-black">Concierge</h5>
+            <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="mailto:royalgames2025@gmail.com">
+              Contact
+            </a>
+            <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="#">
+              FAQ
+            </a>
+            <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="#">
+              Help Desk
+            </a>
+          </div>
+          <div className="flex flex-col gap-4">
+            <h5 className="text-white mb-2 font-black">Protocol</h5>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/terminos-y-condiciones">
+              Privacy
+            </Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/terminos-y-condiciones">
+              Terms
+            </Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/terminos-y-condiciones">
+              Compliance
+            </Link>
           </div>
         </div>
+      </div>
 
-        {/* Col 3: Payment Methods & Copyright */}
-        <div className="flex flex-col gap-4">
-         
-         
-          <p className="text-on-surface-variant font-body-sm mt-4">
-            © 2024 RGAMES. Todos los derechos reservados. Licenciado y regulado.
-          </p>
+      {/* Footer bottom bar */}
+      <div className="max-w-container-max mx-auto mt-20 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-on-surface-variant font-bold tracking-widest uppercase">
+        <p>© 2026 RGAMES. All Rights Reserved.</p>
+        <div className="flex gap-8 items-center opacity-50">
+          <span>Verified by eCOGRA</span>
+          <span>Licensed in Curacao</span>
+          <span>SSL Secured</span>
         </div>
-
       </div>
     </footer>
   );
