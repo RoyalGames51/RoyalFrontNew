@@ -970,10 +970,16 @@ export default function Home() {
         <div className="relative z-10 max-w-6xl w-full px-6 flex flex-col items-center justify-center">
           <div className="text-center reveal" style={{ transitionDelay: "0.2s" }}>
             <h1 className="text-6xl md:text-8xl font-extrabold tracking-tighter mb-6 leading-tight text-white">
-            <span className="gold-shimmer italic" translate="no">RoyalGames</span>
+              <span className="gold-shimmer italic" translate="no">RoyalGames</span>
             </h1>
-            <h1 className="text-6xl md:text-8xl font-extrabold tracking-tighter mb-6 leading-tight text-white">
-              Play. Win. 
+            <h1 className="text-6xl md:text-8xl font-extrabold tracking-tighter mb-6 leading-tight text-white inline-flex items-center justify-center gap-4">
+              <span>Play.</span>
+              <span className="inline-flex items-center gap-3">
+                <span>Win.</span>
+                <span className="relative block w-40 h-40 xl:w-51 xl:h-51">
+                  <div ref={threeDChipRef} id="three-d-chip" className="absolute inset-0 w-full h-full pointer-events-auto" />
+                </span>
+              </span>
             </h1>
             <p className="text-on-surface-variant text-lg md:text-xl font-light tracking-tight max-w-2xl mx-auto mb-12 leading-relaxed">
               Elevate your gaming experience in an exclusive lounge designed for those who demand the finest in high-stakes entertainment.
@@ -989,9 +995,6 @@ export default function Home() {
               >
                 Login
               </button>
-            </div>
-            <div className="mt-3 flex justify-center w-full">
-              <div ref={threeDChipRef} id="three-d-chip" className="w-56 h-40 xl:w-48 xl:h-48 pointer-events-auto" />
             </div>
           </div>
         </div>
