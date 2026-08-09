@@ -61,8 +61,6 @@ export const authService = {
       localStorage.setItem('token', access_token);
       if (user && user.email) {
         localStorage.setItem('userEmail', user.email);
-      } else {
-        console.warn("El objeto user o user.email no vino en la respuesta del backend:", user);
       }
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
 

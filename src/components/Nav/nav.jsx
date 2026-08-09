@@ -1,15 +1,15 @@
-import { useEffect } from "react";
 import logo from '../../assets/logo.png';
 import rgamesLogo from '../../assets/rgames.png';
 import chips from '../../assets/chips.png';
 import { useSelector, useDispatch } from "react-redux";
 import Login from "../Login/login";
 import RegistroForm from "../Register/register";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/oauthContext";
 import { logout } from "../../redux/actions";
 import Swal from "sweetalert2";
 import API_URL from "../../api/rutaApi";
+import { formatChips, swalThemeConfig } from "../../utils/formatters";
 
 export default function Navbar() {
   const { currentUser } = useSelector((state) => state);
@@ -24,21 +24,16 @@ export default function Navbar() {
       Swal.fire({
         title: "¡Sesión cerrada con éxito!",
         icon: "success",
-        confirmButtonColor: "#C9A84C",
-        background: '#16130d',
-        color: '#e9e1d7',
+        ...swalThemeConfig,
       }).then(() => {
         window.location.href = '/';
       });
     } catch (error) {
-      console.error(`Error al cerrar sesión: ${error.message}`);
       Swal.fire({
         title: "Error",
         text: "Hubo un error al cerrar sesión",
         icon: "error",
-        confirmButtonColor: "#C9A84C",
-        background: '#16130d',
-        color: '#e9e1d7',
+        ...swalThemeConfig,
       });
     }
   };
@@ -48,16 +43,11 @@ export default function Navbar() {
       title: "Notificaciones",
       text: "No tienes notificaciones pendientes en este momento.",
       icon: "info",
-      confirmButtonColor: "#C9A84C",
-      background: '#16130d',
-      color: '#e9e1d7',
+      ...swalThemeConfig,
     });
   };
 
-  const formattedChips = (() => {
-    const value = typeof currentUser?.chips === 'string' ? Number(currentUser.chips) : (currentUser?.chips ?? 0);
-    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Number.isFinite(value) ? value : 0);
-  })();
+  const formattedChips = formatChips(currentUser?.chips);
 
   const avatarSrc = currentUser?.id
     ? `${API_URL}/user/${currentUser.id}/avatar-image`
@@ -139,12 +129,7 @@ export default function Navbar() {
             <>
               {/* Logo & Nav Links when Not Logged In */}
               <Link to="/" className="flex items-center">
-                {logo ? (
-                  <h>
-                  </h>
-                ) : (
                   <span className="text-headline-md font-headline-md font-bold text-primary tracking-tighter">RGAMES</span>
-                )}
               </Link>
 
               <nav className="hidden md:flex gap-6 items-center">
@@ -208,9 +193,9 @@ export default function Navbar() {
         </div>
 
         {/* Right Section: Notification, Buy Chips / User Profile / Login */}
-        <div className="flex items-center gap-4" mt-3>
+            <div className="flex items-center gap-4">
           {currentUser?.id ? (
-            <div className="flex items-center gap-4" mt-3>
+        <div className="flex items-center gap-4">
               <div className="hidden sm:flex items-center gap-3 bg-[#222326] border border-blue-500/15 rounded-full px-3 py-2 shadow-[0_10px_25px_rgba(12,25,60,0.35)] max-w-[15.2rem] mt-3">
                 <button
                   type="button"

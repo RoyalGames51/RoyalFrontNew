@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import axios from "axios";
 import Swal from "sweetalert2";
 import { useAuth } from "../../context/oauthContext";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { promo1millon, getUserByEmail } from "../../redux/actions";
 import { validateNick, validateEmail, validatePassword } from "./validate";
 import logo from "../../assets/logo.png";
-import API_URL from "../../api/rutaApi";
 
 const RegistroForm = ({ className, children }) => {
     const navigate = useNavigate();
@@ -23,7 +21,6 @@ const RegistroForm = ({ className, children }) => {
         sexo: "",
     });
 
-    const countUsers = useSelector((state) => state.counterUser);
     const [isRegisterOpen, setIsRegisterOpen] = useState(false);
     const [isTermsChecked, setIsTermsChecked] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -94,18 +91,16 @@ const RegistroForm = ({ className, children }) => {
         }
 
         try {
-            const { signup: signupResponse } = await auth.register(
+            const { signup: signupResult } = await auth.register(
                 input.nick,
                 input.email,
                 input.password,
                 input.sexo,
             );
-            console.log("Signup y login exitosos", signupResponse);
 
             await dispatch(getUserByEmail(input.email));
 
-            // Show appropriate message based on whether they received first chips
-            if (signupResponse?.firstChipsReceived) {
+            if (signupResult?.firstChipsReceived) {
                 Swal.fire(
                     "¡Felicidades!",
                     "¡Ganaste 1,000,000 de fichas por ser uno de los primeros 100 usuarios!",
@@ -118,7 +113,6 @@ const RegistroForm = ({ className, children }) => {
             setIsRegisterOpen(false);
             navigate('/');
         } catch (error) {
-            console.error("Error en el registro:", error);
             Swal.fire("Oops...", "Hubo un error en el registro", "error");
         }
     };

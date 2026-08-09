@@ -4,26 +4,17 @@ import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import * as THREE from 'three';
 
-// Import local assets for Vite bundling
-import logoImg from "../../assets/logo.png";
-import juegoLoteria from "../../assets/IMG_4119.png";
-import juegoRuleta from "../../assets/ruleta.png";
-import juegoBingo from "../../assets/bingoproxi.png";
-import juegoMinas from "../../assets/minas2.png";
 import banner1 from "../../assets/banner1.png";
 import rj from "../../assets/rj.png";
 import rpachinka from "../../assets/rpachinka2.png";
-
-// Generated Banners
-import casinoBanner from "../../assets/casino_banner.png";
+import juegoMinas from "../../assets/minas2.png";
 import sportsBanner from "../../assets/b1.jpg";
-import tournamentBanner from "../../assets/tournament_banner.png";
 import bannercelu from "../../assets/bannercelu.png";
 
-// Import auth triggers to open login/register modals
 import Login from "../Login/login";
 import RegistroForm from "../Register/register";
 import { ShaderAnimation } from "../ui/shader-animation";
+import { formatChips, swalThemeConfig } from "../../utils/formatters";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -112,7 +103,6 @@ export default function Home() {
 
     const gl = canvas.getContext("webgl");
     if (!gl) {
-      console.warn("WebGL not supported on this browser.");
       return;
     }
 
@@ -166,7 +156,6 @@ export default function Home() {
       gl.shaderSource(shader, source);
       gl.compileShader(shader);
       if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error("Shader compile error:", gl.getShaderInfoLog(shader));
         gl.deleteShader(shader);
         return null;
       }
@@ -184,7 +173,6 @@ export default function Home() {
     gl.linkProgram(program);
 
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      console.error("Program link error:", gl.getProgramInfoLog(program));
       return;
     }
 
@@ -443,9 +431,7 @@ export default function Home() {
         title: `${title}`,
         text: "¡Este juego estará disponible muy pronto! Nuestro equipo real está trabajando para traértelo.",
         icon: "info",
-        confirmButtonColor: "#C9A84C",
-        background: '#16130d',
-        color: '#e9e1d7',
+        ...swalThemeConfig,
       });
     }
   };
@@ -455,9 +441,7 @@ export default function Home() {
       title: "Paquete de Bienvenida",
       text: "¡Tu paquete de bienvenida del 100% hasta $1,000 ya está activo en tu cuenta!",
       icon: "success",
-      confirmButtonColor: "#C9A84C",
-      background: '#16130d',
-      color: '#e9e1d7',
+      ...swalThemeConfig,
     });
   };
 
@@ -466,9 +450,7 @@ export default function Home() {
       title: "Giro Diario VIP",
       text: "¡Has girado la ruleta VIP y ganaste 500 fichas extra! Se han sumado a tu balance.",
       icon: "success",
-      confirmButtonColor: "#C9A84C",
-      background: '#16130d',
-      color: '#e9e1d7',
+      ...swalThemeConfig,
     });
   };
 
@@ -477,9 +459,7 @@ export default function Home() {
       title: "Masters Cup",
       text: "¡Te has unido al torneo Masters Cup con éxito! Comienza a jugar para clasificar en el Leaderboard.",
       icon: "success",
-      confirmButtonColor: "#C9A84C",
-      background: '#16130d',
-      color: '#e9e1d7',
+      ...swalThemeConfig,
     });
   };
 
@@ -488,9 +468,7 @@ export default function Home() {
       title: section,
       text: "¡Esta promoción estará disponible muy pronto! Sigue atento a las novedades.",
       icon: "info",
-      confirmButtonColor: "#C9A84C",
-      background: '#16130d',
-      color: '#e9e1d7',
+      ...swalThemeConfig,
     });
   };
 
@@ -505,10 +483,7 @@ export default function Home() {
 
   // 1. Authenticated User Lobby Dashboard
   if (currentUser?.id) {
-    const formattedChips = (() => {
-      const value = typeof currentUser?.chips === 'string' ? Number(currentUser.chips) : (currentUser?.chips ?? 0);
-      return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Number.isFinite(value) ? value : 0);
-    })();
+    const formattedChipsValue = formatChips(currentUser?.chips);
 
     let vipLevel = "Bronce I";
     if (currentUser?.chips >= 1000000) {
@@ -528,7 +503,7 @@ export default function Home() {
           <div className="flex gap-4 md:gap-8 overflow-x-auto no-scrollbar py-1">
             <div className="flex flex-col text-left">
               <span className="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest">Balance Real</span>
-              <span className="text-on-surface font-bold text-label-lg font-label-lg">{formattedChips}</span>
+              <span className="text-on-surface font-bold text-label-lg font-label-lg">{formattedChipsValue}</span>
             </div>
             <div className="flex flex-col text-left">
               <span className="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest">Crédito de Bono</span>

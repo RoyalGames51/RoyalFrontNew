@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Avatar, Text, Flex, Spinner, Link } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import axios from "axios";
@@ -26,7 +26,6 @@ export default function UserList() {
         setUsers(randomUsers);
         setLoading(false);
       } catch (error) {
-        console.error("Error al obtener los usuarios:", error);
         setLoading(false);
       }
     };

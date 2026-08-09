@@ -1,16 +1,19 @@
 import {
-    USER_BY_EMAIL, CLEAN_USER_BY_EMAIL, USER_BY_NICK, ADMINISTRAR_USER, PROMO1K, FETCH_PUBLIC_FAVORITES, REMOVE_FAVORITE_SUCCESS, ADD_FAVORITE_SUCCESS, FETCH_FAVORITES_FAILURE, FETCH_FAVORITES_SUCCESS, FETCH_USER_PROFILE,
-    UPDATE_USER_PROFILE, USER_ACTION_ERROR, CREATE_GAME_REQUEST, CREATE_GAME_SUCCESS, CREATE_GAME_FAILURE, VIEW_USER_PROFILE, SET_AUTH_TOKEN, CLEAR_AUTH_TOKEN
+    USER_BY_EMAIL, CLEAN_USER_BY_EMAIL, USER_BY_NICK, ADMINISTRAR_USER, PROMO1K,
+    FETCH_PUBLIC_FAVORITES, REMOVE_FAVORITE_SUCCESS, ADD_FAVORITE_SUCCESS,
+    FETCH_FAVORITES_FAILURE, FETCH_FAVORITES_SUCCESS, FETCH_USER_PROFILE,
+    UPDATE_USER_PROFILE, USER_ACTION_ERROR, CREATE_GAME_REQUEST, CREATE_GAME_SUCCESS,
+    CREATE_GAME_FAILURE, VIEW_USER_PROFILE, SET_AUTH_TOKEN, CLEAR_AUTH_TOKEN
 } from "../actions/action.types";
 
 const initialState = {
     favoriteGames: [],
-    publicFavorites:[],
+    publicFavorites: [],
     games: [],
     loading: false,
     error: null,
     currentUser: null,
-    viewedUserProfile: [], // Nuevo estado para perfiles públicos
+    viewedUserProfile: [],
     administradorUser: {},
     counterUser: {},
     authToken: localStorage.getItem('token') || null,
@@ -88,11 +91,11 @@ const reducer = (state = initialState, action) => {
         case FETCH_FAVORITES_FAILURE:
             return { ...state, error: action.payload, loading: false };
         
-            case FETCH_PUBLIC_FAVORITES:
-                return {
-                    ...state,
-                    publicFavorites: action.payload,
-                };    
+        case FETCH_PUBLIC_FAVORITES:
+            return {
+                ...state,
+                publicFavorites: action.payload,
+            };
 
         case ADD_FAVORITE_SUCCESS:
             return {

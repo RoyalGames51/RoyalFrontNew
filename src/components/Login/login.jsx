@@ -3,9 +3,9 @@ import { createPortal } from "react-dom";
 import logo from "../../assets/logo.png";
 import { useAuth } from "../../context/oauthContext";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getUserByEmail, getUserByNick } from "../../redux/actions";
+import { getUserByNick } from "../../redux/actions";
 
 // Flag a nivel de módulo: garantiza que initialize() corra solo una vez por carga de página
 // (resiste React StrictMode que ejecuta efectos dos veces en desarrollo)
@@ -47,7 +47,6 @@ export default function Login({ className, children }) {
                 }
                 await auth.login(emailFromNick, input.password);
             } else {
-                console.log("Email usado para login:", email);
                 await auth.login(email, input.password);
             }
 
@@ -62,7 +61,6 @@ export default function Login({ className, children }) {
             });
 
         } catch (error) {
-            console.error("Error al iniciar sesión:", error.message);
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
@@ -108,7 +106,6 @@ export default function Login({ className, children }) {
         const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
         if (!googleBtnRef.current || !window.google?.accounts?.id) {
-            console.warn("[GSI Diagnostic] El contenedor del botón o el SDK de Google no están listos.");
             return;
         }
 
