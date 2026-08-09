@@ -103,7 +103,6 @@ export default function BuyChips() {
           const sorted = response.data.sort((a, b) => new Date(b.date) - new Date(a.date));
           setPaymentHistory(sorted);
         } catch (error) {
-          console.error("Error fetching payment history:", error);
         } finally {
           setLoadingHistory(false);
         }
@@ -178,7 +177,6 @@ export default function BuyChips() {
         throw new Error("No initPoint returned from backend");
       }
     } catch (error) {
-      console.error("Error al crear la orden de Mercado Pago:", error);
       Swal.fire({
         icon: "error",
         title: "Error de Pasarela",
@@ -644,7 +642,6 @@ export default function BuyChips() {
                                 });
                                 return response.data.orderId; // Return orderId to PayPal SDK
                               } catch (err) {
-                                console.error("Error creating PayPal order:", err);
                                 Swal.fire({
                                   icon: "error",
                                   title: "PayPal Error",
@@ -686,7 +683,6 @@ export default function BuyChips() {
                                   window.location.reload();
                                 });
                               } catch (err) {
-                                console.error("Error capturing PayPal order:", err);
                                 Swal.fire({
                                   icon: "error",
                                   title: "Error de Captura",
@@ -696,7 +692,6 @@ export default function BuyChips() {
                               }
                             }}
                             onError={(err) => {
-                              console.error("PayPal general error:", err);
                               Swal.fire({
                                 icon: "error",
                                   title: "Transacción Fallida",

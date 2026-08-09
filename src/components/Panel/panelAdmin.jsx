@@ -24,7 +24,6 @@ export default function Panel() {
       await dispatch(administrarUser(userId));
     } catch (error) {
       setUserFound(false);
-      console.error("Error al buscar usuario:", error);
     }
   };
 
@@ -43,10 +42,8 @@ export default function Panel() {
         amount: Number(chipsAmount),
       });
       Swal.fire("Éxito", "Fichas agregadas correctamente", "success");
-      console.log('Fichas agregadas:', response.data);
     } catch (error) {
       Swal.fire("Error", "No se pudo agregar fichas", "error");
-      console.error('Error al agregar fichas:', error);
     }
   };
 
@@ -57,10 +54,8 @@ export default function Panel() {
         amount: Number(chipsAmount),
       });
       Swal.fire("Éxito", "Fichas quitadas correctamente", "success");
-      console.log('Fichas quitadas:', response.data);
     } catch (error) {
       Swal.fire("Error", "No se pudo quitar fichas", "error");
-      console.error('Error al quitar fichas:', error);
     }
   };
 
@@ -70,10 +65,8 @@ export default function Panel() {
         id: administradorUser.id,
       });
       Swal.fire("Éxito", "Usuario baneado correctamente", "success");
-      console.log('Usuario baneado:', response.data);
     } catch (error) {
       Swal.fire("Error", "No se pudo banear al usuario", "error");
-      console.error('Error al banear usuario:', error);
     }
   };
 
@@ -83,10 +76,8 @@ export default function Panel() {
         id: administradorUser.id,
       });
       Swal.fire("Éxito", "Usuario inactivado correctamente", "success");
-      console.log('Usuario inactivado:', response.data);
     } catch (error) {
       Swal.fire("Error", "No se pudo inactivar al usuario", "error");
-      console.error('Error al inactivar usuario:', error);
     }
   };
 
@@ -94,10 +85,8 @@ export default function Panel() {
     try {
       const response = await axios.delete(`${API_URL}/user-delete/${administradorUser.id}`);
       Swal.fire("Éxito", "Usuario eliminado correctamente", "success");
-      console.log('Usuario eliminado:', response.data);
     } catch (error) {
       Swal.fire("Error", "No se pudo eliminar al usuario", "error");
-      console.error('Error al eliminar usuario:', error);
     }
   };
 
@@ -107,10 +96,8 @@ export default function Panel() {
         nick: userData.nick
       });
       Swal.fire("Éxito", "Usuario actualizado correctamente", "success");
-      console.log('Usuario actualizado:', response.data);
     } catch (error) {
       Swal.fire("Error", "No se pudo actualizar al usuario", "error");
-      console.error('Error al actualizar usuario:', error);
     }
   };
 

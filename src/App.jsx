@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Container, Box, Image, Button } from '@chakra-ui/react';
-import { useLocation } from 'react-router-dom';
+import { Container } from '@chakra-ui/react';
+import { useLocation, Route, Routes } from 'react-router-dom';
 import Nav from './components/Nav/nav';
-// SideNavBar removed — no side navigation
+import Sidebar from './components/Sidebar/sidebar';
 import Footer from './components/footer/footer';
-import { Route, Routes } from 'react-router-dom';
 import Home from './components/Home/home';
 import { AuthProvider } from './context/oauthContext';
 import Perfil from './components/Perfil/perfil';
@@ -15,10 +14,9 @@ import Panel from './components/Panel/panelAdmin';
 import GameGrid from './components/Juegos/juegos';
 import News from './components/News/news';
 import regaloBienvenida from '../src/assets/regalobienvenida.png';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import TermsAndConditions from './components/termsyConds/terminosYCondiciones';
 import axios from 'axios';
-
 import Diamantes from './components/Juegos/Diamantes/diamantes';
 import RoyalJoker from './components/Juegos/RoyalJoker/royaljoker';
 import RoyalPachinka from './components/Juegos/royalpachinka/royalpachinka';
@@ -27,7 +25,6 @@ import AboutUs from './components/AboutUs/aboutUs';
 import UserManagement from './components/AdminPanel/UserManagement/userManagement';
 import AdminDashboard from './components/AdminPanel/AdminDashboard/adminDashboard';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
-
 import PaymentSuccess from './components/PaymentStatus/PaymentSuccess';
 import PaymentFailure from './components/PaymentStatus/PaymentFailure';
 import PaymentPending from './components/PaymentStatus/PaymentPending';
@@ -36,8 +33,7 @@ import Bazar from './components/Bazar/bazar';
 function App() {
   const [showWelcomeGift, setShowWelcomeGift] = useState(false);
   const { currentUser } = useSelector((state) => state);
-  const dispatch = useDispatch();
-  const location = useLocation(); // Hook para obtener la ubicación actual
+  const location = useLocation();
 
   useEffect(() => {
     const checkWelcomeGift = async () => {
@@ -47,7 +43,6 @@ function App() {
         try {
           await axios.put(`${API_URL}/firstchips/${currentUser.id}`);
         } catch (error) {
-          console.error('Error actualizando firstChips:', error);
         }
 
         return () => clearTimeout(timer);
@@ -55,14 +50,11 @@ function App() {
     };
 
     checkWelcomeGift();
-  }, [currentUser, dispatch]);
+  }, [currentUser]);
 
   const handleCloseGift = () => {
     setShowWelcomeGift(false);
   };
-
-  // Determinar si el footer debe mostrarse
-  const shouldShowFooter = !location.pathname.includes('/play');
 
   return (
     <Container
@@ -78,13 +70,17 @@ function App() {
       minH="100vh"
     >
       <AuthProvider>
-        <div className={`transition-all duration-300 flex flex-col flex-1`}>
-          {location.pathname !== "/" && <Nav />}
+        <div
+          className={`transition-all duration-300 flex flex-col flex-1 ${
+            currentUser?.id && !location.pathname.includes('/play') ? 'md:pl-16 lg:pl-56' : ''
+          }`}
+        >
+          {(location.pathname !== "/" || currentUser?.id) && <Nav />}
+          <Sidebar />
           <Routes>
             <Route path="/" element={<Home />} />
-          
-            <Route path="/perfil" element={<Perfil />} /> {/* Perfil propio */}
-            <Route path="/perfil/:userNick" element={<Perfil isPublic={true} />} /> {/* Perfil público */}
+            <Route path="/perfil" element={<Perfil />} />
+            <Route path="/perfil/:userNick" element={<Perfil isPublic={true} />} />
             <Route path="/juegos" element={<GameGrid />} />
             <Route path="/chips" element={<BuyChips />} />
             <Route path="/logout" element={<LogOut />} />
@@ -98,13 +94,11 @@ function App() {
             <Route path="/play/royaljoker" element={<RoyalJoker />} />
             <Route path="/play/royalpachinka" element={<RoyalPachinka />} />
             <Route path="/bazar" element={<Bazar />} />
-            
-            {/* MercadoPago Status Routes */}
             <Route path="/mercadopago/success" element={<PaymentSuccess />} />
             <Route path="/mercadopago/failure" element={<PaymentFailure />} />
             <Route path="/mercadopago/pending" element={<PaymentPending />} />
           </Routes>
-          {shouldShowFooter && <Footer />}
+          {!location.pathname.includes('/play') && <Footer />}
         </div>
         {showWelcomeGift && currentUser?.id && createPortal(
           <div

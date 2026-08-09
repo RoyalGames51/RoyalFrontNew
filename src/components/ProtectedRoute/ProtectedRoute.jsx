@@ -15,9 +15,7 @@ const ProtectedRoute = ({ children }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  console.log('ProtectedRoute - currentUser:', currentUser);
-  console.log('ProtectedRoute - currentUser.role:', currentUser?.role);
-  console.log('ProtectedRoute - isChecking:', isChecking);
+  
 
   // Mientras se verifica, muestra un loader
   if (isChecking) {
@@ -30,18 +28,15 @@ const ProtectedRoute = ({ children }) => {
 
   // Si no hay usuario logueado, redirige a home
   if (!currentUser) {
-    console.warn('ProtectedRoute: No hay currentUser, redirigiendo a home');
     return <Navigate to="/" replace />;
   }
 
   // Si el usuario no es admin, redirige a home
   if (currentUser.role !== 'admin') {
-    console.warn(`ProtectedRoute: Usuario no es admin (role: ${currentUser.role}), redirigiendo a home`);
     return <Navigate to="/" replace />;
   }
 
   // Si es admin, renderiza el componente
-  console.log('ProtectedRoute: Usuario es admin, permitiendo acceso');
   return children;
 };
 

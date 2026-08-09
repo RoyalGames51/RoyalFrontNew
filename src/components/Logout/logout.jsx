@@ -1,8 +1,8 @@
-import { IconButton, Button, Stack,Icon } from "@chakra-ui/react";
+import { IconButton, Button, Stack } from "@chakra-ui/react";
 import { FaSignOutAlt } from "react-icons/fa";
-import {  useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useAuth } from "../../context/oauthContext";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { logout } from "../../redux/actions";
 import Swal from "sweetalert2";
 
@@ -11,12 +11,9 @@ const LogOut = ({ insideMenu }) => {
   const auth = useAuth();
   const dispatch = useDispatch();
 
-
   const handleLogOut = async () => {
     try {
       await auth.logOut();
-      
-      // Dispatch de la acción logout de Redux (limpia token y usuario)
       dispatch(logout());
       
       Swal.fire({
@@ -27,7 +24,6 @@ const LogOut = ({ insideMenu }) => {
         window.location.href = '/';
       });
     } catch (error) {
-      console.error(`Error al cerrar sesión: ${error.message}`);
       Swal.fire({
         title: "Error",
         text: "Hubo un error al cerrar sesión",

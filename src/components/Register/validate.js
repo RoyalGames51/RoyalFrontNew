@@ -1,7 +1,4 @@
-import { useDispatch } from "react-redux";
 export const validateNick = (nick) => {
-    // const dispatch = useDispatch()
-    // dispatch(getUserByNick(nick))
     if (!nick) {
         return "El nombre de usuario es obligatorio.";
     }

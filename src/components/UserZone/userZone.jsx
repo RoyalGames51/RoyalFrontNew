@@ -90,7 +90,6 @@ export default function UserZone() {
           });
          
         } catch (error) {
-          console.error(`Error al cerrar sesión: ${error.message}`);
           Swal.fire({
             title: "Error",
             text: "Hubo un error al cerrar sesión",

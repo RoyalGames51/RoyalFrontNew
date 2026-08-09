@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import API_URL from '../../../api/rutaApi';
@@ -25,7 +25,6 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
       onUserUpdate();
     } catch (error) {
       Swal.fire('Error', 'No se pudo agregar fichas', 'error');
-      console.error('Error:', error);
     } finally {
       setLoading(false);
     }
@@ -48,7 +47,6 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
       onUserUpdate();
     } catch (error) {
       Swal.fire('Error', 'No se pudo quitar fichas', 'error');
-      console.error('Error:', error);
     } finally {
       setLoading(false);
     }
@@ -76,7 +74,6 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
       onUserUpdate();
     } catch (error) {
       Swal.fire('Error', 'No se pudo banear al usuario', 'error');
-      console.error('Error:', error);
     } finally {
       setLoading(false);
     }
@@ -98,7 +95,6 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
       onUserUpdate();
     } catch (error) {
       Swal.fire('Error', 'No se pudo cambiar el rol del usuario', 'error');
-      console.error('Error:', error);
     } finally {
       setLoading(false);
     }
@@ -126,7 +122,6 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
       onUserUpdate();
     } catch (error) {
       Swal.fire('Error', 'No se pudo inactivar al usuario', 'error');
-      console.error('Error:', error);
     } finally {
       setLoading(false);
     }

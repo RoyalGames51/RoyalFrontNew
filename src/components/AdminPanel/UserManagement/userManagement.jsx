@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import API_URL from '../../../api/rutaApi';
 import UserDetailModal from './UserDetailModal';
@@ -87,11 +87,9 @@ const UserManagement = () => {
   };
 
   const handleActionEdit = (userId) => {
-    console.log('Edit user:', userId);
   };
 
   const handleActionBlock = (userId, currentStatus) => {
-    console.log('Toggle block user:', userId, currentStatus);
   };
 
   const handleCloseModal = () => {
@@ -110,7 +108,6 @@ const UserManagement = () => {
         setSelectedUser(updatedUser);
       }
     } catch (err) {
-      console.error('Error reloading users:', err);
     }
   };
 

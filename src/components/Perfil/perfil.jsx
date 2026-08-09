@@ -118,7 +118,6 @@ const Perfil = ({ isPublic = false }) => {
   const handleUpdate = (e) => {
     e.preventDefault();
     if (!user || !user.id) {
-      console.error("El ID del usuario es inválido.");
       return;
     }
     dispatch(updateUserProfile(user.id, formData));

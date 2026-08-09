@@ -54,7 +54,6 @@ export default function GameGrid({ onlyFavorites = false, isPublicProfile = fals
         navigate(gamePath);
       }
     } catch (err) {
-      console.error('Error navigating to game:', err);
     }
   };
 

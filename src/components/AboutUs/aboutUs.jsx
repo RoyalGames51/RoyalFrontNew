@@ -1,5 +1,3 @@
-import React from 'react';
-
 const AboutUs = () => {
   return (
     <div className="bg-background text-on-background min-h-screen pt-8 pb-24 md:pb-12 px-4 md:px-margin-desktop">
