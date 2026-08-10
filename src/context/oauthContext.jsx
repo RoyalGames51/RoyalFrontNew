@@ -1,6 +1,6 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import { authService } from "../services/authService";
-import { getUserByEmail } from "../redux/actions";
+import { getUserByEmail, cleanCurrentUser } from "../redux/actions";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 
@@ -46,6 +46,12 @@ const decodeJwt = (token) => {
     }
 };
 
+// Chequea localmente el claim `exp` del JWT, sin pegarle al backend
+const isTokenExpired = (payload) => {
+    if (!payload?.exp) return false;
+    return payload.exp * 1000 <= Date.now();
+};
+
 export function AuthProvider({ children }) {
     const dispatch = useDispatch();
     const [user, setUser] = useState(null);
@@ -64,6 +70,19 @@ export function AuthProvider({ children }) {
             // Si el token es inválido o no existe, limpiar sesión
             if (!token) {
                 authService.clearSession();
+                dispatch(cleanCurrentUser());
+                setIsAuthenticated(false);
+                setUser(null);
+                setLoading(false);
+                return;
+            }
+
+            // Chequeo local de expiración: evita mostrar una sesión "fantasma" mientras
+            // se espera la respuesta del backend (y funciona aunque el backend esté caído).
+            const decodedToken = decodeJwt(token);
+            if (isTokenExpired(decodedToken)) {
+                authService.clearSession();
+                dispatch(cleanCurrentUser());
                 setIsAuthenticated(false);
                 setUser(null);
                 setLoading(false);
@@ -72,12 +91,12 @@ export function AuthProvider({ children }) {
 
             // Fallback robusto: si el email es nulo o el string "undefined", lo extraemos del JWT
             if (!userEmail || userEmail === "undefined") {
-                const payload = decodeJwt(token);
-                if (payload?.email) {
-                    userEmail = payload.email;
+                if (decodedToken?.email) {
+                    userEmail = decodedToken.email;
                     localStorage.setItem('userEmail', userEmail);
                 } else {
                     authService.clearSession();
+                    dispatch(cleanCurrentUser());
                     setIsAuthenticated(false);
                     setUser(null);
                     setLoading(false);
@@ -89,6 +108,7 @@ export function AuthProvider({ children }) {
 
             const isValid = await authService.validateStoredSession();
             if (!isValid) {
+                dispatch(cleanCurrentUser());
                 setIsAuthenticated(false);
                 setUser(null);
                 setLoading(false);
@@ -101,6 +121,7 @@ export function AuthProvider({ children }) {
                 setUser(refreshedUser || null);
             } catch (error) {
                 authService.clearSession();
+                dispatch(cleanCurrentUser());
                 setIsAuthenticated(false);
                 setUser(null);
             }
