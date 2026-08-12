@@ -10,6 +10,7 @@ import rpachinka from "../../assets/rpachinka2.png";
 import juegoMinas from "../../assets/minas2.png";
 import sportsBanner from "../../assets/b1.jpg";
 import bannercelu from "../../assets/bannercelu.png";
+import chipsImage from "../../assets/chips.png";
 
 import Login from "../Login/login";
 import RegistroForm from "../Register/register";
@@ -247,29 +248,23 @@ export default function Home() {
     renderer.setClearColor(0x000000, 0);
     container.appendChild(renderer.domElement);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
     const pointLight = new THREE.PointLight(0xc9a84c, 2, 40);
     pointLight.position.set(4, 4, 4);
     scene.add(pointLight);
 
     const group = new THREE.Group();
-    const geometry = new THREE.CylinderGeometry(1, 1, 0.2, 64);
-    const material = new THREE.MeshPhongMaterial({
-      color: 0xc9a84c,
-      shininess: 120,
-      specular: 0xffffff,
+    const chipTexture = new THREE.TextureLoader().load(chipsImage);
+    const geometry = new THREE.CircleGeometry(1, 64);
+    const material = new THREE.MeshStandardMaterial({
+      map: chipTexture,
+      transparent: true,
+      side: THREE.DoubleSide,
     });
 
     const chip = new THREE.Mesh(geometry, material);
-    chip.rotation.x = Math.PI / 2;
     group.add(chip);
-
-    const ringGeo = new THREE.TorusGeometry(0.7, 0.05, 16, 100);
-    const ringMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.1 });
-    const ring = new THREE.Mesh(ringGeo, ringMat);
-    ring.position.z = 0.11;
-    group.add(ring);
 
     scene.add(group);
     camera.position.z = 5;
@@ -339,8 +334,7 @@ export default function Home() {
       }
       geometry.dispose();
       material.dispose();
-      ringGeo.dispose();
-      ringMat.dispose();
+      chipTexture.dispose();
       renderer.dispose();
     };
   }, [currentUser]);
@@ -944,12 +938,15 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background z-[1] pointer-events-none"></div>
         <div className="relative z-10 max-w-6xl w-full px-6 flex flex-col items-center justify-center">
           <div className="text-center reveal" style={{ transitionDelay: "0.2s" }}>
-            <h1 className="text-6xl md:text-8xl font-extrabold tracking-tighter mb-6 leading-tight text-white inline-flex items-center justify-center gap-4">
-              <span className="gold-shimmer italic">La mejor pagina de juegos</span>
+            <h1 className="text-6xl md:text-8xl font-extrabold tracking-tighter mb-4 leading-tight text-white inline-flex items-center justify-center gap-4">
+              <span className="gold-shimmer italic" translate="no">RoyalGames</span>
               <span className="relative block w-40 h-40 xl:w-51 xl:h-51">
                 <div ref={threeDChipRef} id="three-d-chip" className="absolute inset-0 w-full h-full pointer-events-auto" />
               </span>
             </h1>
+            <p className="text-on-surface-variant text-lg md:text-xl font-light tracking-tight mb-6">
+              La mejor pagina de juegos
+            </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 relative">
               <RegistroForm className="px-14 py-5 rounded-full gold-gradient text-black font-bold text-sm uppercase tracking-[0.2em] shadow-2xl btn-hover-glow transition-all cursor-pointer border-0">
                 Create Account
