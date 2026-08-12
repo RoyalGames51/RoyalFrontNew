@@ -938,9 +938,9 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background z-[1] pointer-events-none"></div>
         <div className="relative z-10 max-w-6xl w-full px-6 flex flex-col items-center justify-center">
           <div className="text-center reveal" style={{ transitionDelay: "0.2s" }}>
-            <h1 className="text-6xl md:text-8xl font-extrabold tracking-tighter mb-4 leading-tight text-white inline-flex items-center justify-center gap-4">
-              <span className="gold-shimmer italic" translate="no">RoyalGames</span>
-              <span className="relative block w-40 h-40 xl:w-51 xl:h-51">
+            <h1 className="relative inline-block text-6xl md:text-8xl font-extrabold tracking-tighter mb-4 leading-normal text-white">
+              <span className="gold-shimmer italic inline-block pb-2" translate="no">RoyalGames</span>
+              <span className="absolute top-1/2 -translate-y-1/2 -right-32 md:-right-44 w-32 h-32 md:w-40 md:h-40 pointer-events-none">
                 <div ref={threeDChipRef} id="three-d-chip" className="absolute inset-0 w-full h-full pointer-events-auto" />
               </span>
             </h1>
