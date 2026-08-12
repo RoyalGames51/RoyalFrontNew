@@ -949,14 +949,14 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 relative">
               <RegistroForm className="px-14 py-5 rounded-full gold-gradient text-black font-bold text-sm uppercase tracking-[0.2em] shadow-2xl btn-hover-glow transition-all cursor-pointer border-0">
-                Create Account
+                Crear Cuenta
               </RegistroForm>
 
               <button
                 onClick={() => window.dispatchEvent(new Event('open-login-modal'))}
                 className="px-14 py-5 rounded-full border-2 border-primary/50 text-primary font-bold text-sm uppercase tracking-[0.2em] hover:bg-primary/5 transition-all cursor-pointer bg-transparent"
               >
-                Login
+                Iniciar Sesión
               </button>
             </div>
           </div>

@@ -321,12 +321,12 @@ const RegistroForm = ({ className, children }) => {
                                 className="royal-gold-gradient royal-gold-glow w-full py-2.5 px-4 rounded-lg text-[#0A0A0F] font-bold text-sm transition-transform active:scale-95 duration-150 uppercase tracking-wider cursor-pointer"
                                 type="submit"
                             >
-                                Create Account
+                                Crear Cuenta
                             </button>
 
                             {/* Footer Link */}
                             <p className="text-center font-body-sm text-[12px] text-on-surface-variant pt-1">
-                                Already have an account?{" "}
+                                Ya tenes una cuenta?{" "}
                                 <a
                                     className="text-primary font-bold hover:underline cursor-pointer"
                                     href="#"
@@ -336,7 +336,7 @@ const RegistroForm = ({ className, children }) => {
                                         window.dispatchEvent(new Event("open-login-modal"));
                                     }}
                                 >
-                                    Sign in
+                                    Entrar
                                 </a>
                             </p>
                         </form>

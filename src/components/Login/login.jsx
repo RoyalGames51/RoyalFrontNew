@@ -266,7 +266,7 @@ export default function Login({ className, children }) {
                           type="checkbox"
                         />
                         <label className="ml-2 block font-label-md text-label-md text-on-surface-variant cursor-pointer" htmlFor="remember-me">
-                          Remember me
+                          Recuerdame
                         </label>
                       </div>
                       <div className="text-sm">
@@ -294,7 +294,7 @@ export default function Login({ className, children }) {
                         className="gold-gradient gold-glow gold-glow-hover w-full flex justify-center py-3.5 px-4 border border-transparent rounded-lg font-headline-sm text-headline-sm text-on-primary-fixed uppercase tracking-wider transition-all duration-300 transform active:scale-[0.98] cursor-pointer"
                         type="submit"
                       >
-                        Sign In
+                        Entrar
                       </button>
                     </div>
                   </form>
@@ -329,7 +329,7 @@ export default function Login({ className, children }) {
                     href="#"
                     onClick={handleRegister}
                   >
-                    Create account
+                    Crear Cuenta
                   </a>
                 </p>
               </div>

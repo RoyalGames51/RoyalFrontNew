@@ -241,7 +241,7 @@ export default function Navbar() {
           ) : (
             <div className="flex gap-3">
               <Login className="px-6 py-2.5 rounded-sm border border-primary/40 text-primary text-xs font-bold uppercase tracking-widest hover:bg-primary/10 transition-all btn-hover-glow cursor-pointer bg-transparent">
-                Sign In
+                Entrar
               </Login>
               <RegistroForm className="px-6 py-2.5 rounded-sm gold-gradient text-black text-xs font-bold uppercase tracking-widest transition-all btn-hover-glow cursor-pointer border-0">
                 Join Now
