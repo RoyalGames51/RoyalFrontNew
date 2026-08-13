@@ -56,10 +56,9 @@ export default function Navbar() {
 
   return (
     <header className={`sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm h-20 transition-all duration-300 pt-1` }>
-      <div className="flex justify-between items-center h-16 px-4 md:px-margin-desktop w-full">
+      <div className="flex justify-between items-center h-16 pl-0 pr-4 md:pr-margin-desktop w-full">
         {/* Left Section: Logo & Nav Links */}
         <div className="flex items-center gap-6">
-         
           <img src={rgamesLogo} className="h-12 md:h-14 w-auto object-contain" alt="RGAMES" />
            
           {currentUser?.id ? (

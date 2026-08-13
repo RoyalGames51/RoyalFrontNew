@@ -54,17 +54,18 @@ function App() {
     checkWelcomeGift();
   }, [currentUser]);
 
-  // Lightweight presence signal: lets the admin panel approximate "online now"
-  // by marking lastSeen every couple of minutes while the app is open.
+  // Lightweight presence signal: lets the admin panel + "jugadores conectados" widget
+  // approximate "online now" (and what page/game someone is on) by marking lastSeen
+  // every couple of minutes while the app is open, and immediately on navigation.
   useEffect(() => {
     if (!currentUser?.id) return;
     const sendHeartbeat = () => {
-      axios.put(`${API_URL}/users/heartbeat`).catch(() => {});
+      axios.put(`${API_URL}/users/heartbeat`, { currentPath: location.pathname }).catch(() => {});
     };
     sendHeartbeat();
     const interval = setInterval(sendHeartbeat, 2 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [currentUser?.id]);
+  }, [currentUser?.id, location.pathname]);
 
   const handleCloseGift = () => {
     setShowWelcomeGift(false);

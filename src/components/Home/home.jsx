@@ -2,12 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
+import axios from "axios";
 import * as THREE from 'three';
 
 import banner1 from "../../assets/banner1.png";
-import rj from "../../assets/rj.png";
-import rpachinka from "../../assets/rpachinka2.png";
-import juegoMinas from "../../assets/minas2.png";
 import sportsBanner from "../../assets/b1.jpg";
 import bannercelu from "../../assets/bannercelu.png";
 import chipsImage from "../../assets/chips.png";
@@ -17,6 +15,8 @@ import RegistroForm from "../Register/register";
 import { ShaderAnimation } from "../ui/shader-animation";
 import { formatChips, swalThemeConfig } from "../../utils/formatters";
 import GamesCatalog from "../GamesCatalog/gamesCatalog";
+import { GAMES_CATALOG, CATEGORY_META, getGameByPlayPath } from "../../data/gamesCatalog";
+import API_URL from "../../api/rutaApi";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -26,8 +26,8 @@ export default function Home() {
   const threeDChipRef = useRef(null);
   const chipSpinSpeedRef = useRef(0.015);
 
-  // Countdown timer state for the live tournament widget
-  const [timeLeft, setTimeLeft] = useState({ days: 2, hours: 14, minutes: 55, seconds: 0 });
+  const [topWinners, setTopWinners] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
   // Ticker items for recent wins
   const tickerItems = [
@@ -385,37 +385,17 @@ export default function Home() {
     };
   }, [currentUser]);
 
-  // Tournament countdown ticker
+  // Real top-winners leaderboard (chips actually won in games) + online players list
   useEffect(() => {
     if (!currentUser?.id) return;
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        let { days, hours, minutes, seconds } = prev;
-        if (seconds > 0) {
-          seconds--;
-        } else {
-          seconds = 59;
-          if (minutes > 0) {
-            minutes--;
-          } else {
-            minutes = 59;
-            if (hours > 0) {
-              hours--;
-            } else {
-              hours = 23;
-              if (days > 0) {
-                days--;
-              } else {
-                clearInterval(interval);
-              }
-            }
-          }
-        }
-        return { days, hours, minutes, seconds };
-      });
-    }, 1000);
+    const fetchWidgets = () => {
+      axios.get(`${API_URL}/leaderboard/top-winners?limit=5`).then(({ data }) => setTopWinners(data)).catch(() => {});
+      axios.get(`${API_URL}/users/online`).then(({ data }) => setOnlineUsers(data)).catch(() => {});
+    };
+    fetchWidgets();
+    const interval = setInterval(fetchWidgets, 60 * 1000);
     return () => clearInterval(interval);
-  }, [currentUser]);
+  }, [currentUser?.id]);
 
   // Helper alerts and navigation functions
   const handlePlayGame = (path, title) => {
@@ -449,15 +429,6 @@ export default function Home() {
     });
   };
 
-  const handleJoinTournament = () => {
-    Swal.fire({
-      title: "Masters Cup",
-      text: "¡Te has unido al torneo Masters Cup con éxito! Comienza a jugar para clasificar en el Leaderboard.",
-      icon: "success",
-      ...swalThemeConfig,
-    });
-  };
-
   const handleSoonAlert = (section) => {
     Swal.fire({
       title: section,
@@ -479,6 +450,7 @@ export default function Home() {
   // 1. Authenticated User Lobby Dashboard
   if (currentUser?.id) {
     const formattedChipsValue = formatChips(currentUser?.chips);
+    const otherOnlineUsers = onlineUsers.filter((u) => u.id !== currentUser.id);
 
     let vipLevel = "Bronce I";
     if (currentUser?.chips >= 1000000) {
@@ -568,100 +540,6 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Continue Playing Section */}
-          <section>
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">star</span>
-                <h2 className="font-headline-sm text-headline-sm text-white">Ultimos juegos</h2>
-              </div>
-              <button 
-                onClick={() => navigate('/juegos')}
-                className="text-primary text-label-md font-label-md hover:underline bg-transparent border-0 cursor-pointer"
-              >
-                Ver Todos
-              </button>
-            </div>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {/* Game Item 1: Lotería Real */}
-              <div 
-                onClick={() => handlePlayGame('/play/royalpachinka', 'Royal Pachinka')}
-                className="group relative rounded-lg overflow-hidden border border-outline-variant/20 aspect-[4/3] cursor-pointer bg-surface-container"
-              >
-                <img 
-                  className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" 
-                  src={rpachinka} 
-                  alt="Royal Pachinka" 
-                />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 backdrop-blur-[2px]">
-                  <span className="material-symbols-outlined text-primary text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>play_circle</span>
-                </div>
-                <div className="absolute bottom-0 w-full p-2 bg-gradient-to-t from-black to-transparent text-left">
-                  <p className="text-[12px] font-bold text-white truncate">Royal Pachinka</p>
-                </div>
-              </div>
-
-              {/* Game Item 2: VIP Roulette */}
-              {/* <div 
-                onClick={() => handlePlayGame('/ruleta', 'VIP Roulette')}
-                className="group relative rounded-lg overflow-hidden border border-outline-variant/20 aspect-[4/3] cursor-pointer bg-surface-container"
-              >
-                <img 
-                  className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" 
-                  src={juegoRuleta} 
-                  alt="VIP Roulette" 
-                />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 backdrop-blur-[2px]">
-                  <span className="material-symbols-outlined text-primary text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>play_circle</span>
-                </div>
-                <div className="absolute bottom-0 w-full p-2 bg-gradient-to-t from-black to-transparent text-left">
-                  <p className="text-[12px] font-bold text-white truncate">VIP Roulette</p>
-                </div>
-              </div> */}
-
-              {/* Game Item 3: Bingo */}
-              <div
-                onClick={() => handlePlayGame('/play/royaljoker', 'Royal Joker')}
-                className="group relative rounded-lg overflow-hidden border border-outline-variant/20 aspect-[4/3] cursor-pointer"
-              >
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-tr from-[#121212] to-[#1b1b1b]">
-                  <img
-                    className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                    src={rj}
-                    alt="Royal Joker"
-                  />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px]">
-                  <span className="material-symbols-outlined text-primary text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>play_circle</span>
-                </div>
-                <div className="absolute bottom-0 w-full p-2 bg-gradient-to-t from-black to-transparent text-left">
-                  <p className="text-[12px] font-bold text-white truncate">Royal Joker</p>
-                </div>
-              </div>
-
-              {/* Game Item 4: Minas */}
-              <div
-                onClick={() => handlePlayGame('/play/minas', 'Minas')}
-                className="group relative rounded-lg overflow-hidden border border-outline-variant/20 aspect-[4/3] cursor-pointer"
-              >
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-tr from-[#0f1115] to-[#17181b]">
-                  <img
-                    className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                    src={juegoMinas}
-                    alt="Minas"
-                  />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px]">
-                  <span className="material-symbols-outlined text-primary text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>play_circle</span>
-                </div>
-                <div className="absolute bottom-0 w-full p-2 bg-gradient-to-t from-black to-transparent text-left">
-                  <p className="text-[12px] font-bold text-white truncate">Minas</p>
-                </div>
-              </div>
-            </div>
-          </section>
-
           {/* Popular Games & Active Tournament */}
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
             {/* Popular Games List */}
@@ -687,193 +565,119 @@ export default function Home() {
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                {/* Popular Card 1 */}
-                <div className="group relative bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant/20 hover:border-primary/50 transition-all hover:-translate-y-1">
-                  <div className="aspect-[3/4] overflow-hidden">
-                    <img 
-                      className="w-full h-full object-cover" 
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpCcNDDLhupT0iOwy1efwVKGf6ATUKCy6U7q50kyjk86DZ0ESSWDYB3IrG_VbQ2nLajCDmLvXOct59w89ERq7kJydta4x2rtj18hF3ffoEPNHFxRiAJHXOp4-joRLAss2GIpXRWXEpfCcn17eLUjcdKtMQDo4p-lNCzppHIIyPmM_WXToorkNt3NbXKLAfPkWDm4ln0gxkOhUv8fxWHOTdBFnPxsnTABAi2RPFBg9hCCwRzQGJ6YIBJ6Bvk8_pA9vPVUZpUJk60PQ" 
-                      alt="Sweet Bonanza" 
-                    />
+                {GAMES_CATALOG.filter((game) => game.status === "active").map((game) => (
+                  <div
+                    key={game.slug}
+                    className="group relative bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant/20 hover:border-primary/50 transition-all hover:-translate-y-1"
+                  >
+                    <div className="aspect-[3/4] overflow-hidden">
+                      <img
+                        className="w-full h-full object-cover"
+                        src={game.image}
+                        alt={game.name}
+                      />
+                    </div>
+                    <div className="p-3 text-left">
+                      <span className={`text-[10px] font-bold uppercase tracking-wider ${CATEGORY_META[game.category].className}`}>
+                        {CATEGORY_META[game.category].label}
+                      </span>
+                      <h4 className="font-bold text-label-lg font-label-lg truncate text-white">{game.name}</h4>
+                    </div>
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => handlePlayGame(game.playPath, game.name)}
+                        className="gold-gradient w-3/4 py-2 rounded font-bold text-on-primary text-label-md cursor-pointer border-0"
+                      >
+                        JUGAR
+                      </button>
+                      <button
+                        onClick={() => navigate(`/juegos/${game.slug}`)}
+                        className="border border-primary bg-transparent text-primary w-3/4 py-2 rounded font-bold text-label-md hover:bg-primary/10 cursor-pointer"
+                      >
+                        INFO
+                      </button>
+                    </div>
                   </div>
-                  <div className="p-3 text-left">
-                    <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">PRAGMATIC</span>
-                    <h4 className="font-bold text-label-lg font-label-lg truncate text-white">Sweet Bonanza</h4>
-                  </div>
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button 
-                      onClick={() => navigate('/juegos')}
-                      className="gold-gradient w-3/4 py-2 rounded font-bold text-on-primary text-label-md cursor-pointer border-0"
-                    >
-                      JUGAR
-                    </button>
-                    <button 
-                      onClick={() => navigate('/juegos')}
-                      className="border border-primary bg-transparent text-primary w-3/4 py-2 rounded font-bold text-label-md hover:bg-primary/10 cursor-pointer"
-                    >
-                      DEMO
-                    </button>
-                  </div>
-                </div>
-
-                {/* Popular Card 2 */}
-                <div className="group relative bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant/20 hover:border-primary/50 transition-all hover:-translate-y-1">
-                  <div className="aspect-[3/4] overflow-hidden">
-                    <img 
-                      className="w-full h-full object-cover" 
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpCcNDDLhupT0iOwy1efwVKGf6ATUKCy6U7q50kyjk86DZ0ESSWDYB3IrG_VbQ2nLajCDmLvXOct59w89ERq7kJydta4x2rtj18hF3ffoEPNHFxRiAJHXOp4-joRLAss2GIpXRWXEpfCcn17eLUjcdKtMQDo4p-lNCzppHIIyPmM_WXToorkNt3NbXKLAfPkWDm4ln0gxkOhUv8fxWHOTdBFnPxsnTABAi2RPFBg9hCCwRzQGJ6YIBJ6Bvk8_pA9vPVUZpUJk60PQ" 
-                      alt="Poker Stars" 
-                    />
-                  </div>
-                  <div className="p-3 text-left">
-                    <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">EVOLUTION</span>
-                    <h4 className="font-bold text-label-lg font-label-lg truncate text-white">Poker Stars</h4>
-                  </div>
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button 
-                      onClick={() => navigate('/juegos')}
-                      className="gold-gradient w-3/4 py-2 rounded font-bold text-on-primary text-label-md cursor-pointer border-0"
-                    >
-                      JUGAR
-                    </button>
-                    <button 
-                      onClick={() => navigate('/juegos')}
-                      className="border border-primary bg-transparent text-primary w-3/4 py-2 rounded font-bold text-label-md hover:bg-primary/10 cursor-pointer"
-                    >
-                      DEMO
-                    </button>
-                  </div>
-                </div>
-
-                {/* Popular Card 3 */}
-                <div className="group relative bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant/20 hover:border-primary/50 transition-all hover:-translate-y-1">
-                  <div className="aspect-[3/4] overflow-hidden">
-                    <img 
-                      className="w-full h-full object-cover" 
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpCcNDDLhupT0iOwy1efwVKGf6ATUKCy6U7q50kyjk86DZ0ESSWDYB3IrG_VbQ2nLajCDmLvXOct59w89ERq7kJydta4x2rtj18hF3ffoEPNHFxRiAJHXOp4-joRLAss2GIpXRWXEpfCcn17eLUjcdKtMQDo4p-lNCzppHIIyPmM_WXToorkNt3NbXKLAfPkWDm4ln0gxkOhUv8fxWHOTdBFnPxsnTABAi2RPFBg9hCCwRzQGJ6YIBJ6Bvk8_pA9vPVUZpUJk60PQ" 
-                      alt="Wanted Dead or Alive" 
-                    />
-                  </div>
-                  <div className="p-3 text-left">
-                    <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">HACKSAW</span>
-                    <h4 className="font-bold text-label-lg font-label-lg truncate text-white">Wanted Dead or Alive</h4>
-                  </div>
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button 
-                      onClick={() => navigate('/juegos')}
-                      className="gold-gradient w-3/4 py-2 rounded font-bold text-on-primary text-label-md cursor-pointer border-0"
-                    >
-                      JUGAR
-                    </button>
-                    <button 
-                      onClick={() => navigate('/juegos')}
-                      className="border border-primary bg-transparent text-primary w-3/4 py-2 rounded font-bold text-label-md hover:bg-primary/10 cursor-pointer"
-                    >
-                      DEMO
-                    </button>
-                  </div>
-                </div>
-
-                {/* Popular Card 4 */}
-                <div className="group relative bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant/20 hover:border-primary/50 transition-all hover:-translate-y-1">
-                  <div className="aspect-[3/4] overflow-hidden">
-                    <img 
-                      className="w-full h-full object-cover" 
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpCcNDDLhupT0iOwy1efwVKGf6ATUKCy6U7q50kyjk86DZ0ESSWDYB3IrG_VbQ2nLajCDmLvXOct59w89ERq7kJydta4x2rtj18hF3ffoEPNHFxRiAJHXOp4-joRLAss2GIpXRWXEpfCcn17eLUjcdKtMQDo4p-lNCzppHIIyPmM_WXToorkNt3NbXKLAfPkWDm4ln0gxkOhUv8fxWHOTdBFnPxsnTABAi2RPFBg9hCCwRzQGJ6YIBJ6Bvk8_pA9vPVUZpUJk60PQ" 
-                      alt="Dice Roller" 
-                    />
-                  </div>
-                  <div className="p-3 text-left">
-                    <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">RG ORIGINALS</span>
-                    <h4 className="font-bold text-label-lg font-label-lg truncate text-white">Dice Roller</h4>
-                  </div>
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button 
-                      onClick={() => navigate('/juegos')}
-                      className="gold-gradient w-3/4 py-2 rounded font-bold text-on-primary text-label-md cursor-pointer border-0"
-                    >
-                      JUGAR
-                    </button>
-                    <button 
-                      onClick={() => navigate('/juegos')}
-                      className="border border-primary bg-transparent text-primary w-3/4 py-2 rounded font-bold text-label-md hover:bg-primary/10 cursor-pointer"
-                    >
-                      DEMO
-                    </button>
-                  </div>
-                </div>
+                ))}
               </div>
             </section>
 
-            {/* Active Tournament Widget */}
+            {/* Top Winners + Online Players */}
             <aside className="xl:col-span-4 flex flex-col gap-6 text-left">
+              {/* Top Winners Leaderboard */}
               <div className="bg-surface-container-high rounded-xl border border-primary/30 overflow-hidden flex flex-col gold-glow">
                 <div className="gold-gradient p-4 flex justify-between items-center">
-                  <h3 className="text-on-primary font-bold text-headline-sm font-headline-sm">Masters Cup</h3>
+                  <h3 className="text-on-primary font-bold text-headline-sm font-headline-sm">Top Ganadores</h3>
                   <span className="bg-black/20 text-on-primary px-2 py-1 rounded text-label-md font-label-md font-bold">EN VIVO</span>
                 </div>
-                <div className="p-6 space-y-6">
-                  {/* Prize Pool */}
-                  <div className="text-center">
-                    <p className="text-on-surface-variant text-label-md font-label-md mb-1 uppercase tracking-widest font-bold">POZO TOTAL ACTUAL</p>
-                    <p className="text-primary font-display-lg text-[40px] leading-none font-bold">$50,000.00</p>
-                  </div>
+                <div className="p-6 space-y-3">
+                  {topWinners.length === 0 ? (
+                    <p className="text-on-surface-variant text-sm text-center py-4">
+                      Todavía no hay premios registrados. ¡Sé el primero en ganar!
+                    </p>
+                  ) : (
+                    topWinners.map((player, index) => (
+                      <div
+                        key={player.id}
+                        className={`flex items-center justify-between p-3 rounded ${index === 0 ? "bg-surface border-l-4 border-primary" : "bg-surface/50"}`}
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <span className={`font-bold flex-shrink-0 ${index === 0 ? "text-primary" : "text-on-surface-variant"}`}>
+                            {index + 1}
+                          </span>
+                          <span className="font-bold text-white truncate">{player.nick}</span>
+                        </div>
+                        <span className={`font-bold flex-shrink-0 ${index === 0 ? "text-primary" : "text-on-surface-variant"}`}>
+                          {new Intl.NumberFormat('es-ES').format(player.totalWon)}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
 
-                  {/* Countdown Ticker */}
-                  <div className="flex justify-center gap-4">
-                    <div className="bg-surface p-2 rounded border border-outline-variant/20 w-16 text-center">
-                      <p className="text-primary font-bold text-xl">{String(timeLeft.days).padStart(2, '0')}</p>
-                      <p className="text-on-surface-variant text-[10px] font-bold">DÍAS</p>
-                    </div>
-                    <div className="bg-surface p-2 rounded border border-outline-variant/20 w-16 text-center">
-                      <p className="text-primary font-bold text-xl">{String(timeLeft.hours).padStart(2, '0')}</p>
-                      <p className="text-on-surface-variant text-[10px] font-bold">HORAS</p>
-                    </div>
-                    <div className="bg-surface p-2 rounded border border-outline-variant/20 w-16 text-center">
-                      <p className="text-primary font-bold text-xl">{String(timeLeft.minutes).padStart(2, '0')}</p>
-                      <p className="text-on-surface-variant text-[10px] font-bold">MIN</p>
-                    </div>
-                    <div className="bg-surface p-2 rounded border border-outline-variant/20 w-16 text-center">
-                      <p className="text-primary font-bold text-xl">{String(timeLeft.seconds).padStart(2, '0')}</p>
-                      <p className="text-on-surface-variant text-[10px] font-bold">SEG</p>
-                    </div>
-                  </div>
-
-                  {/* Leaderboard list */}
-                  <div className="space-y-3">
-                    <p className="text-on-surface-variant text-label-md font-label-md uppercase tracking-widest font-bold">MEJORES JUGADORES</p>
-                    <div className="flex items-center justify-between p-3 rounded bg-surface border-l-4 border-primary">
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-primary">1</span>
-                        <span className="font-bold text-white">LuckyWhale99</span>
-                      </div>
-                      <span className="text-primary font-bold">$12,400</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 rounded bg-surface/50">
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-on-surface-variant">2</span>
-                        <span className="font-bold text-white">VegasKing_01</span>
-                      </div>
-                      <span className="text-on-surface-variant font-bold">$9,250</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 rounded bg-surface/50">
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-on-surface-variant">3</span>
-                        <span className="font-bold text-white">HighRoller_X</span>
-                      </div>
-                      <span className="text-on-surface-variant font-bold">$7,800</span>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={handleJoinTournament}
-                    className="w-full border border-primary text-primary py-3 rounded-lg font-bold hover:bg-primary/10 transition-colors bg-transparent cursor-pointer"
-                  >
-                    Unirse al Torneo
-                  </button>
+              {/* Online Players */}
+              <div className="bg-surface-container-high rounded-xl border border-outline-variant/20 overflow-hidden flex flex-col">
+                <div className="p-4 border-b border-outline-variant/10 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0"></span>
+                  <h3 className="font-bold text-headline-sm font-headline-sm text-white">
+                    {otherOnlineUsers.length} {otherOnlineUsers.length === 1 ? "Jugador Conectado" : "Jugadores Conectados"}
+                  </h3>
+                </div>
+                <div className="max-h-80 overflow-y-auto divide-y divide-outline-variant/10">
+                  {otherOnlineUsers.length === 0 ? (
+                    <p className="text-on-surface-variant text-sm text-center py-6 px-4">
+                      No hay otros jugadores conectados ahora mismo.
+                    </p>
+                  ) : (
+                    otherOnlineUsers.map((player) => {
+                      const activeGame = getGameByPlayPath(player.currentActivity);
+                      return (
+                        <div key={player.id} className="flex items-center justify-between gap-3 p-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-9 h-9 rounded-full royal-gold-gradient flex items-center justify-center text-surface-container-lowest font-bold text-xs flex-shrink-0">
+                              {(player.nick || "RG").slice(0, 2).toUpperCase()}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-bold text-white text-sm truncate">{player.nick}</p>
+                              <p className="text-[11px] text-on-surface-variant truncate">
+                                {activeGame ? <span className="text-primary">Jugando a {activeGame.name}</span> : "En el sitio"}
+                              </p>
+                            </div>
+                          </div>
+                          {activeGame && (
+                            <button
+                              onClick={() => handlePlayGame(activeGame.playPath, activeGame.name)}
+                              className="px-3 py-1.5 rounded gold-gradient text-black text-[11px] font-bold uppercase flex-shrink-0 cursor-pointer border-0"
+                            >
+                              Jugar
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </div>
 

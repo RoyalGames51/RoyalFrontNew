@@ -144,5 +144,7 @@ export const GAMES_CATALOG = [
 
 export const getGameBySlug = (slug) => GAMES_CATALOG.find((game) => game.slug === slug);
 
+export const getGameByPlayPath = (path) => GAMES_CATALOG.find((game) => game.playPath === path);
+
 export const getGamesByCategory = (category) =>
   GAMES_CATALOG.filter((game) => game.category === category);
