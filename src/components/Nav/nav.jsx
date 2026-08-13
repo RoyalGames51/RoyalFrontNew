@@ -59,7 +59,7 @@ export default function Navbar() {
       <div className="flex justify-between items-center h-16 pl-0 pr-4 md:pr-margin-desktop w-full">
         {/* Left Section: Logo & Nav Links */}
         <div className="flex items-center gap-6">
-          <img src={rgamesLogo} className="h-12 md:h-14 w-auto object-contain" alt="RGAMES" />
+          <img src={rgamesLogo} className="h-12 md:h-14 w-auto object-contain pl-4 md:pl-6" alt="RGAMES" />
            
           {currentUser?.id ? (
             <>
