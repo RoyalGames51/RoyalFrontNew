@@ -525,10 +525,10 @@ export default function Home() {
               onClick={handleClaimWelcomePackage}
               className="lg:col-span-8 relative rounded-xl overflow-hidden border border-outline-variant/30 group cursor-pointer h-[320px] lg:h-full"
             >
-              <img 
-                alt="Banner Welcome" 
-                className="absolute inset-0 w-full h-full object-contain object-center transition-transform duration-700" 
-                src={banner1} 
+              <img
+                alt="Banner Welcome"
+                className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700"
+                src={banner1}
               />
             
             </div>
