@@ -39,7 +39,6 @@ const Perfil = ({ isPublic = false }) => {
     viewedUser?.id ? state.friends.relationship[viewedUser.id] : null,
   );
 
-  const [activeTab, setActiveTab] = useState("info"); // "info", "favoritos"
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const user = isPublic ? viewedUser : currentUser;
@@ -376,95 +375,17 @@ const Perfil = ({ isPublic = false }) => {
         </div>
       </section>
 
-      {/* Tabs Navigation */}
-      <div className="flex gap-8 border-b border-outline-variant/20 mb-10 overflow-x-auto no-scrollbar">
-        <button
-          onClick={() => setActiveTab("info")}
-          className={`pb-4 font-label-lg text-label-lg whitespace-nowrap transition-all border-b-2 ${
-            activeTab === "info"
-              ? "text-primary border-primary font-bold"
-              : "text-on-surface-variant hover:text-on-surface border-transparent"
-          }`}
-        >
-          Personal Info
-        </button>
-        <button
-          onClick={() => setActiveTab("favoritos")}
-          className={`pb-4 font-label-lg text-label-lg whitespace-nowrap transition-all border-b-2 ${
-            activeTab === "favoritos"
-              ? "text-primary border-primary font-bold"
-              : "text-on-surface-variant hover:text-on-surface border-transparent"
-          }`}
-        >
-          Juegos Favoritos
-        </button>
-      </div>
-
-      {/* Profile Form Content */}
+      {/* Profile Content */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-        
-        {/* Left Column: Form & Lists */}
+
+        {/* Left Column: Favorite Games */}
         <div className="lg:col-span-8">
-          {activeTab === "info" && (
-            <div className="glass-card p-8 rounded-xl relative overflow-hidden">
-              <div className="flex justify-between items-center mb-8">
-                <h3 className="font-headline-sm text-headline-sm text-white font-bold">Personal Information</h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-                <div className="space-y-2">
-                  <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Username / Nick</span>
-                  <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm">
-                    {capitalize(user.nick)}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Email Address</span>
-                  <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm">
-                    {user.email || "Email no disponible"}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Gender / Género</span>
-                  <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm">
-                    {user.sexo === "H" ? "Hombre / Male" : user.sexo === "M" ? "Mujer / Female" : "No especificado"}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Age / Edad</span>
-                  <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm">
-                    {user.age ? `${user.age} años` : "No especificado"}
-                  </div>
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Country / País</span>
-                  <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm">
-                    {user.country || "No especificado"}
-                  </div>
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Biography / Descripción</span>
-                  <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm italic">
-                    {user.description ? `"${user.description}"` : "Sin descripción disponible."}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "favoritos" && (
-            <div className="glass-card p-8 rounded-xl relative overflow-hidden">
-              <h3 className="font-headline-sm text-headline-sm text-white mb-6 text-center">
-                Mis Juegos Favoritos
-              </h3>
-              <GameGrid onlyFavorites={true} isPublicProfile={!isOwnProfile} />
-            </div>
-          )}
+          <div className="glass-card p-8 rounded-xl relative overflow-hidden">
+            <h3 className="font-headline-sm text-headline-sm text-white mb-6 text-center">
+              Mis Juegos Favoritos
+            </h3>
+            <GameGrid onlyFavorites={true} isPublicProfile={!isOwnProfile} />
+          </div>
         </div>
 
         {/* Right Column: Secondary Info Cards */}
@@ -474,6 +395,10 @@ const Perfil = ({ isPublic = false }) => {
           <div className="glass-card p-6 rounded-xl relative overflow-hidden group">
             <div className="absolute -right-8 -bottom-8 w-32 h-32 royal-gold-gradient opacity-10 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
             <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <span className="font-label-md text-label-md text-on-surface-variant uppercase">Rango Actual</span>
+                <RankBadge tier={user.rank} size="sm" />
+              </div>
               <span className="font-label-md text-label-md text-on-surface-variant uppercase mb-2 block">
                 {nextRank ? "Próximo Rango" : "Rango Máximo Alcanzado"}
               </span>
@@ -502,25 +427,6 @@ const Perfil = ({ isPublic = false }) => {
                 <span className="material-symbols-outlined text-sm">workspace_premium</span>
                 Ver Beneficios de Rango
               </button>
-            </div>
-          </div>
-
-          {/* Security Preview */}
-          <div className="glass-card p-6 rounded-xl">
-            <h4 className="font-headline-sm text-headline-sm text-white mb-4">Security Overview</h4>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center border-b border-outline-variant/10 pb-2">
-                <span className="text-on-surface-variant font-body-sm">Account Status</span>
-                <span className="text-primary font-label-md">ACTIVE</span>
-              </div>
-              <div className="flex justify-between items-center border-b border-outline-variant/10 pb-2">
-                <span className="text-on-surface-variant font-body-sm">Last Session</span>
-                <span className="text-on-surface font-body-sm text-right">Just now</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-on-surface-variant font-body-sm">Security Grade</span>
-                <span className="text-[#F5D980] font-label-md text-right">ELITE</span>
-              </div>
             </div>
           </div>
 
