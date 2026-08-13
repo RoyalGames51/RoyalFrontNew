@@ -218,7 +218,7 @@ export default function Navbar() {
                 <div className="flex-1 min-w-0">
                   <button
                     type="button"
-                    onClick={() => navigate('/perfil')}
+                    onClick={() => navigate(currentUser.nick ? `/perfil/${currentUser.nick}` : '/perfil')}
                     className="w-full text-left text-white font-semibold text-sm truncate hover:text-blue-100 flex items-center gap-1.5"
                   >
                     <span className="truncate">

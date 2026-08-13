@@ -40,9 +40,12 @@ const Perfil = ({ isPublic = false }) => {
   );
 
   const [activeTab, setActiveTab] = useState("info"); // "info", "favoritos"
-  const [isEditing, setIsEditing] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const user = isPublic ? viewedUser : currentUser;
+  // Ownership is always derived from comparing IDs, never from which route/prop was used to
+  // get here, so editing controls can never be exposed while looking at someone else's data.
+  const isOwnProfile = !!currentUser?.id && !!user?.id && currentUser.id === user.id;
 
   // Form states for updates
   const [formData, setFormData] = useState({
@@ -60,16 +63,13 @@ const Perfil = ({ isPublic = false }) => {
   }, [dispatch, userNick, isPublic]);
   
   useEffect(() => {
-    if (isPublic && viewedUser?.id) {
-      dispatch(fetchPublicFavorites(viewedUser.id));
+    if (!user?.id) return;
+    if (isOwnProfile) {
+      dispatch(fetchFavoriteGames(user.id));
+    } else {
+      dispatch(fetchPublicFavorites(user.id));
     }
-  }, [dispatch, isPublic, viewedUser?.id]);
-  
-  useEffect(() => {
-    if (!isPublic && currentUser?.id) {
-      dispatch(fetchFavoriteGames(currentUser.id));
-    }
-  }, [dispatch, isPublic, currentUser?.id]);
+  }, [dispatch, user?.id, isOwnProfile]);
 
   useEffect(() => {
     if (isPublic && viewedUser?.id && currentUser?.id && viewedUser.id !== currentUser.id) {
@@ -108,7 +108,7 @@ const Perfil = ({ isPublic = false }) => {
   }
 
   // If logged-in user is admin, show a placeholder or handle accordingly (as they will share the admin profile mockup next)
-  if (!isPublic && user.admin) {
+  if (isOwnProfile && user.admin) {
     return (
       <div className="w-full max-w-4xl mx-auto p-8 text-center my-16 glass-card rounded-xl">
         <span className="material-symbols-outlined text-primary text-6xl mb-4" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -138,11 +138,11 @@ const Perfil = ({ isPublic = false }) => {
 
   const handleUpdate = (e) => {
     e.preventDefault();
-    if (!user || !user.id) {
+    if (!user || !user.id || !isOwnProfile) {
       return;
     }
     dispatch(updateUserProfile(user.id, formData));
-    setIsEditing(false);
+    setIsSettingsOpen(false);
     Swal.fire({
       icon: "success",
       title: "¡Perfil Actualizado!",
@@ -197,6 +197,11 @@ const Perfil = ({ isPublic = false }) => {
     return nickName.slice(0, 2).toUpperCase();
   };
 
+  const capitalize = (text) => {
+    if (!text) return text;
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  };
+
   const totalChips = user.chips || 0;
   const totalChipsDeposited = Number(user.totalChipsDeposited || 0);
   const rankMeta = getRankMeta(user.rank);
@@ -226,6 +231,16 @@ const Perfil = ({ isPublic = false }) => {
       {/* Profile Header */}
       <section className="relative mb-12">
         <div className="absolute inset-0 royal-gold-gradient opacity-5 blur-[100px] rounded-full -z-10 h-64 w-64 translate-x-1/2"></div>
+        {isOwnProfile && (
+          <button
+            type="button"
+            onClick={() => setIsSettingsOpen(true)}
+            title="Configuración de Perfil"
+            className="absolute top-0 right-0 w-10 h-10 rounded-full bg-surface-container-highest border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary/40 transition-all cursor-pointer z-10"
+          >
+            <span className="material-symbols-outlined text-[20px]">settings</span>
+          </button>
+        )}
         <div className="flex flex-col md:flex-row items-center md:items-end gap-8">
           
           <div className="relative group">
@@ -252,7 +267,7 @@ const Perfil = ({ isPublic = false }) => {
                   {getInitials(user.nick)}
                 </div>
               )}
-              {!isPublic && (
+              {isOwnProfile && (
                 <button
                   type="button"
                   onClick={() => {
@@ -292,7 +307,7 @@ const Perfil = ({ isPublic = false }) => {
           </div>
 
           <div className="flex-grow text-center md:text-left pb-4">
-            <h1 className="font-headline-lg text-headline-lg text-white mb-2">{user.nick}</h1>
+            <h1 className="font-headline-lg text-headline-lg text-white mb-2">{capitalize(user.nick)}</h1>
             <div className="flex flex-wrap justify-center md:justify-start items-center gap-4">
               <RankBadge tier={user.rank} size="md" />
               <span className="text-on-surface-variant font-body-sm text-body-sm">
@@ -300,7 +315,7 @@ const Perfil = ({ isPublic = false }) => {
               </span>
             </div>
 
-            {isPublic && currentUser?.id && user.id !== currentUser.id && (
+            {!isOwnProfile && currentUser?.id && (
               <div className="flex flex-wrap justify-center md:justify-start items-center gap-3 mt-4">
                 {relationship?.status === "friends" && (
                   <button
@@ -364,10 +379,7 @@ const Perfil = ({ isPublic = false }) => {
       {/* Tabs Navigation */}
       <div className="flex gap-8 border-b border-outline-variant/20 mb-10 overflow-x-auto no-scrollbar">
         <button
-          onClick={() => {
-            setActiveTab("info");
-            setIsEditing(false);
-          }}
+          onClick={() => setActiveTab("info")}
           className={`pb-4 font-label-lg text-label-lg whitespace-nowrap transition-all border-b-2 ${
             activeTab === "info"
               ? "text-primary border-primary font-bold"
@@ -377,10 +389,7 @@ const Perfil = ({ isPublic = false }) => {
           Personal Info
         </button>
         <button
-          onClick={() => {
-            setActiveTab("favoritos");
-            setIsEditing(false);
-          }}
+          onClick={() => setActiveTab("favoritos")}
           className={`pb-4 font-label-lg text-label-lg whitespace-nowrap transition-all border-b-2 ${
             activeTab === "favoritos"
               ? "text-primary border-primary font-bold"
@@ -400,155 +409,51 @@ const Perfil = ({ isPublic = false }) => {
             <div className="glass-card p-8 rounded-xl relative overflow-hidden">
               <div className="flex justify-between items-center mb-8">
                 <h3 className="font-headline-sm text-headline-sm text-white font-bold">Personal Information</h3>
-                {!isPublic && !isEditing && (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="flex items-center gap-2 px-4 py-2 border border-primary/30 rounded-lg text-primary hover:bg-primary/10 transition-all font-label-md text-label-md cursor-pointer bg-transparent"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">edit</span>
-                    <span>Editar Perfil</span>
-                  </button>
-                )}
               </div>
 
-              {isEditing ? (
-                /* Editing Mode Form */
-                <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-                  <div className="space-y-2">
-                    <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Username</label>
-                    <input
-                      className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
-                      type="text"
-                      name="nick"
-                      value={formData.nick}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Age / Edad</label>
-                    <input
-                      className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
-                      type="number"
-                      name="age"
-                      value={formData.age}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Country / País</label>
-                    <select
-                      className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
-                      name="country"
-                      value={formData.country}
-                      onChange={handleInputChange}
-                    >
-                      <option value="">Selecciona un país</option>
-                      {countryOptions.map((country) => (
-                        <option key={country.value} value={country.value}>
-                          {country.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Avatar Image URL</label>
-                    <input
-                      className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
-                      type="text"
-                      name="image"
-                      value={formData.image}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Biography / Descripción</label>
-                    <textarea
-                      rows="3"
-                      className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm resize-none"
-                      name="description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="md:col-span-2 pt-6 flex justify-end gap-4">
-                    <button
-                      onClick={() => {
-                        if (user) {
-                          setFormData({
-                            nick: user.nick || "",
-                            age: user.age || "",
-                            description: user.description || "",
-                            country: user.country || "",
-                            image: user.image || "",
-                          });
-                        }
-                        setIsEditing(false);
-                      }}
-                      className="px-6 py-3 border border-outline-variant/30 rounded-lg font-label-lg text-label-lg hover:bg-surface-variant/50 transition-all text-on-surface cursor-pointer bg-transparent"
-                      type="button"
-                    >
-                      Discard Changes
-                    </button>
-                    <button
-                      className="royal-gold-gradient text-surface-container-lowest px-8 py-3 rounded-lg font-bold font-label-lg text-label-lg hover:brightness-110 active:scale-95 transition-all gold-glow cursor-pointer border-0"
-                      type="submit"
-                    >
-                      Save Information
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                /* Read-Only Mode Grid */
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-                  <div className="space-y-2">
-                    <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Username / Nick</span>
-                    <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm">
-                      {user.nick}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Email Address</span>
-                    <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm">
-                      {user.email || "Email no disponible"}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Gender / Género</span>
-                    <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm">
-                      {user.sexo === "H" ? "Hombre / Male" : user.sexo === "M" ? "Mujer / Female" : "No especificado"}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Age / Edad</span>
-                    <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm">
-                      {user.age ? `${user.age} años` : "No especificado"}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 md:col-span-2">
-                    <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Country / País</span>
-                    <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm">
-                      {user.country || "No especificado"}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 md:col-span-2">
-                    <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Biography / Descripción</span>
-                    <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm italic">
-                      {user.description ? `"${user.description}"` : "Sin descripción disponible."}
-                    </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                <div className="space-y-2">
+                  <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Username / Nick</span>
+                  <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm">
+                    {capitalize(user.nick)}
                   </div>
                 </div>
-              )}
+
+                <div className="space-y-2">
+                  <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Email Address</span>
+                  <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm">
+                    {user.email || "Email no disponible"}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Gender / Género</span>
+                  <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm">
+                    {user.sexo === "H" ? "Hombre / Male" : user.sexo === "M" ? "Mujer / Female" : "No especificado"}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Age / Edad</span>
+                  <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm">
+                    {user.age ? `${user.age} años` : "No especificado"}
+                  </div>
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Country / País</span>
+                  <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm">
+                    {user.country || "No especificado"}
+                  </div>
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <span className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Biography / Descripción</span>
+                  <div className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg px-4 py-3 text-on-surface font-body-md text-sm italic">
+                    {user.description ? `"${user.description}"` : "Sin descripción disponible."}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -557,7 +462,7 @@ const Perfil = ({ isPublic = false }) => {
               <h3 className="font-headline-sm text-headline-sm text-white mb-6 text-center">
                 Mis Juegos Favoritos
               </h3>
-              <GameGrid onlyFavorites={true} isPublicProfile={isPublic} />
+              <GameGrid onlyFavorites={true} isPublicProfile={!isOwnProfile} />
             </div>
           )}
         </div>
@@ -622,6 +527,120 @@ const Perfil = ({ isPublic = false }) => {
         </div>
 
       </div>
+
+      {isSettingsOpen && isOwnProfile && (
+        <div
+          className="fixed inset-0 z-[999] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4"
+          onClick={() => setIsSettingsOpen(false)}
+        >
+          <div
+            className="glass-card rounded-xl p-8 shadow-2xl relative max-w-2xl w-full max-h-[85vh] overflow-y-auto border border-[#1A1A26]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-headline-sm text-headline-sm text-white font-bold">Configuración de Perfil</h3>
+              <button
+                type="button"
+                onClick={() => setIsSettingsOpen(false)}
+                className="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-variant/40 transition-all cursor-pointer bg-transparent border-0"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+              <div className="space-y-2">
+                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Username</label>
+                <input
+                  className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
+                  type="text"
+                  name="nick"
+                  value={formData.nick}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Age / Edad</label>
+                <input
+                  className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
+                  type="number"
+                  name="age"
+                  value={formData.age}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Country / País</label>
+                <select
+                  className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
+                  name="country"
+                  value={formData.country}
+                  onChange={handleInputChange}
+                >
+                  <option value="">Selecciona un país</option>
+                  {countryOptions.map((country) => (
+                    <option key={country.value} value={country.value}>
+                      {country.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Avatar Image URL</label>
+                <input
+                  className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
+                  type="text"
+                  name="image"
+                  value={formData.image}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Biography / Descripción</label>
+                <textarea
+                  rows="3"
+                  className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm resize-none"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="md:col-span-2 pt-4 flex justify-end gap-4">
+                <button
+                  onClick={() => {
+                    if (user) {
+                      setFormData({
+                        nick: user.nick || "",
+                        age: user.age || "",
+                        description: user.description || "",
+                        country: user.country || "",
+                        image: user.image || "",
+                      });
+                    }
+                    setIsSettingsOpen(false);
+                  }}
+                  className="px-6 py-3 border border-outline-variant/30 rounded-lg font-label-lg text-label-lg hover:bg-surface-variant/50 transition-all text-on-surface cursor-pointer bg-transparent"
+                  type="button"
+                >
+                  Descartar Cambios
+                </button>
+                <button
+                  className="royal-gold-gradient text-surface-container-lowest px-8 py-3 rounded-lg font-bold font-label-lg text-label-lg hover:brightness-110 active:scale-95 transition-all gold-glow cursor-pointer border-0"
+                  type="submit"
+                >
+                  Guardar Cambios
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
   );
 };

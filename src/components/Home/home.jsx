@@ -917,8 +917,8 @@ export default function Home() {
             <span className="material-symbols-outlined">search</span>
             <span className="font-label-md text-label-md">Buscar</span>
           </button>
-          <button 
-            onClick={() => navigate('/perfil')}
+          <button
+            onClick={() => navigate(currentUser?.nick ? `/perfil/${currentUser.nick}` : '/perfil')}
             className="text-on-surface-variant hover:text-primary flex flex-col items-center gap-1 transition-transform active:scale-90 duration-200 bg-transparent border-0 cursor-pointer"
           >
             <span className="material-symbols-outlined">account_circle</span>
