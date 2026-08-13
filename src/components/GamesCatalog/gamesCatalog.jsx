@@ -9,7 +9,7 @@ function GameRow({ game }) {
     <button
       type="button"
       onClick={() => navigate(`/juegos/${game.slug}`)}
-      className={`w-full flex items-center gap-3 p-2.5 rounded-xl text-left cursor-pointer transition-all bg-transparent border-0 hover:bg-surface-variant/30 ${
+      className={`w-full flex items-start gap-3 p-2.5 rounded-xl text-left cursor-pointer transition-all bg-transparent border-0 hover:bg-surface-variant/30 ${
         isActive ? "" : "opacity-60 hover:opacity-90"
       }`}
     >
@@ -26,19 +26,21 @@ function GameRow({ game }) {
           </span>
         )}
       </div>
-      <span className={`flex-1 min-w-0 truncate font-label-lg text-label-lg ${isActive ? "text-white" : "text-on-surface-variant"}`}>
-        {game.name}
-      </span>
-      {isActive ? (
-        <span className="flex items-center gap-1 text-[11px] text-on-surface-variant flex-shrink-0">
-          <span className="material-symbols-outlined text-[14px]">person</span>
-          {new Intl.NumberFormat("es-ES").format(game.players)}
-        </span>
-      ) : (
-        <span className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/70 border border-outline-variant/30 rounded-full px-2 py-0.5 flex-shrink-0">
-          Próximamente
-        </span>
-      )}
+      <div className="min-w-0 flex-1 pt-1">
+        <p className={`font-label-lg text-label-lg leading-tight ${isActive ? "text-white" : "text-on-surface-variant"}`}>
+          {game.name}
+        </p>
+        {isActive ? (
+          <span className="flex items-center gap-1 text-[11px] text-on-surface-variant mt-1">
+            <span className="material-symbols-outlined text-[13px]">person</span>
+            {new Intl.NumberFormat("es-ES").format(game.players)}
+          </span>
+        ) : (
+          <span className="inline-block mt-1 text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/70 border border-outline-variant/30 rounded-full px-2 py-0.5">
+            Próximamente
+          </span>
+        )}
+      </div>
     </button>
   );
 }
@@ -55,7 +57,7 @@ export default function GamesCatalog() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-8 gap-y-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-x-8 gap-y-12">
         {CATEGORY_ORDER.map((categoryKey) => {
           const meta = CATEGORY_META[categoryKey];
           const games = getGamesByCategory(categoryKey);

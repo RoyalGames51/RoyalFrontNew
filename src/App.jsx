@@ -24,6 +24,8 @@ import AboutUs from './components/AboutUs/aboutUs';
 import UserManagement from './components/AdminPanel/UserManagement/userManagement';
 import AdminDashboard from './components/AdminPanel/AdminDashboard/adminDashboard';
 import SupportTicketsAdmin from './components/AdminPanel/SupportTickets/supportTickets';
+import AdminDeposits from './components/AdminPanel/Deposits/deposits';
+import ResetPassword from './components/ResetPassword/resetPassword';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import PaymentSuccess from './components/PaymentStatus/PaymentSuccess';
 import PaymentFailure from './components/PaymentStatus/PaymentFailure';
@@ -106,6 +108,7 @@ function App() {
             <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/tickets" element={<ProtectedRoute><SupportTicketsAdmin /></ProtectedRoute>} />
+            <Route path="/admin/deposits" element={<ProtectedRoute><AdminDeposits /></ProtectedRoute>} />
             <Route path="/noticias" element={<News />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/terminos-y-condiciones" element={<TermsAndConditions />} />
@@ -118,6 +121,7 @@ function App() {
             <Route path="/mensajes/:nick" element={<Messages />} />
             <Route path="/ayuda" element={<Support />} />
             <Route path="/ayuda/:ticketId" element={<Support />} />
+            <Route path="/restablecer-contrasena" element={<ResetPassword />} />
             <Route path="/mercadopago/success" element={<PaymentSuccess />} />
             <Route path="/mercadopago/failure" element={<PaymentFailure />} />
             <Route path="/mercadopago/pending" element={<PaymentPending />} />

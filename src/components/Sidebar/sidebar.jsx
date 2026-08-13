@@ -31,6 +31,7 @@ export default function Sidebar() {
     { to: "/admin/dashboard", icon: "dashboard", label: "Panel Admin" },
     { to: "/admin/users", icon: "manage_accounts", label: "Usuarios" },
     { to: "/admin/tickets", icon: "support_agent", label: "Tickets" },
+    { to: "/admin/deposits", icon: "payments", label: "Cargas" },
   ];
 
   if (!currentUser?.id || location.pathname.includes("/play")) {

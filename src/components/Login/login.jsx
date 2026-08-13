@@ -5,7 +5,10 @@ import { useAuth } from "../../context/oauthContext";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import axios from "axios";
+import API_URL from "../../api/rutaApi";
 import { getUserByNick } from "../../redux/actions";
+import { swalThemeConfig } from "../../utils/formatters";
 
 // Flag a nivel de módulo: garantiza que initialize() corra solo una vez por carga de página
 // (resiste React StrictMode que ejecuta efectos dos veces en desarrollo)
@@ -273,13 +276,32 @@ export default function Login({ className, children }) {
                         <a
                           className="font-label-md text-label-md text-primary hover:text-primary-fixed transition-colors"
                           href="#"
-                          onClick={(e) => {
+                          onClick={async (e) => {
                             e.preventDefault();
-                            Swal.fire({
+                            const result = await Swal.fire({
                               title: "Recuperar Contraseña",
-                              text: "Por favor, ponte en contacto con soporte técnico para restablecer tu contraseña.",
+                              text: "Ingresá el email de tu cuenta y te mandamos un enlace para restablecer tu contraseña.",
+                              input: "email",
+                              inputPlaceholder: "tu@email.com",
+                              showCancelButton: true,
+                              confirmButtonText: "Enviar",
+                              cancelButtonText: "Cancelar",
+                              ...swalThemeConfig,
+                              inputValidator: (value) => {
+                                if (!value) return "Ingresá tu email";
+                              },
+                            });
+                            if (!result.isConfirmed || !result.value) return;
+                            try {
+                              await axios.post(`${API_URL}/auth/forgot-password`, { email: result.value });
+                            } catch (error) {
+                              // El backend siempre responde genérico; si falla la request en sí, igual mostramos el mismo mensaje.
+                            }
+                            Swal.fire({
+                              title: "Revisá tu correo",
+                              text: "Si el email existe en nuestra plataforma, vas a recibir un enlace para restablecer tu contraseña.",
                               icon: "info",
-                              confirmButtonColor: "#C9A84C",
+                              ...swalThemeConfig,
                             });
                           }}
                         >

@@ -97,11 +97,10 @@ export default function BuyChips() {
       if (activeTab === "history" && currentUser?.id) {
         setLoadingHistory(true);
         try {
-          // Backend GET endpoint to retrieve specific user transactions
-          const response = await axios.get(`${API_URL}/payments/user/${currentUser.id}`);
-          // Sort transactions by date in descending order (newest first)
-          const sorted = response.data.sort((a, b) => new Date(b.date) - new Date(a.date));
-          setPaymentHistory(sorted);
+          // Unified movement history: deposits + non-gameplay chip adjustments (already
+          // sorted newest-first by the backend).
+          const response = await axios.get(`${API_URL}/chips/history`);
+          setPaymentHistory(response.data);
         } catch (error) {
         } finally {
           setLoadingHistory(false);
@@ -941,33 +940,64 @@ export default function BuyChips() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-outline-variant/10 text-sm">
-                          {paymentHistory.map((item) => (
-                            <tr key={item.paymentId} className="hover:bg-surface-variant/10 transition-colors">
-                              <td className="px-6 py-4 text-on-surface">
-                                {new Date(item.date).toLocaleString('es-ES', {
-                                  day: '2-digit', month: 'short', year: 'numeric',
-                                  hour: '2-digit', minute: '2-digit'
-                                })}
-                              </td>
-                              <td className="px-6 py-4">
-                                <div className="flex items-center gap-2 text-green-400">
-                                  <span className="material-symbols-outlined text-sm">south_west</span>
-                                  <span className="font-bold">Depósito</span>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 text-on-surface-variant">
-                                {formatPlatformName(item.paymentPlatform)}
-                              </td>
-                              <td className="px-6 py-4 text-right font-bold text-white">
-                                + {symbol} {new Intl.NumberFormat('es-ES').format(parseFloat(item.price).toFixed(2))}
-                              </td>
-                              <td className="px-6 py-4 text-center">
-                                <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-[10px] font-bold uppercase tracking-wider">
-                                  Completado
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
+                          {paymentHistory.map((item) => {
+                            const typeMeta = {
+                              deposit: { icon: "south_west", color: "text-green-400", label: "Depósito" },
+                              welcome: { icon: "redeem", color: "text-primary", label: "Bono de Bienvenida" },
+                              admin_adjustment: {
+                                icon: item.chips >= 0 ? "add_circle" : "remove_circle",
+                                color: item.chips >= 0 ? "text-green-400" : "text-error",
+                                label: "Ajuste Administrativo",
+                              },
+                            }[item.type];
+
+                            const statusMeta = {
+                              approved: { label: "Completado", className: "bg-green-500/10 text-green-400" },
+                              pending: { label: "Pendiente", className: "bg-amber-500/10 text-amber-400" },
+                              rejected: { label: "Rechazado", className: "bg-error/10 text-error" },
+                              cancelled: { label: "Cancelado", className: "bg-gray-500/10 text-gray-400" },
+                              refunded: { label: "Reembolsado", className: "bg-gray-500/10 text-gray-400" },
+                            }[item.status] || { label: item.status, className: "bg-gray-500/10 text-gray-400" };
+
+                            return (
+                              <tr key={item.id} className="hover:bg-surface-variant/10 transition-colors">
+                                <td className="px-6 py-4 text-on-surface">
+                                  {new Date(item.date).toLocaleString('es-ES', {
+                                    day: '2-digit', month: 'short', year: 'numeric',
+                                    hour: '2-digit', minute: '2-digit'
+                                  })}
+                                </td>
+                                <td className="px-6 py-4">
+                                  <div className={`flex items-center gap-2 ${typeMeta.color}`}>
+                                    <span className="material-symbols-outlined text-sm">{typeMeta.icon}</span>
+                                    <span className="font-bold">{typeMeta.label}</span>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 text-on-surface-variant">
+                                  {formatPlatformName(item.paymentPlatform)}
+                                </td>
+                                <td className="px-6 py-4 text-right font-bold text-white">
+                                  {item.type === "deposit" ? (
+                                    <>
+                                      + {symbol} {new Intl.NumberFormat('es-ES').format(parseFloat(item.price).toFixed(2))}
+                                      <span className="block text-[11px] font-normal text-on-surface-variant">
+                                        {new Intl.NumberFormat('es-ES').format(item.chips)} fichas
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <span className={typeMeta.color}>
+                                      {item.chips >= 0 ? "+" : ""}{new Intl.NumberFormat('es-ES').format(item.chips)} fichas
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="px-6 py-4 text-center">
+                                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusMeta.className}`}>
+                                    {statusMeta.label}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     ) : (

@@ -1,135 +1,124 @@
-import { Box, Grid, Text, Image, Spinner } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import FavoriteButton from "./FavoriteButton";
-import juego1 from "../../assets/IMG_4119.png";
-import juego2 from "../../assets/ruleta.png";
-import juego3 from "../../assets/bingoproxi.png";
-import juego4 from "../../assets/minas.png";
 import { useSelector, useDispatch } from "react-redux";
+import FavoriteButton from "./FavoriteButton";
+import { fetchFavoriteGames } from "../../redux/actions";
+import { GAMES_CATALOG, CATEGORY_META, CATEGORY_ORDER } from "../../data/gamesCatalog";
 
-
-// Lista de juegos disponibles
-const GAMES = [
-  { id: "40cf64b9-35a2-4953-beee-ca764135337b", src: juego1, path: "/loteria-instantanea", alt: "Lotería" },
-  { id: "a438f824-2f97-492d-89ba-73e213930ecb", src: juego2, path: "/ruleta", alt: "Ruleta" },
-  { id: "02814291-c075-4b77-8105-10b912f9dd31", src: juego3, path: "/bingo", alt: "Bingo" },
-  { id: "501ffe04-71e2-44c9-a06a-f97df1babd0a", src: juego4, path: "/play/minas", alt: "Minas" },
-  // Nuevo juego: Royal Pachinka
-  { id: "d9c2b8f0-7e6a-4c9a-9a2b-1f3e5a2b6c7d", src: juego1, path: "/play/royalpachinka", alt: "Royal Pachinka" },
-];
-
-export default function GameGrid({ onlyFavorites = false, isPublicProfile = false }) {
+export default function GameGrid() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const favoriteGames = useSelector((state) =>
-    isPublicProfile ? state.publicFavorites : state.favoriteGames
+  const { currentUser, favoriteGames } = useSelector((state) => state);
+  const [activeCategory, setActiveCategory] = useState("all");
+
+  useEffect(() => {
+    if (currentUser?.id) {
+      dispatch(fetchFavoriteGames(currentUser.id));
+    }
+  }, [currentUser?.id, dispatch]);
+
+  const games = activeCategory === "all"
+    ? GAMES_CATALOG
+    : GAMES_CATALOG.filter((game) => game.category === activeCategory);
+
+  const availableCategories = CATEGORY_ORDER.filter((key) =>
+    GAMES_CATALOG.some((game) => game.category === key)
   );
 
-  const [filteredGames, setFilteredGames] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Estado de carga
-
-  // Cargar favoritos públicos si es un perfil público
- 
-
-  // Actualizar juegos favoritos en base al estado
-  useEffect(() => {
-    if (favoriteGames) {
-      const newFilteredGames = onlyFavorites
-        ? GAMES.filter((game) => favoriteGames.includes(game.id))
-        : GAMES;
-      setFilteredGames(newFilteredGames);
-      setIsLoading(false); // Detener el spinner una vez que los datos estén listos
-    } else {
-      setFilteredGames([]);
-    }
-  }, [favoriteGames, onlyFavorites]);
-
-  const handleGameClick = (gamePath) => {
-    try {
-      if (typeof gamePath === 'string' && (gamePath.startsWith('http://') || gamePath.startsWith('https://'))) {
-        // Abrir enlaces externos en nueva pestaña
-        window.open(gamePath, '_blank', 'noopener,noreferrer');
-      } else {
-        navigate(gamePath);
-      }
-    } catch (err) {
-    }
-  };
-
-
-
   return (
-    <Box w={{ base: "95%", sm: "90%", md: "85%", lg: "80%" }} m="0 auto" p={{ base: "12px", sm: "16px", md: "20px" }}>
-      <Text 
-        fontSize={{ base: "lg", sm: "xl", md: "2xl" }} 
-        fontWeight="bold" 
-        textAlign="center" 
-        mb={{ base: "16px", md: "20px" }} 
-        bgColor="gray.200" 
-        borderTopRadius="15px"
-        py={{ base: "10px", md: "12px" }}
-      >
-        {onlyFavorites ? "Juegos Favoritos" : "Todos los Juegos"}
-      </Text>
+    <div className="w-full max-w-container-max mx-auto px-4 md:px-margin-desktop py-6">
+      <h1 className="font-headline-lg text-headline-lg text-white mb-2 text-center md:text-left">
+        Todos los Juegos
+      </h1>
+      <p className="text-on-surface-variant text-sm mb-6 text-center md:text-left">
+        Explorá nuestro catálogo completo. Tocá un juego para ver sus detalles.
+      </p>
 
-      {isLoading ? (
-        <Box display="flex" justifyContent="center" alignItems="center" minH="300px">
-          <Spinner size={{ base: "md", md: "xl" }} />
-        </Box>
-      ) : filteredGames.length > 0 ? (
-        <Grid 
-          templateColumns={{
-            base: "repeat(2, 1fr)",
-            sm: "repeat(2, 1fr)",
-            md: "repeat(3, 1fr)",
-            lg: "repeat(4, 1fr)",
-          }}
-          gap={{ base: "12px", sm: "16px", md: "20px", lg: "30px" }}
-        >
-          {filteredGames.map((game) => (
-            <Box
-              key={game.id}
-              position="relative"
-              overflow="hidden"
-              borderRadius={{ base: "10px", md: "15px" }}
-              boxShadow="0 4px 10px rgba(0, 0, 0, 0.2)"
-              cursor="pointer"
-              transition="transform 0.3s, box-shadow 0.3s"
-              _hover={{ transform: "scale(1.05)", boxShadow: "0 8px 20px rgba(0, 0, 0, 0.3)" }}
-              aspectRatio="1/1"
+      {availableCategories.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-8">
+          <button
+            onClick={() => setActiveCategory("all")}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer ${
+              activeCategory === "all"
+                ? "gold-gradient text-black border-transparent"
+                : "border-outline-variant/30 text-on-surface-variant hover:bg-surface-variant/30 bg-transparent"
+            }`}
+          >
+            Todos
+          </button>
+          {availableCategories.map((key) => (
+            <button
+              key={key}
+              onClick={() => setActiveCategory(key)}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer ${
+                activeCategory === key
+                  ? "gold-gradient text-black border-transparent"
+                  : "border-outline-variant/30 text-on-surface-variant hover:bg-surface-variant/30 bg-transparent"
+              }`}
             >
-              <Image
-                src={game.src}
-                alt={game.alt}
-                objectFit="contain"
-                w="100%"
-                h="100%"
-                onClick={() => handleGameClick(game.path)}
-              />
-              <Box 
-                position="absolute" 
-                bottom="0" 
-                w="100%" 
-                bg="rgba(0, 0, 0, 0.5)" 
-                color="white" 
-                textAlign="center" 
-                py={{ base: "8px", md: "10px" }}
-                fontSize={{ base: "12px", md: "14px" }}
-                fontWeight="500"
-              >
-                {game.alt}
-              </Box>
-
-              {!isPublicProfile && <FavoriteButton gameId={game.id} isFavorite={favoriteGames.includes(game.id)} />}
-            </Box>
+              {CATEGORY_META[key].label}
+            </button>
           ))}
-        </Grid>
-      ) : (
-        <Text textAlign="center" fontSize="lg" color="gray.500">
-          No hay juegos favoritos aún.
-        </Text>
+        </div>
       )}
-    </Box>
+
+      {games.length === 0 ? (
+        <div className="glass-card rounded-xl p-12 text-center">
+          <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-3 block">
+            casino
+          </span>
+          <p className="text-on-surface-variant">No hay juegos en esta categoría.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+          {games.map((game) => {
+            const isActive = game.status === "active";
+            return (
+              <div
+                key={game.slug}
+                onClick={() => navigate(`/juegos/${game.slug}`)}
+                className={`group relative rounded-xl overflow-hidden border border-outline-variant/20 hover:border-primary/50 transition-all cursor-pointer bg-surface-container-high ${
+                  isActive ? "" : "opacity-70 hover:opacity-100"
+                }`}
+              >
+                <div className={`aspect-square overflow-hidden flex items-center justify-center bg-gradient-to-br from-surface-container-high to-surface-container-low ${!isActive ? "grayscale" : ""}`}>
+                  {game.image ? (
+                    <img
+                      src={game.image}
+                      alt={game.name}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <span className="material-symbols-outlined text-[64px] text-on-surface-variant/40">
+                      {game.icon}
+                    </span>
+                  )}
+                </div>
+
+                <div className="absolute bottom-0 w-full p-3 bg-gradient-to-t from-black via-black/70 to-transparent text-left">
+                  <span className={`text-[9px] font-black uppercase tracking-widest ${CATEGORY_META[game.category].className}`}>
+                    {CATEGORY_META[game.category].label}
+                  </span>
+                  <p className="text-white font-bold text-sm truncate">{game.name}</p>
+                </div>
+
+                {!isActive && (
+                  <span className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-on-surface-variant text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border border-white/10">
+                    Próximamente
+                  </span>
+                )}
+
+                {game.favoriteId && (
+                  <FavoriteButton
+                    gameId={game.favoriteId}
+                    isFavorite={!!favoriteGames?.includes(game.favoriteId)}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }

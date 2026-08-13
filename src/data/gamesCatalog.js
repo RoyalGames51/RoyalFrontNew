@@ -42,6 +42,9 @@ export const GAMES_CATALOG = [
     icon: "grid_view",
     players: 3349,
     playPath: "/play/minas",
+    // Matches the pre-existing backend Game row so favorites saved before the catalog
+    // rework aren't lost.
+    favoriteId: "501ffe04-71e2-44c9-a06a-f97df1babd0a",
     description:
       "Revela casillas en una grilla y evita las minas ocultas para multiplicar tu apuesta. Cuanto más avances, mayor será tu premio... si te arriesgas.",
   },
@@ -54,6 +57,7 @@ export const GAMES_CATALOG = [
     icon: "casino",
     players: 2004,
     playPath: "/play/royalpachinka",
+    favoriteId: "d9c2b8f0-7e6a-4c9a-9a2b-1f3e5a2b6c7d",
     description:
       "El clásico juego de pachinko con estilo Royal: deja caer la bola y observa cómo rebota entre los pines hasta encontrar tu multiplicador.",
   },

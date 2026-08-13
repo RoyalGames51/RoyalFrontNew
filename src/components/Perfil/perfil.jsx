@@ -2,11 +2,8 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import GameGrid from "./../Juegos/juegos";
 import API_URL from "../../api/rutaApi";
 import {
-  fetchFavoriteGames,
-  fetchPublicFavorites,
   viewedUserProfile,
   updateUserProfile,
   fetchRelationship,
@@ -62,15 +59,6 @@ const Perfil = ({ isPublic = false }) => {
     }
   }, [dispatch, userNick, isPublic]);
   
-  useEffect(() => {
-    if (!user?.id) return;
-    if (isOwnProfile) {
-      dispatch(fetchFavoriteGames(user.id));
-    } else {
-      dispatch(fetchPublicFavorites(user.id));
-    }
-  }, [dispatch, user?.id, isOwnProfile]);
-
   useEffect(() => {
     if (isPublic && viewedUser?.id && currentUser?.id && viewedUser.id !== currentUser.id) {
       dispatch(fetchRelationship(viewedUser.id));
@@ -207,9 +195,9 @@ const Perfil = ({ isPublic = false }) => {
   };
 
   return (
-    <main className="flex-grow p-6 md:p-margin-desktop max-w-container-max mx-auto w-full select-none text-on-surface min-h-[85vh] pt-20 md:pt-24">
+    <main className="flex-grow p-6 md:p-margin-desktop max-w-container-max mx-auto w-full select-none text-on-surface pt-20 md:pt-24">
       {/* Profile Header */}
-      <section className="relative mb-12">
+      <section className="relative mb-6">
         <div className="absolute inset-0 royal-gold-gradient opacity-5 blur-[100px] rounded-full -z-10 h-64 w-64 translate-x-1/2"></div>
         <div className="absolute top-0 right-0 flex items-center gap-3 z-10">
           {(() => {
@@ -238,10 +226,10 @@ const Perfil = ({ isPublic = false }) => {
             </button>
           )}
         </div>
-        <div className="flex flex-col md:flex-row items-center md:items-end gap-8">
-          
+        <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
+
           <div className="relative group">
-            <div className="w-44 h-44 md:w-52 md:h-52 flex items-center justify-center relative bg-transparent overflow-visible">
+            <div className="w-24 h-24 md:w-28 md:h-28 flex items-center justify-center relative bg-transparent overflow-visible">
               {avatarSrc ? (
                 <img
                   alt="Avatar de Usuario"
@@ -260,7 +248,7 @@ const Perfil = ({ isPublic = false }) => {
                   src={user.image}
                 />
               ) : (
-                <div className="w-full h-full rounded-full royal-gold-gradient flex items-center justify-center text-surface-container-lowest font-display-lg text-display-lg font-bold">
+                <div className="w-full h-full rounded-full royal-gold-gradient flex items-center justify-center text-surface-container-lowest text-2xl md:text-3xl font-bold">
                   {getInitials(user.nick)}
                 </div>
               )}
@@ -295,17 +283,17 @@ const Perfil = ({ isPublic = false }) => {
                       }
                     });
                   }}
-                  className="absolute bottom-1 right-1 bg-surface-container-highest border border-outline-variant w-10 h-10 rounded-full flex items-center justify-center hover:bg-primary hover:text-surface-container-lowest transition-all group-hover:scale-110 cursor-pointer"
+                  className="absolute bottom-0 right-0 bg-surface-container-highest border border-outline-variant w-7 h-7 rounded-full flex items-center justify-center hover:bg-primary hover:text-surface-container-lowest transition-all group-hover:scale-110 cursor-pointer"
                 >
-                  <span className="material-symbols-outlined text-sm">edit</span>
+                  <span className="material-symbols-outlined text-[14px]">edit</span>
                 </button>
               )}
             </div>
           </div>
 
-          <div className="flex-grow text-center md:text-left pb-4">
-            <h1 className="font-headline-lg text-headline-lg text-white mb-2">{capitalize(user.nick)}</h1>
-            <div className="flex flex-wrap justify-center md:justify-start items-center gap-4">
+          <div className="flex-grow text-center md:text-left pb-1">
+            <h1 className="font-headline-md text-headline-md text-white mb-1">{capitalize(user.nick)}</h1>
+            <div className="flex flex-wrap justify-center md:justify-start items-center gap-3">
               <RankBadge tier={user.rank} size="md" />
               <span className="text-on-surface-variant font-body-sm text-body-sm">
                 {getMemberSince(user.createdAt || user.created_at || user.created)}
@@ -361,7 +349,7 @@ const Perfil = ({ isPublic = false }) => {
             )}
           </div>
 
-          <div className="hidden lg:flex flex-col items-end gap-2 pb-4">
+          <div className="hidden lg:flex flex-col items-end gap-2 pb-1">
             <div className="text-right">
               <span className="font-label-md text-label-md text-on-surface-variant uppercase block">Fichas Totales</span>
               <span className="font-headline-sm text-headline-sm royal-gold-text">
@@ -374,23 +362,10 @@ const Perfil = ({ isPublic = false }) => {
       </section>
 
       {/* Profile Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        {/* Left Column: Favorite Games */}
-        <div className="lg:col-span-8">
-          <div className="glass-card p-8 rounded-xl relative overflow-hidden">
-            <h3 className="font-headline-sm text-headline-sm text-white mb-6 text-center">
-              Mis Juegos Favoritos
-            </h3>
-            <GameGrid onlyFavorites={true} isPublicProfile={!isOwnProfile} />
-          </div>
-        </div>
-
-        {/* Right Column: Secondary Info Cards */}
-        <div className="lg:col-span-4 flex flex-col gap-gutter">
-          
-          {/* Rank Card */}
-          <div className="glass-card p-6 rounded-xl relative overflow-hidden group">
+        {/* Rank Card */}
+        <div className="glass-card p-6 rounded-xl relative overflow-hidden group">
             <div className="absolute -right-8 -bottom-8 w-32 h-32 royal-gold-gradient opacity-10 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-4">
@@ -456,8 +431,6 @@ const Perfil = ({ isPublic = false }) => {
               </div>
             </div>
           )}
-
-        </div>
 
       </div>
 
