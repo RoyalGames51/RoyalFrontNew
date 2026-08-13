@@ -1,9 +1,17 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { useDispatch } from 'react-redux';
 import Swal from 'sweetalert2';
-import API_URL from '../../../api/rutaApi';
+import {
+  addUserChips,
+  removeUserChips,
+  setUserRole,
+  setUserBanStatus,
+  setUserInactiveStatus,
+  deleteUserAccount,
+} from '../../../redux/actions';
 
 const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
+  const dispatch = useDispatch();
   const [chipsAmount, setChipsAmount] = useState('');
   const [newRole, setNewRole] = useState(user?.role || 'user');
   const [loading, setLoading] = useState(false);
@@ -16,10 +24,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
 
     setLoading(true);
     try {
-      await axios.put(`${API_URL}/add/chips`, {
-        userId: user.id,
-        amount: Number(chipsAmount),
-      });
+      await dispatch(addUserChips(user.id, Number(chipsAmount)));
       Swal.fire('Éxito', 'Fichas agregadas correctamente', 'success');
       setChipsAmount('');
       onUserUpdate();
@@ -38,10 +43,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
 
     setLoading(true);
     try {
-      await axios.put(`${API_URL}/remove/chips`, {
-        userId: user.id,
-        amount: Number(chipsAmount),
-      });
+      await dispatch(removeUserChips(user.id, Number(chipsAmount)));
       Swal.fire('Éxito', 'Fichas quitadas correctamente', 'success');
       setChipsAmount('');
       onUserUpdate();
@@ -52,13 +54,16 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
     }
   };
 
-  const handleBanUser = async () => {
+  const handleToggleBan = async () => {
+    const willBan = !user.banned;
     const confirm = await Swal.fire({
-      title: '¿Banear usuario?',
-      text: `¿Deseas banear a ${user?.nick}? Esta acción no se puede deshacer fácilmente.`,
+      title: willBan ? '¿Banear usuario?' : '¿Desbanear usuario?',
+      text: willBan
+        ? `¿Deseas banear a ${user?.nick}? No podrá iniciar sesión hasta que lo desbanees.`
+        : `¿Deseas restaurar el acceso de ${user?.nick}?`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Sí, banear',
+      confirmButtonText: willBan ? 'Sí, banear' : 'Sí, desbanear',
       cancelButtonText: 'Cancelar',
     });
 
@@ -66,14 +71,11 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
 
     setLoading(true);
     try {
-      await axios.put(`${API_URL}/user-ban`, {
-        userId: user.id,
-        status: true,
-      });
-      Swal.fire('Éxito', 'Usuario baneado correctamente', 'success');
+      await dispatch(setUserBanStatus(user.id, willBan));
+      Swal.fire('Éxito', willBan ? 'Usuario baneado correctamente' : 'Usuario desbaneado correctamente', 'success');
       onUserUpdate();
     } catch (error) {
-      Swal.fire('Error', 'No se pudo banear al usuario', 'error');
+      Swal.fire('Error', 'No se pudo actualizar el estado de baneo', 'error');
     } finally {
       setLoading(false);
     }
@@ -87,10 +89,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
 
     setLoading(true);
     try {
-      await axios.put(`${API_URL}/admin`, {
-        userId: user.id,
-        role: newRole,
-      });
+      await dispatch(setUserRole(user.id, newRole));
       Swal.fire('Éxito', 'Rol cambiado correctamente', 'success');
       onUserUpdate();
     } catch (error) {
@@ -100,13 +99,16 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
     }
   };
 
-  const handleDeactivateUser = async () => {
+  const handleToggleInactive = async () => {
+    const willDeactivate = !user.inactive;
     const confirm = await Swal.fire({
-      title: '¿Inactivar usuario?',
-      text: `¿Deseas inactivar a ${user?.nick}?`,
+      title: willDeactivate ? '¿Inactivar usuario?' : '¿Reactivar usuario?',
+      text: willDeactivate
+        ? `¿Deseas inactivar a ${user?.nick}?`
+        : `¿Deseas reactivar a ${user?.nick}?`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Sí, inactivar',
+      confirmButtonText: willDeactivate ? 'Sí, inactivar' : 'Sí, reactivar',
       cancelButtonText: 'Cancelar',
     });
 
@@ -114,14 +116,44 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
 
     setLoading(true);
     try {
-      await axios.put(`${API_URL}/inactivar-user`, {
-        userId: user.id,
-        status: true,
-      });
-      Swal.fire('Éxito', 'Usuario inactivado correctamente', 'success');
+      await dispatch(setUserInactiveStatus(user.id, willDeactivate));
+      Swal.fire('Éxito', willDeactivate ? 'Usuario inactivado correctamente' : 'Usuario reactivado correctamente', 'success');
       onUserUpdate();
     } catch (error) {
-      Swal.fire('Error', 'No se pudo inactivar al usuario', 'error');
+      Swal.fire('Error', 'No se pudo actualizar el estado del usuario', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    const confirm = await Swal.fire({
+      title: '¿Eliminar usuario definitivamente?',
+      html: `Esta acción <b>no se puede deshacer</b>. Escribe <b>${user?.nick}</b> para confirmar.`,
+      icon: 'error',
+      input: 'text',
+      inputPlaceholder: 'Nick del usuario',
+      showCancelButton: true,
+      confirmButtonText: 'Eliminar definitivamente',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33',
+      inputValidator: (value) => {
+        if (value !== user?.nick) {
+          return 'El nick no coincide';
+        }
+      },
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    setLoading(true);
+    try {
+      await dispatch(deleteUserAccount(user.id));
+      Swal.fire('Éxito', 'Usuario eliminado correctamente', 'success');
+      onClose();
+      onUserUpdate();
+    } catch (error) {
+      Swal.fire('Error', 'No se pudo eliminar al usuario', 'error');
     } finally {
       setLoading(false);
     }
@@ -185,7 +217,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
             <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
               <p className="text-[10px] uppercase tracking-widest text-primary mb-1">Fichas</p>
               <p className="font-headline-md text-headline-md text-on-surface">
-                € {(user.chips || 0).toLocaleString('de-DE', { minimumFractionDigits: 2 })}
+                {new Intl.NumberFormat('es-ES').format(user.chips || 0)}
               </p>
             </div>
             <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
@@ -269,6 +301,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                   disabled={loading}
                 >
                   <option value="user">Usuario</option>
+                  <option value="mod">Mod</option>
                   <option value="admin">Admin</option>
                 </select>
                 <button
@@ -289,22 +322,30 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
             </h4>
             <div className="grid grid-cols-2 gap-4">
               <button
-                onClick={handleDeactivateUser}
+                onClick={handleToggleInactive}
                 disabled={loading}
                 className="px-4 py-3 bg-gray-500/10 border border-gray-500/30 text-gray-500 rounded-lg font-semibold hover:bg-gray-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
               >
                 <span className="material-symbols-outlined">person_off</span>
-                Inactivar
+                {user.inactive ? 'Reactivar' : 'Inactivar'}
               </button>
               <button
-                onClick={handleBanUser}
-                disabled={loading || user.banned}
+                onClick={handleToggleBan}
+                disabled={loading}
                 className="px-4 py-3 bg-error/10 border border-error/30 text-error rounded-lg font-semibold hover:bg-error/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
               >
                 <span className="material-symbols-outlined">block</span>
-                {user.banned ? 'Baneado' : 'Banear'}
+                {user.banned ? 'Desbanear' : 'Banear'}
               </button>
             </div>
+            <button
+              onClick={handleDeleteUser}
+              disabled={loading}
+              className="w-full px-4 py-3 bg-error text-white rounded-lg font-semibold hover:bg-error/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+            >
+              <span className="material-symbols-outlined">delete_forever</span>
+              Eliminar Usuario Definitivamente
+            </button>
           </div>
         </div>
 

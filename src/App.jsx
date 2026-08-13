@@ -10,7 +10,6 @@ import { AuthProvider } from './context/oauthContext';
 import Perfil from './components/Perfil/perfil';
 import BuyChips from './components/Buychips/buyChips';
 import LogOut from './components/Logout/logout';
-import Panel from './components/Panel/panelAdmin';
 import GameGrid from './components/Juegos/juegos';
 import News from './components/News/news';
 import regaloBienvenida from '../src/assets/regalobienvenida.png';
@@ -31,6 +30,7 @@ import PaymentPending from './components/PaymentStatus/PaymentPending';
 import Bazar from './components/Bazar/bazar';
 import Friends from './components/Friends/friends';
 import Messages from './components/Messages/messages';
+import GameDetail from './components/Juegos/GameDetail/gameDetail';
 
 function App() {
   const [showWelcomeGift, setShowWelcomeGift] = useState(false);
@@ -53,6 +53,18 @@ function App() {
 
     checkWelcomeGift();
   }, [currentUser]);
+
+  // Lightweight presence signal: lets the admin panel approximate "online now"
+  // by marking lastSeen every couple of minutes while the app is open.
+  useEffect(() => {
+    if (!currentUser?.id) return;
+    const sendHeartbeat = () => {
+      axios.put(`${API_URL}/users/heartbeat`).catch(() => {});
+    };
+    sendHeartbeat();
+    const interval = setInterval(sendHeartbeat, 2 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [currentUser?.id]);
 
   const handleCloseGift = () => {
     setShowWelcomeGift(false);
@@ -84,9 +96,9 @@ function App() {
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/perfil/:userNick" element={<Perfil isPublic={true} />} />
             <Route path="/juegos" element={<GameGrid />} />
+            <Route path="/juegos/:slug" element={<GameDetail />} />
             <Route path="/chips" element={<BuyChips />} />
             <Route path="/logout" element={<LogOut />} />
-            <Route path="/panel" element={<Panel />} />
             <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="/noticias" element={<News />} />

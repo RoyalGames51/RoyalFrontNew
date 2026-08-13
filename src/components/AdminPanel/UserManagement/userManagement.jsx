@@ -10,7 +10,6 @@ const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [kycFilter, setKycFilter] = useState('all');
   const [countryFilter, setCountryFilter] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -41,9 +40,7 @@ const UserManagement = () => {
       user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.id?.toString().includes(searchTerm);
     
-    const matchesKyc = kycFilter === 'all' || 
-      (kycFilter === 'admin' && user.role === 'admin') ||
-      (kycFilter === 'user' && user.role === 'user');
+    const matchesKyc = kycFilter === 'all' || user.role === kycFilter;
     
     const matchesCountry = countryFilter === 'all' || user.country === countryFilter;
     
@@ -51,10 +48,10 @@ const UserManagement = () => {
   });
 
   const getKycBadge = (user) => {
-    // Sin campo KYC en el backend, mostrar role en su lugar
+    const label = user.role === 'admin' ? 'Admin' : user.role === 'mod' ? 'Mod' : 'Usuario';
     return (
       <span className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded-full border border-primary/30 uppercase">
-        {user.role === 'admin' ? 'Admin' : 'Usuario'}
+        {label}
       </span>
     );
   };
@@ -84,12 +81,6 @@ const UserManagement = () => {
   const handleActionView = (user) => {
     setSelectedUser(user);
     setIsModalOpen(true);
-  };
-
-  const handleActionEdit = (userId) => {
-  };
-
-  const handleActionBlock = (userId, currentStatus) => {
   };
 
   const handleCloseModal = () => {
@@ -192,6 +183,7 @@ const UserManagement = () => {
               >
                 <option value="all">Todos los Roles</option>
                 <option value="user">Usuario</option>
+                <option value="mod">Mod</option>
                 <option value="admin">Admin</option>
               </select>
             </div>
@@ -311,14 +303,8 @@ const UserManagement = () => {
                         </td>
                         <td className="px-6 py-5">
                           <p className="font-label-lg text-label-lg text-primary">
-                            € {(user.chips || 0).toLocaleString('de-DE', { minimumFractionDigits: 2 })}
+                            {new Intl.NumberFormat('es-ES').format(user.chips || 0)} fichas
                           </p>
-                          <div className="w-full bg-outline-variant/20 h-1 rounded-full mt-2 overflow-hidden">
-                            <div
-                              className="bg-primary h-full transition-all"
-                              style={{ width: `${Math.min((user.chips || 0) / 100000, 100)}%` }}
-                            ></div>
-                          </div>
                         </td>
                         <td className="px-6 py-5 text-center">
                           {getKycBadge(user)}
@@ -327,29 +313,13 @@ const UserManagement = () => {
                           {getStatusBadge(user)}
                         </td>
                         <td className="px-6 py-5 text-right">
-                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button 
-                              onClick={() => handleActionView(user)}
-                              className="p-2 text-on-surface-variant hover:text-primary transition-colors"
-                              title="Ver detalles"
-                            >
-                              <span className="material-symbols-outlined text-[20px]">visibility</span>
-                            </button>
-                            <button 
-                              onClick={() => handleActionEdit(user.id)}
-                              className="p-2 text-on-surface-variant hover:text-primary transition-colors"
-                            >
-                              <span className="material-symbols-outlined text-[20px]">edit</span>
-                            </button>
-                            <button 
-                              onClick={() => handleActionBlock(user.id, user.banned)}
-                              className="p-2 text-on-surface-variant hover:text-error transition-colors"
-                            >
-                              <span className="material-symbols-outlined text-[20px]">
-                                {user.banned ? 'lock_open' : 'block'}
-                              </span>
-                            </button>
-                          </div>
+                          <button
+                            onClick={() => handleActionView(user)}
+                            className="p-2 text-on-surface-variant hover:text-primary transition-colors bg-transparent border-0 cursor-pointer"
+                            title="Gestionar usuario"
+                          >
+                            <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
+                          </button>
                         </td>
                       </tr>
                     ))}

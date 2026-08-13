@@ -7,6 +7,7 @@ import {
     FRIENDS_LIST_SUCCESS, FRIENDS_INCOMING_SUCCESS, FRIENDS_OUTGOING_SUCCESS,
     FRIENDS_RELATIONSHIP_SUCCESS, FRIENDS_ACTION_ERROR,
     MESSAGES_CONVERSATIONS_SUCCESS, MESSAGES_THREAD_SUCCESS, MESSAGES_ACTION_ERROR,
+    ADMIN_OVERVIEW_SUCCESS, ADMIN_ACTION_ERROR,
 } from "../actions/action.types";
 
 const initialState = {
@@ -32,6 +33,7 @@ const initialState = {
         threads: {},
         error: null,
     },
+    adminOverview: null,
 };
 
 const reducer = (state = initialState, action) => {
@@ -180,6 +182,13 @@ const reducer = (state = initialState, action) => {
 
         case MESSAGES_ACTION_ERROR:
             return { ...state, messages: { ...state.messages, error: action.payload } };
+
+        // Manejo de administración
+        case ADMIN_OVERVIEW_SUCCESS:
+            return { ...state, adminOverview: action.payload };
+
+        case ADMIN_ACTION_ERROR:
+            return { ...state, error: action.payload };
 
         default:
             return state;

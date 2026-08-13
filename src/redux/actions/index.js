@@ -27,6 +27,8 @@ import {
     MESSAGES_CONVERSATIONS_SUCCESS,
     MESSAGES_THREAD_SUCCESS,
     MESSAGES_ACTION_ERROR,
+    ADMIN_OVERVIEW_SUCCESS,
+    ADMIN_ACTION_ERROR,
 } from "./action.types";
 import axios from 'axios';
 
@@ -201,9 +203,8 @@ export const createGame = (gameData) => async (dispatch) => {
 export const promo1millon = () => {
     return async (dispatch) => {
         try {
-            const { data } = await axios.get(`${API_URL}/getUsers`);
-            const userCount = Array.isArray(data) ? data.length : data.count;
-            dispatch({ type: PROMO1K, payload: userCount });
+            const { data } = await axios.get(`${API_URL}/users/count`);
+            dispatch({ type: PROMO1K, payload: data.count });
         } catch (error) {
             throw new Error(`Error al añadir las fichas: ${error.message}`);
         }
@@ -343,4 +344,39 @@ export const markThreadRead = (userId) => async (dispatch) => {
     } catch (error) {
         dispatch({ type: MESSAGES_ACTION_ERROR, payload: error.message });
     }
+};
+
+// ===== Admin =====
+
+export const fetchAdminOverview = () => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`${API_URL}/admin/overview`);
+        dispatch({ type: ADMIN_OVERVIEW_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({ type: ADMIN_ACTION_ERROR, payload: error.message });
+    }
+};
+
+export const addUserChips = (userId, amount) => async () => {
+    await axios.put(`${API_URL}/add/chips`, { userId, amount });
+};
+
+export const removeUserChips = (userId, amount) => async () => {
+    await axios.put(`${API_URL}/remove/chips`, { userId, amount });
+};
+
+export const setUserRole = (userId, role) => async () => {
+    await axios.put(`${API_URL}/admin`, { userId, role });
+};
+
+export const setUserBanStatus = (userId, status) => async () => {
+    await axios.put(`${API_URL}/user-ban`, { userId, status });
+};
+
+export const setUserInactiveStatus = (userId, status) => async () => {
+    await axios.put(`${API_URL}/inactivar-user`, { userId, status });
+};
+
+export const deleteUserAccount = (userId) => async () => {
+    await axios.delete(`${API_URL}/user-delete/${userId}`);
 };

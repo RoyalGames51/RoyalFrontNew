@@ -16,6 +16,7 @@ import Login from "../Login/login";
 import RegistroForm from "../Register/register";
 import { ShaderAnimation } from "../ui/shader-animation";
 import { formatChips, swalThemeConfig } from "../../utils/formatters";
+import GamesCatalog from "../GamesCatalog/gamesCatalog";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -892,6 +893,9 @@ export default function Home() {
               </div>
             </aside>
           </div>
+
+          {/* Games Catalog by Category */}
+          <GamesCatalog />
         </main>
 
         {/* BottomNavBar (Mobile Only) */}
@@ -1041,6 +1045,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Games Catalog by Category */}
+      <GamesCatalog />
 
       {/* Featured Games */}
       <section id="featured-games" className="py-32 bg-surface/30 px-6">

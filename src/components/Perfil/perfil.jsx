@@ -106,26 +106,6 @@ const Perfil = ({ isPublic = false }) => {
     );
   }
 
-  // If logged-in user is admin, show a placeholder or handle accordingly (as they will share the admin profile mockup next)
-  if (isOwnProfile && user.admin) {
-    return (
-      <div className="w-full max-w-4xl mx-auto p-8 text-center my-16 glass-card rounded-xl">
-        <span className="material-symbols-outlined text-primary text-6xl mb-4" style={{ fontVariationSettings: "'FILL' 1" }}>
-          admin_panel_settings
-        </span>
-        <h2 className="text-2xl font-bold text-white mb-2">Panel de Administración de Élite</h2>
-        <p className="text-on-surface-variant mb-6">
-          Bienvenido, Administrador {user.nick}. Próximamente se aplicará el diseño de administración premium.
-        </p>
-        <button
-          onClick={() => navigate("/panel")}
-          className="px-6 py-2.5 rounded-lg gold-gradient text-[#0A0A0F] font-bold uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all"
-        >
-          Ir al Panel Admin
-        </button>
-      </div>
-    );
-  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -429,6 +409,34 @@ const Perfil = ({ isPublic = false }) => {
               </button>
             </div>
           </div>
+
+          {/* Quick Access */}
+          {isOwnProfile && (
+            <div className="glass-card rounded-xl overflow-hidden">
+              <h4 className="font-headline-sm text-headline-sm text-white px-6 pt-6 pb-3">Accesos Rápidos</h4>
+              <div className="flex flex-col">
+                {[
+                  { label: "Mis Amigos", icon: "group", to: "/amigos" },
+                  { label: "Mis Mensajes", icon: "forum", to: "/mensajes" },
+                  { label: "Comprar Fichas", icon: "paid", to: "/chips" },
+                  { label: "Cambiar Avatar", icon: "face_retouching_natural", to: "/bazar" },
+                  ...(user.role === "admin"
+                    ? [{ label: "Panel de Administración", icon: "admin_panel_settings", to: "/admin/dashboard" }]
+                    : []),
+                ].map((item) => (
+                  <button
+                    key={item.to}
+                    type="button"
+                    onClick={() => navigate(item.to)}
+                    className="flex items-center gap-3 px-6 py-3 text-left bg-transparent border-0 border-t border-outline-variant/10 first:border-t-0 hover:bg-surface-variant/30 transition-colors cursor-pointer text-on-surface"
+                  >
+                    <span className="material-symbols-outlined text-primary text-[20px]">{item.icon}</span>
+                    <span className="font-label-lg text-label-lg">{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
         </div>
 

@@ -1,142 +1,49 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { fetchAdminOverview } from '../../../redux/actions';
+import { RANK_META } from '../../../utils/rank';
+
+const numberFormat = (n) => new Intl.NumberFormat('es-ES').format(n || 0);
+
+const timeAgo = (dateString) => {
+  const diffMs = Date.now() - new Date(dateString).getTime();
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 1) return 'justo ahora';
+  if (minutes < 60) return `hace ${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `hace ${hours} h`;
+  const days = Math.floor(hours / 24);
+  return `hace ${days} d`;
+};
 
 const AdminDashboard = () => {
-  const [selectedMetric, setSelectedMetric] = useState('revenue');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const overview = useSelector((state) => state.adminOverview);
 
-  // Mock data - Podemos conectar a API después
-  const kpis = [
-    {
-      id: 1,
-      title: 'Usuarios Totales',
-      value: '1,284,302',
-      change: '+12%',
-      icon: 'group',
-      isPositive: true,
-    },
-    {
-      id: 2,
-      title: 'Activos Hoy',
-      value: '84,291',
-      change: '+4%',
-      icon: 'bolt',
-      isPositive: true,
-    },
-    {
-      id: 3,
-      title: 'GGR Hoy',
-      value: '$412.5k',
-      change: '-2.4%',
-      icon: 'payments',
-      isPositive: false,
-    },
-    {
-      id: 4,
-      title: 'Depósitos',
-      value: '$892.1k',
-      change: '+18%',
-      icon: 'account_balance_wallet',
-      isPositive: true,
-    },
-    {
-      id: 5,
-      title: 'Pendientes',
-      value: '142',
-      change: null,
-      icon: 'hourglass_empty',
-      isPositive: null,
-      isPulse: true,
-    },
-    {
-      id: 6,
-      title: 'Nuevos Registros',
-      value: '1,042',
-      change: '+31%',
-      icon: 'person_add',
-      isPositive: true,
-    },
-  ];
+  useEffect(() => {
+    dispatch(fetchAdminOverview());
+  }, [dispatch]);
 
-  const activities = [
-    {
-      id: 1,
-      type: 'deposit',
-      user: 'MarcoR_88',
-      action: 'depositó exitosamente',
-      amount: '$2,500.00',
-      time: 'hace 2 minutos',
-      id_ref: 'TR-98231',
-      icon: 'person',
-    },
-    {
-      id: 2,
-      type: 'jackpot',
-      user: 'VegasKing',
-      action: 'Jackpot ganado en Royal Slots Platinum',
-      amount: '$12,400.00',
-      time: 'hace 14 minutos',
-      id_ref: null,
-      icon: 'casino',
-    },
-    {
-      id: 3,
-      type: 'vip',
-      user: 'ElitePlayer_01',
-      action: 'Nuevo nivel VIP asignado',
-      amount: 'Oro',
-      time: 'hace 45 minutos',
-      id_ref: null,
-      icon: 'security',
-    },
-    {
-      id: 4,
-      type: 'maintenance',
-      user: null,
-      action: 'Mantenimiento del sistema programado para las 02:00 UTC',
-      amount: null,
-      time: 'hace 1 hora',
-      id_ref: '15 min',
-      icon: 'history',
-    },
-  ];
+  const kpis = overview
+    ? [
+        { id: 1, title: 'Usuarios Totales', value: numberFormat(overview.totalUsers), icon: 'group' },
+        { id: 2, title: 'Conectados Ahora', value: numberFormat(overview.onlineUsers), icon: 'bolt', isPositive: true },
+        { id: 3, title: 'Nuevos Hoy', value: numberFormat(overview.newSignupsToday), icon: 'person_add', isPositive: true },
+        { id: 4, title: 'Usuarios Baneados', value: numberFormat(overview.bannedUsers), icon: 'block', isPositive: false },
+        { id: 5, title: 'Fichas en Circulación', value: numberFormat(overview.totalChipsInCirculation), icon: 'payments' },
+        { id: 6, title: 'Fichas Depositadas (Total)', value: numberFormat(overview.totalChipsDeposited), icon: 'account_balance_wallet' },
+      ]
+    : [];
 
-  const alerts = [
-    {
-      id: 1,
-      severity: 'critical',
-      title: 'Retraso en Retiros - Pasarela 04',
-      description: 'Latencia superando los 5000ms. Investigando la conexión.',
-      icon: 'warning',
-    },
-    {
-      id: 2,
-      severity: 'warning',
-      title: 'Múltiples Inicios de Sesión Fallidos',
-      description: 'IP: 192.168.1.45 marcada por intentos de fuerza bruta.',
-      icon: 'notifications_active',
-    },
-    {
-      id: 3,
-      severity: 'info',
-      title: 'Se Requiere Mantenimiento de BD',
-      description: 'El rendimiento del sistema puede mejorar un 5%.',
-      icon: 'info',
-    },
-  ];
-
-  const chartData = [40, 35, 45, 60, 55, 80, 65, 70, 40, 50, 45, 55, 30, 35, 60];
-
-  const getAlertColor = (severity) => {
-    switch (severity) {
-      case 'critical':
-        return 'border-red-500 bg-red-500/5 text-red-500';
-      case 'warning':
-        return 'border-amber-500 bg-amber-500/5 text-amber-500';
-      case 'info':
-        return 'border-primary bg-primary/5 text-primary';
-      default:
-        return 'border-primary bg-primary/5 text-primary';
-    }
-  };
+  if (!overview) {
+    return (
+      <div className="bg-background text-on-background min-h-screen pt-24 pb-12 flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-background text-on-background min-h-screen pt-20 pb-12">
@@ -148,19 +55,16 @@ const AdminDashboard = () => {
               Panel de Operaciones
             </h1>
             <p className="text-on-surface-variant font-body-sm">
-              Métricas de rendimiento en tiempo real y monitoreo de salud del sistema.
+              Métricas en tiempo real de la plataforma: usuarios, fichas y actividad reciente.
             </p>
           </div>
-          <div className="flex gap-3">
-            <button className="px-6 py-2.5 rounded-xl border border-outline-variant/30 text-on-surface font-label-lg hover:bg-surface-variant/20 transition-all active:scale-95 flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">download</span>
-              Exportar Reporte
-            </button>
-            <button className="px-6 py-2.5 rounded-xl bg-primary text-on-primary font-bold font-label-lg hover:brightness-110 transition-all active:scale-95 flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">add</span>
-              Nueva Campaña
-            </button>
-          </div>
+          <button
+            onClick={() => navigate('/admin/users')}
+            className="px-6 py-2.5 rounded-xl bg-primary text-on-primary font-bold font-label-lg hover:brightness-110 transition-all active:scale-95 flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined text-[18px]">manage_accounts</span>
+            Gestionar Usuarios
+          </button>
         </div>
 
         {/* KPI Cards */}
@@ -168,24 +72,12 @@ const AdminDashboard = () => {
           {kpis.map((kpi) => (
             <div
               key={kpi.id}
-              className="bg-surface-container p-6 border border-outline-variant/20 rounded-xl hover:border-primary/40 transition-all group"
+              className="bg-surface-container p-6 border border-outline-variant/20 rounded-xl hover:border-primary/40 transition-all"
             >
               <div className="flex justify-between items-start mb-4">
                 <span className="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">
                   {kpi.icon}
                 </span>
-                {kpi.change && (
-                  <span
-                    className={`text-[12px] font-bold ${
-                      kpi.isPositive ? 'text-green-500' : 'text-red-500'
-                    }`}
-                  >
-                    {kpi.change}
-                  </span>
-                )}
-                {kpi.isPulse && (
-                  <div className="flex h-2 w-2 rounded-full bg-red-500 animate-pulse"></div>
-                )}
               </div>
               <p className="text-on-surface-variant font-label-md uppercase tracking-wider text-[10px]">
                 {kpi.title}
@@ -197,199 +89,98 @@ const AdminDashboard = () => {
           ))}
         </div>
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-8">
-          {/* Revenue Chart */}
-          <div className="lg:col-span-8 bg-surface-container border border-outline-variant/20 rounded-xl p-6">
-            <div className="flex justify-between items-center mb-6">
+        {/* Deposits today + staff summary */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div className="bg-surface-container border border-outline-variant/20 rounded-xl p-6">
+            <h4 className="font-headline-sm text-headline-sm text-on-surface mb-4">Depósitos de Hoy</h4>
+            <div className="flex justify-between items-end">
               <div>
-                <h4 className="font-headline-sm text-headline-sm text-on-surface">
-                  Tendencia de Ingresos (30 Días)
-                </h4>
-                <p className="text-body-sm text-on-surface-variant">
-                  Seguimiento de ingresos brutos de juego en todos los sectores.
-                </p>
+                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Transacciones</p>
+                <p className="font-headline-md text-headline-md text-primary">{numberFormat(overview.depositsTodayCount)}</p>
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setSelectedMetric('revenue')}
-                  className={`px-3 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all ${
-                    selectedMetric === 'revenue'
-                      ? 'bg-surface-variant text-on-surface'
-                      : 'hover:bg-surface-variant/50 text-on-surface-variant'
-                  }`}
-                >
-                  Línea
-                </button>
-                <button
-                  onClick={() => setSelectedMetric('area')}
-                  className={`px-3 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all ${
-                    selectedMetric === 'area'
-                      ? 'bg-surface-variant text-on-surface'
-                      : 'hover:bg-surface-variant/50 text-on-surface-variant'
-                  }`}
-                >
-                  Área
-                </button>
+              <div className="text-right">
+                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Fichas Depositadas</p>
+                <p className="font-headline-md text-headline-md text-primary">{numberFormat(overview.depositsTodayChips)}</p>
               </div>
-            </div>
-
-            <div className="h-64 w-full flex items-end gap-1 px-2 relative">
-              {chartData.map((height, index) => (
-                <div
-                  key={index}
-                  className="flex-1 bg-primary/20 hover:bg-primary/40 transition-all rounded-t-lg"
-                  style={{ height: `${height}%` }}
-                >
-                  {height > 75 && (
-                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-surface-bright px-2 py-1 border border-primary/40 rounded-lg text-[10px] whitespace-nowrap shadow-xl">
-                      Pico: $52,300
-                    </div>
-                  )}
-                </div>
-              ))}
-              <div className="absolute bottom-0 left-0 w-full h-[1px] bg-outline-variant/30"></div>
-            </div>
-
-            <div className="flex justify-between mt-4 px-2">
-              <span className="text-[10px] text-on-surface-variant font-bold">01 MAY</span>
-              <span className="text-[10px] text-on-surface-variant font-bold">15 MAY</span>
-              <span className="text-[10px] text-on-surface-variant font-bold">HOY</span>
             </div>
           </div>
-
-          {/* Liquidity Ratio */}
-          <div className="lg:col-span-4 bg-surface-container border border-outline-variant/20 rounded-xl p-6">
-            <h4 className="font-headline-sm text-headline-sm text-on-surface mb-2">
-              Ratio de Liquidez
-            </h4>
-            <p className="text-body-sm text-on-surface-variant mb-6">
-              Comparación entre ingresos y egresos de flujo de caja.
-            </p>
-
-            <div className="space-y-6">
+          <div className="bg-surface-container border border-outline-variant/20 rounded-xl p-6">
+            <h4 className="font-headline-sm text-headline-sm text-on-surface mb-4">Equipo</h4>
+            <div className="flex justify-between items-end">
               <div>
-                <div className="flex justify-between text-label-md mb-2">
-                  <span className="text-on-surface uppercase">Depósitos</span>
-                  <span className="text-primary">$892,100</span>
-                </div>
-                <div className="w-full h-2 bg-surface-container-low rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-primary to-secondary rounded-full" style={{ width: '78%' }}></div>
-                </div>
+                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Admins</p>
+                <p className="font-headline-md text-headline-md text-primary">{numberFormat(overview.adminCount)}</p>
               </div>
-
-              <div>
-                <div className="flex justify-between text-label-md mb-2">
-                  <span className="text-on-surface uppercase">Retiros</span>
-                  <span className="text-on-surface-variant">$241,500</span>
-                </div>
-                <div className="w-full h-2 bg-surface-container-low rounded-full overflow-hidden">
-                  <div className="h-full bg-outline-variant rounded-full" style={{ width: '32%' }}></div>
-                </div>
+              <div className="text-right">
+                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Mods</p>
+                <p className="font-headline-md text-headline-md text-primary">{numberFormat(overview.modCount)}</p>
               </div>
-            </div>
-
-            <div className="mt-12 p-4 bg-surface-container-low border border-outline-variant/10 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-green-500/10 text-green-500">
-                  <span className="material-symbols-outlined">trending_up</span>
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">
-                    Puntaje de Salud
-                  </p>
-                  <p className="font-headline-sm text-green-500">94% Óptimo</p>
-                </div>
+              <div className="text-right">
+                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Inactivos</p>
+                <p className="font-headline-md text-headline-md text-on-surface">{numberFormat(overview.inactiveUsers)}</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Activity & Alerts */}
+        {/* Activity & Top Players */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Recent Activity */}
           <div className="bg-surface-container border border-outline-variant/20 rounded-xl flex flex-col overflow-hidden">
-            <div className="p-6 border-b border-outline-variant/10 flex justify-between items-center">
+            <div className="p-6 border-b border-outline-variant/10">
               <h4 className="font-headline-sm text-headline-sm text-on-surface">
-                Actividad Reciente
+                Depósitos Recientes
               </h4>
-              <button className="text-primary text-label-md hover:underline">
-                Ver Todo
-              </button>
             </div>
 
-            <div className="flex-grow overflow-y-auto p-6 space-y-6">
-              {activities.map((activity) => (
-                <div key={activity.id} className="flex gap-4">
-                  <div className="w-10 h-10 rounded-full border border-outline-variant/20 flex items-center justify-center shrink-0 bg-surface-container-high">
-                    <span className="material-symbols-outlined text-[18px] text-on-surface-variant">
-                      {activity.icon}
-                    </span>
+            <div className="flex-grow overflow-y-auto p-6 space-y-6 max-h-[420px]">
+              {overview.recentPayments.length === 0 ? (
+                <p className="text-on-surface-variant text-sm">Todavía no hay depósitos registrados.</p>
+              ) : (
+                overview.recentPayments.map((payment, index) => (
+                  <div key={index} className="flex gap-4">
+                    <div className="w-10 h-10 rounded-full border border-outline-variant/20 flex items-center justify-center shrink-0 bg-surface-container-high">
+                      <span className="material-symbols-outlined text-[18px] text-primary">payments</span>
+                    </div>
+                    <div>
+                      <p className="text-body-sm text-on-surface">
+                        <span className="font-bold text-primary">{payment.nick}</span>{' '}
+                        depositó{' '}
+                        <span className="text-primary font-bold">{numberFormat(payment.chips)} fichas</span>
+                        {' '}vía {payment.paymentPlatform}
+                      </p>
+                      <p className="text-[11px] text-on-surface-variant mt-1">{timeAgo(payment.createdAt)}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-body-sm text-on-surface">
-                      {activity.user && (
-                        <>
-                          <span className="font-bold text-primary">{activity.user}</span>{' '}
-                        </>
-                      )}
-                      <span>{activity.action}</span>
-                      {activity.amount && (
-                        <span className="text-primary font-bold"> {activity.amount}</span>
-                      )}
-                    </p>
-                    <p className="text-[11px] text-on-surface-variant mt-1">
-                      {activity.time}
-                      {activity.id_ref && ` • ${activity.id_ref}`}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
-          {/* System Alerts */}
+          {/* Top Players by Chips */}
           <div className="bg-surface-container border border-outline-variant/20 rounded-xl flex flex-col overflow-hidden">
-            <div className="p-6 border-b border-outline-variant/10 flex justify-between items-center">
+            <div className="p-6 border-b border-outline-variant/10">
               <h4 className="font-headline-sm text-headline-sm text-on-surface">
-                Alertas del Sistema
+                Top Jugadores por Fichas
               </h4>
-              <span className="px-2 py-0.5 bg-error-container text-error rounded-lg text-[10px] font-bold">
-                {alerts.length} ACTIVAS
-              </span>
             </div>
 
-            <div className="p-6 space-y-4 overflow-y-auto">
-              {alerts.map((alert) => (
+            <div className="p-6 space-y-3 overflow-y-auto max-h-[420px]">
+              {overview.topByChips.map((player, index) => (
                 <div
-                  key={alert.id}
-                  className={`p-4 border-l-4 flex justify-between items-start ${getAlertColor(
-                    alert.severity
-                  )}`}
+                  key={player.id}
+                  className="flex items-center justify-between p-3 rounded-lg bg-surface-container-low border border-outline-variant/10"
                 >
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="material-symbols-outlined text-[16px]">
-                        {alert.icon}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="font-bold text-primary w-5 flex-shrink-0">{index + 1}</span>
+                    <span className="font-bold text-on-surface truncate">{player.nick}</span>
+                    {RANK_META[player.rank] && (
+                      <span className={`text-[10px] font-bold uppercase flex-shrink-0 ${RANK_META[player.rank].className}`}>
+                        {RANK_META[player.rank].label}
                       </span>
-                      <span className="text-[12px] font-bold uppercase tracking-widest">
-                        {alert.severity === 'critical'
-                          ? 'Alerta Crítica'
-                          : alert.severity === 'warning'
-                          ? 'Advertencia de Seguridad'
-                          : 'Optimización'}
-                      </span>
-                    </div>
-                    <h5 className="text-body-md font-bold text-on-surface">
-                      {alert.title}
-                    </h5>
-                    <p className="text-body-sm text-on-surface-variant">
-                      {alert.description}
-                    </p>
+                    )}
                   </div>
-                  <button className="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-colors">
-                    close
-                  </button>
+                  <span className="text-primary font-bold flex-shrink-0">{numberFormat(player.chips)}</span>
                 </div>
               ))}
             </div>
