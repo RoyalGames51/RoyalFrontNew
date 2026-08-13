@@ -31,10 +31,10 @@ export default function Home() {
   // Ticker items for recent wins
   const tickerItems = [
     { user: "User_992", amount: "$1,240.00", game: "Sweet Bonanza" },
-    { user: "VIP_King", amount: "$5,500.00", game: "Live Blackjack" },
+    { user: "VIP_King", amount: "$5,500.00", game: "Blackjack en Vivo" },
     { user: "SlotMaster", amount: "$820.50", game: "Gates of Olympus" },
     { user: "Elena_G", amount: "$12,000.00", game: "Mega Moolah" },
-    { user: "PlayerOne", amount: "$450.00", game: "Roulette" },
+    { user: "PlayerOne", amount: "$450.00", game: "Ruleta" },
   ];
 
   // Featured games configuration matching the new design layout
@@ -45,53 +45,53 @@ export default function Home() {
       category: "Premium",
       src: "https://lh3.googleusercontent.com/aida-public/AB6AXuD_XM-5gOSoZ-Nx1kEgMkizy64GDZGL-n51pbx110tNwTaaALceWNPAKH2DmbTkFmop_Av2OK236264M85GHmnhvnoJNqWGmZUGWJ0xRwql7JtvwFWeCJ7l6UEWanE7jXShjftw2_TfvOyCUfiMtBum84AibwaKyA9ezimQhliCUy-CJyxpfKOp0itrJYE6AW3sEcW-5l_4KaZHUPf8Qi5oOqnLQpe5p4dnzkV-SvdCmcbO22XaIshl",
       path: null,
-      actionText: "Join Table",
-      subActionText: "Spectate",
+      actionText: "Unirse a la Mesa",
+      subActionText: "Espectar",
     },
     {
       id: "midnight-poker",
       title: "Midnight Poker",
-      category: "Exclusive",
+      category: "Exclusivo",
       src: "https://lh3.googleusercontent.com/aida-public/AB6AXuB5rNtRzJR2KsWje6yXo4bqDyBhlZ9A1Q_ts_KdpHxSGIFhxUqX9UawI2pg6yEi7BNugsGHCQ5l0eLDPPOmH3S0a6gtrEthJH9yxoYIQIqBrivGdM0n9BiY_2RtYUFOjWbcBrEUlFh_4KOIGO_UtWkAWo3jgjP7XR2mnu0KWvt-jf3fYtu8Jnf3_duMyJ9ID5r8wJQn70TBPFTt32lJQkkQB07UTe85Nk5xbQp68f7F4jJLjO73wysp",
       path: null,
-      actionText: "Join Table",
-      subActionText: "Spectate",
+      actionText: "Unirse a la Mesa",
+      subActionText: "Espectar",
     },
     {
       id: "royal-baccarat",
       title: "Royal Baccarat",
-      category: "Legacy",
+      category: "Clásico",
       src: "https://lh3.googleusercontent.com/aida-public/AB6AXuDB39KZuadJcJPpam6nUfIj5qRO-xDXqrO-ePAYczj3bvNGfH1ucEKvfr1mcz8rxjwdIhvKayjq4P5HIJp86uMT1Lsa2wn40XeAjR47spehrACItvJc_EAr2la7TrB40BxL4NI96Vk23iF9xRvnwZnKs8vs9LzLLCpSsbeaiAj2ez5CtA204-bZ76-jUFozh_iemlQcjvEJ7GiOcJ_He-mWKYxSlyBCg-pvQs1lNGfc_EM8MUHAF_3z",
       path: null,
-      actionText: "Join Table",
-      subActionText: "Spectate",
+      actionText: "Unirse a la Mesa",
+      subActionText: "Espectar",
     },
     {
       id: "grand-slots",
       title: "Grand Slots",
-      category: "Featured",
+      category: "Destacado",
       src: "https://lh3.googleusercontent.com/aida-public/AB6AXuB8WoEOn9qEXeg8cSyJceGPMIkCSO3wS4WCtbabeF7cG7cgOUHQwI8sguXKp-RdH82oLK1Dqq9n5PgNwpUopMsxTulKNlbxk991MkyhPjc7deP80d82_HSr6NVaqsaTDax8ADKHYz9minCkrRRId-zpnvzyXBp7W-XfJ0Du5SZvSydCyebjSvhfIUGB82rs2pSXUv7XBGi3POMCx1TGVcHGed54eMBVOFTU_1vENfIJLfhmi73sTlG-",
       path: "/play/royalpachinka",
-      actionText: "Spin Now",
-      subActionText: "Free Play",
+      actionText: "Girar Ahora",
+      subActionText: "Juego Gratis",
     },
     {
       id: "neon-blackjack",
       title: "Neon Blackjack",
-      category: "Live",
+      category: "En Vivo",
       src: "https://lh3.googleusercontent.com/aida-public/AB6AXuDNA4WUrDQGa5zpBBkrA4GuHzRMiyQ8QtktL8ImimFsM_X6GwK36SahiAVMNAmggQ-Xf9E6YPR7EcDUn6dFl4cgV_6TMkDn6_YOlu0NIPzexb_-C0-m5681ui-S7UM40qhXhovjlCtEfk9zsPFMtc5CmtPO1xT4hRu7tqIDsfnojJN63k3qyIT9djmqpMGls6tBxFFG8yPzsF3i3dB9VCOcYTVLpMayhnPIpDhBdoNuze5DFgnMlGjx",
       path: "/play/royaljoker",
-      actionText: "Join Table",
-      subActionText: "Spectate",
+      actionText: "Unirse a la Mesa",
+      subActionText: "Espectar",
     },
     {
       id: "gold-dice",
       title: "Gold Dice",
-      category: "New",
+      category: "Nuevo",
       src: "https://lh3.googleusercontent.com/aida-public/AB6AXuC9wuspkm5e8dzW_u5shrePV2VGwWiJ0rEdM9ZFxMi6ZXwRVkUIylGoUNKZqIFZdJH7wMqj__d9OiKb3pgzI4s-qP2T04A9GRTP0tV7xW3jtzBKoRkGqlO8IWkF-h2MnlzO0JR_GV_qq6pOiaRUlEWobz6CafYSC_FOBINc2M0w6kYmT5ucqsQUSClrrkYJzmo47tUW4cs4ENBpp4FunLui8RckkebgLKfsQU9WuElRlrT0XcxzA-qI",
       path: "/play/minas",
-      actionText: "Roll Dice",
-      subActionText: "Free Play",
+      actionText: "Lanzar Dados",
+      subActionText: "Juego Gratis",
     },
   ];
 
@@ -526,7 +526,7 @@ export default function Home() {
               className="lg:col-span-8 relative rounded-xl overflow-hidden border border-outline-variant/30 group cursor-pointer h-[320px] lg:h-full"
             >
               <img
-                alt="Banner Welcome"
+                alt="Banner de Bienvenida"
                 className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700"
                 src={banner1}
               />
@@ -540,7 +540,7 @@ export default function Home() {
                 className="relative flex-1 rounded-xl overflow-hidden border border-outline-variant/30 group cursor-pointer"
               >
                 <img 
-                  alt="Weekly Reload Banner" 
+                  alt="Banner de Recarga Semanal"
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                   src={sportsBanner} 
                 />
@@ -555,7 +555,7 @@ export default function Home() {
                 className="relative flex-1 rounded-xl overflow-hidden border border-primary/40 group cursor-pointer gold-glow"
               >
                 <img 
-                  alt="Pragmatic Drops Banner" 
+                  alt="Banner de Premios Pragmatic"
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                   src={bannercelu} 
                 />
@@ -705,7 +705,7 @@ export default function Home() {
                       onClick={() => navigate('/juegos')}
                       className="gold-gradient w-3/4 py-2 rounded font-bold text-on-primary text-label-md cursor-pointer border-0"
                     >
-                      PLAY
+                      JUGAR
                     </button>
                     <button 
                       onClick={() => navigate('/juegos')}
@@ -735,7 +735,7 @@ export default function Home() {
                       onClick={() => navigate('/juegos')}
                       className="gold-gradient w-3/4 py-2 rounded font-bold text-on-primary text-label-md cursor-pointer border-0"
                     >
-                      PLAY
+                      JUGAR
                     </button>
                     <button 
                       onClick={() => navigate('/juegos')}
@@ -765,7 +765,7 @@ export default function Home() {
                       onClick={() => navigate('/juegos')}
                       className="gold-gradient w-3/4 py-2 rounded font-bold text-on-primary text-label-md cursor-pointer border-0"
                     >
-                      PLAY
+                      JUGAR
                     </button>
                     <button 
                       onClick={() => navigate('/juegos')}
@@ -795,7 +795,7 @@ export default function Home() {
                       onClick={() => navigate('/juegos')}
                       className="gold-gradient w-3/4 py-2 rounded font-bold text-on-primary text-label-md cursor-pointer border-0"
                     >
-                      PLAY
+                      JUGAR
                     </button>
                     <button 
                       onClick={() => navigate('/juegos')}
@@ -813,7 +813,7 @@ export default function Home() {
               <div className="bg-surface-container-high rounded-xl border border-primary/30 overflow-hidden flex flex-col gold-glow">
                 <div className="gold-gradient p-4 flex justify-between items-center">
                   <h3 className="text-on-primary font-bold text-headline-sm font-headline-sm">Masters Cup</h3>
-                  <span className="bg-black/20 text-on-primary px-2 py-1 rounded text-label-md font-label-md font-bold">LIVE</span>
+                  <span className="bg-black/20 text-on-primary px-2 py-1 rounded text-label-md font-label-md font-bold">EN VIVO</span>
                 </div>
                 <div className="p-6 space-y-6">
                   {/* Prize Pool */}
@@ -844,7 +844,7 @@ export default function Home() {
 
                   {/* Leaderboard list */}
                   <div className="space-y-3">
-                    <p className="text-on-surface-variant text-label-md font-label-md uppercase tracking-widest font-bold">TOP PLAYERS</p>
+                    <p className="text-on-surface-variant text-label-md font-label-md uppercase tracking-widest font-bold">MEJORES JUGADORES</p>
                     <div className="flex items-center justify-between p-3 rounded bg-surface border-l-4 border-primary">
                       <div className="flex items-center gap-3">
                         <span className="font-bold text-primary">1</span>
@@ -871,7 +871,7 @@ export default function Home() {
                     onClick={handleJoinTournament}
                     className="w-full border border-primary text-primary py-3 rounded-lg font-bold hover:bg-primary/10 transition-colors bg-transparent cursor-pointer"
                   >
-                    Join Tournament
+                    Unirse al Torneo
                   </button>
                 </div>
               </div>
@@ -882,7 +882,7 @@ export default function Home() {
                 className="bg-surface-container rounded-xl p-6 border border-outline-variant/20 flex items-center gap-4 relative overflow-hidden group cursor-pointer text-left"
               >
                 <div className="relative z-10 flex-1">
-                  <h4 className="font-bold text-headline-sm text-white">VIP Daily Spin</h4>
+                  <h4 className="font-bold text-headline-sm text-white">Giro Diario VIP</h4>
                   <p className="text-on-surface-variant text-body-sm font-body-sm">Tu regalo diario está listo para reclamar.</p>
                 </div>
                 <span className="material-symbols-outlined text-primary text-5xl relative z-10 group-hover:scale-110 transition-transform">redeem</span>
@@ -901,7 +901,7 @@ export default function Home() {
             className="text-primary flex flex-col items-center gap-1 transition-transform active:scale-90 duration-200 bg-transparent border-0 cursor-pointer"
           >
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>home</span>
-            <span className="font-label-md text-label-md">Lobby</span>
+            <span className="font-label-md text-label-md">Inicio</span>
           </button>
           <button 
             onClick={() => navigate('/juegos')}
@@ -970,9 +970,9 @@ export default function Home() {
             {tickerItems.map((item, i) => (
               <div key={i} className="flex items-center gap-4 whitespace-nowrap">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span className="text-on-surface-variant font-medium">Player <span className="text-primary font-bold">{item.user}</span> won</span>
+                <span className="text-on-surface-variant font-medium">El jugador <span className="text-primary font-bold">{item.user}</span> ganó</span>
                 <span className="text-white font-bold bg-white/5 px-3 py-1 rounded border border-white/10">{item.amount}</span>
-                <span className="text-on-surface-variant/80 text-xs">on {item.game}</span>
+                <span className="text-on-surface-variant/80 text-xs">en {item.game}</span>
               </div>
             ))}
           </div>
@@ -980,9 +980,9 @@ export default function Home() {
             {tickerItems.map((item, i) => (
               <div key={`dup-${i}`} className="flex items-center gap-4 whitespace-nowrap">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span className="text-on-surface-variant font-medium">Player <span className="text-primary font-bold">{item.user}</span> won</span>
+                <span className="text-on-surface-variant font-medium">El jugador <span className="text-primary font-bold">{item.user}</span> ganó</span>
                 <span className="text-white font-bold bg-white/5 px-3 py-1 rounded border border-white/10">{item.amount}</span>
-                <span className="text-on-surface-variant/80 text-xs">on {item.game}</span>
+                <span className="text-on-surface-variant/80 text-xs">en {item.game}</span>
               </div>
             ))}
           </div>
@@ -1000,8 +1000,8 @@ export default function Home() {
             <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mb-6 shadow-xl">
               <span className="material-symbols-outlined text-black text-3xl">casino</span>
             </div>
-            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Classic Slots</h3>
-            <p className="text-on-surface-variant text-sm font-light">Experience the timeless thrill of mechanical elegance.</p>
+            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Tragamonedas Clásicas</h3>
+            <p className="text-on-surface-variant text-sm font-light">Vive la emoción atemporal de la elegancia mecánica.</p>
           </div>
 
           <div
@@ -1012,8 +1012,8 @@ export default function Home() {
             <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mb-6 shadow-xl">
               <span className="material-symbols-outlined text-black text-3xl">person_play</span>
             </div>
-            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Live Casino</h3>
-            <p className="text-on-surface-variant text-sm font-light">Real-time action with our world-class croupiers.</p>
+            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Casino en Vivo</h3>
+            <p className="text-on-surface-variant text-sm font-light">Acción en tiempo real con nuestros crupieres de clase mundial.</p>
           </div>
 
           <div
@@ -1024,8 +1024,8 @@ export default function Home() {
             <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mb-6 shadow-xl">
               <span className="material-symbols-outlined text-black text-3xl">table_restaurant</span>
             </div>
-            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">High Tables</h3>
-            <p className="text-on-surface-variant text-sm font-light">Exclusive stakes for the discerning poker enthusiast.</p>
+            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Mesas Altas</h3>
+            <p className="text-on-surface-variant text-sm font-light">Apuestas exclusivas para el entusiasta exigente del póker.</p>
           </div>
 
           <div
@@ -1037,7 +1037,7 @@ export default function Home() {
               <span className="material-symbols-outlined text-black text-3xl">sports_soccer</span>
             </div>
             <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Royal Sports</h3>
-            <p className="text-on-surface-variant text-sm font-light">Elite sportsbook coverage on global events.</p>
+            <p className="text-on-surface-variant text-sm font-light">Cobertura de apuestas deportivas de élite en eventos globales.</p>
           </div>
         </div>
       </section>
@@ -1047,14 +1047,14 @@ export default function Home() {
         <div className="max-w-container-max mx-auto">
           <div className="flex justify-between items-end mb-16 reveal">
             <div className="text-left">
-              <h2 className="text-4xl font-extrabold text-white tracking-tighter mb-2 uppercase">Curated Favorites</h2>
-              <p className="text-on-surface-variant font-light">A selection of premium titles hand-picked for our elite community.</p>
+              <h2 className="text-4xl font-extrabold text-white tracking-tighter mb-2 uppercase">Favoritos Seleccionados</h2>
+              <p className="text-on-surface-variant font-light">Una selección de títulos premium elegidos para nuestra comunidad de élite.</p>
             </div>
             <button
               onClick={() => navigate("/juegos")}
               className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest hover:translate-x-2 transition-transform bg-transparent border-0 cursor-pointer"
             >
-              View Entire Lounge <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              Ver Todos los Juegos <span className="material-symbols-outlined text-sm">arrow_forward</span>
             </button>
           </div>
 
@@ -1101,25 +1101,25 @@ export default function Home() {
         <div className="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-3 gap-20">
           <div className="text-center reveal" style={{ transitionDelay: "0.1s" }}>
             <span className="material-symbols-outlined text-primary text-5xl mb-6">verified_user</span>
-            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Globally Certified</h4>
+            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Certificados Globalmente</h4>
             <p className="text-on-surface-variant font-light text-sm leading-relaxed">
-              Adhering to the most stringent international standards for fair play and operational excellence.
+              Cumplimos con los estándares internacionales más estrictos de juego justo y excelencia operativa.
             </p>
           </div>
 
           <div className="text-center reveal" style={{ transitionDelay: "0.2s" }}>
             <span className="material-symbols-outlined text-primary text-5xl mb-6">security</span>
-            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Fortified Security</h4>
+            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Seguridad Fortificada</h4>
             <p className="text-on-surface-variant font-light text-sm leading-relaxed">
-              Your assets and data are protected by state-of-the-art encryption and continuous monitoring.
+              Tus activos y datos están protegidos con encriptación de última generación y monitoreo continuo.
             </p>
           </div>
 
           <div className="text-center reveal" style={{ transitionDelay: "0.3s" }}>
             <span className="material-symbols-outlined text-primary text-5xl mb-6">workspace_premium</span>
-            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Elite Support</h4>
+            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Soporte de Élite</h4>
             <p className="text-on-surface-variant font-light text-sm leading-relaxed">
-              A personal concierge team available 24/7 to cater to your every request with absolute discretion.
+              Un equipo de conserjería personal disponible 24/7 para atender cada solicitud con absoluta discreción.
             </p>
           </div>
         </div>
@@ -1132,7 +1132,7 @@ export default function Home() {
           className="text-primary flex flex-col items-center gap-1 text-[11px] active:scale-90 transition-transform duration-200 bg-transparent border-0 cursor-pointer"
         >
           <span className="material-symbols-outlined">home</span>
-          <span>Lobby</span>
+          <span>Inicio</span>
         </button>
 
         <button

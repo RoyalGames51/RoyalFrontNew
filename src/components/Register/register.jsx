@@ -54,7 +54,7 @@ const RegistroForm = ({ className, children }) => {
     };
 
     const getPasswordStrength = (val) => {
-        if (!val) return { text: "Weak", color: "text-red-500", bars: [false, false, false, false], barColor: "bg-surface-container-highest" };
+        if (!val) return { text: "Débil", color: "text-red-500", bars: [false, false, false, false], barColor: "bg-surface-container-highest" };
         let score = 0;
         if (val.length > 5) score++;
         if (val.length > 8) score++;
@@ -62,13 +62,13 @@ const RegistroForm = ({ className, children }) => {
         if (/[^A-Za-z0-9]/.test(val)) score++;
 
         if (score <= 1) {
-            return { text: "Weak", color: "text-red-500", bars: [true, false, false, false], barColor: "bg-red-500" };
+            return { text: "Débil", color: "text-red-500", bars: [true, false, false, false], barColor: "bg-red-500" };
         } else if (score === 2) {
-            return { text: "Medium", color: "text-amber-500", bars: [true, true, false, false], barColor: "bg-amber-500" };
+            return { text: "Media", color: "text-amber-500", bars: [true, true, false, false], barColor: "bg-amber-500" };
         } else if (score === 3) {
-            return { text: "Strong", color: "text-primary", bars: [true, true, true, false], barColor: "bg-primary" };
+            return { text: "Fuerte", color: "text-primary", bars: [true, true, true, false], barColor: "bg-primary" };
         } else {
-            return { text: "Elite", color: "text-[#F5D980]", bars: [true, true, true, true], barColor: "bg-[#F5D980]" };
+            return { text: "Élite", color: "text-[#F5D980]", bars: [true, true, true, true], barColor: "bg-[#F5D980]" };
         }
     };
 
@@ -158,16 +158,16 @@ const RegistroForm = ({ className, children }) => {
 
                         {/* Header */}
                         <div className="pt-6 px-6 flex flex-col items-center relative z-10">
-                            <img alt="RGAMES Logo" className="h-12 w-auto mb-3 object-contain" src={logo} />
-                            <h1 className="font-headline-sm text-headline-sm text-on-surface tracking-tight">Create your account</h1>
-                            <p className="text-[12px] text-on-surface-variant mt-0.5">Join the elite world of premium gaming</p>
+                            <img alt="Logo RGAMES" className="h-12 w-auto mb-3 object-contain" src={logo} />
+                            <h1 className="font-headline-sm text-headline-sm text-on-surface tracking-tight">Crea tu cuenta</h1>
+                            <p className="text-[12px] text-on-surface-variant mt-0.5">Únete al mundo de élite del juego premium</p>
                         </div>
 
                         {/* Form */}
                         <form onSubmit={handleSubmit} className="px-6 pb-6 pt-4 space-y-3.5 relative z-10" id="registrationForm">
                             {/* Username / Full Name */}
                             <div className="space-y-1">
-                                <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Username</label>
+                                <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Nombre de Usuario</label>
                                 <input
                                     className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg py-2 px-3 text-on-surface font-body-md transition-all text-sm"
                                     placeholder="Nombre de usuario"
@@ -182,7 +182,7 @@ const RegistroForm = ({ className, children }) => {
 
                             {/* Email */}
                             <div className="space-y-1">
-                                <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Email Address</label>
+                                <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Correo Electrónico</label>
                                 <input
                                     className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg py-2 px-3 text-on-surface font-body-md transition-all text-sm"
                                     placeholder="Correo electrónico"
@@ -199,7 +199,7 @@ const RegistroForm = ({ className, children }) => {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 {/* Password */}
                                 <div className="space-y-1 relative">
-                                    <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Password</label>
+                                    <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Contraseña</label>
                                     <div className="relative">
                                         <input
                                             className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg py-2 px-3 pr-8 text-on-surface font-body-md transition-all text-sm"
@@ -225,7 +225,7 @@ const RegistroForm = ({ className, children }) => {
                                 </div>
                                 {/* Confirm Password */}
                                 <div className="space-y-1 relative">
-                                    <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Confirm Password</label>
+                                    <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Confirmar Contraseña</label>
                                     <div className="relative">
                                         <input
                                             className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg py-2 px-3 pr-8 text-on-surface font-body-md transition-all text-sm"
@@ -254,7 +254,7 @@ const RegistroForm = ({ className, children }) => {
                             {/* Password Strength Meter */}
                             <div className="space-y-1">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-[11px] text-on-surface-variant">Security Strength</span>
+                                    <span className="text-[11px] text-on-surface-variant">Seguridad de la Contraseña</span>
                                     <span className={`text-[11px] font-bold ${strength.color}`}>{strength.text}</span>
                                 </div>
                                 <div className="flex gap-1 h-0.5 w-full">
@@ -271,7 +271,7 @@ const RegistroForm = ({ className, children }) => {
 
                             {/* Gender (Sexo) */}
                             <div className="space-y-1">
-                                <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Gender</label>
+                                <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Género</label>
                                 <select
                                     className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg py-2 px-3 text-on-surface font-body-md transition-all cursor-pointer text-sm"
                                     required
@@ -280,8 +280,8 @@ const RegistroForm = ({ className, children }) => {
                                     onChange={handleInputChange}
                                 >
                                     <option disabled value="">Selecciona tu género</option>
-                                    <option value="H">Hombre / Male</option>
-                                    <option value="M">Mujer / Female</option>
+                                    <option value="H">Hombre</option>
+                                    <option value="M">Mujer</option>
                                 </select>
                                 {errors.sexo && <p className="text-red-500 text-[11px] mt-0.5">{errors.sexo}</p>}
                             </div>

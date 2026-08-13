@@ -23,7 +23,7 @@ export default function FavoriteButton({  gameId, isFavorite }) {
 
   return (
     <IconButton
-      aria-label="Toggle favorite"
+      aria-label="Alternar favorito"
       icon={isFavorite ? <FaHeart color="red" /> : <FaRegHeart />}
       position="absolute"
       top={{ base: "6px", md: "10px" }}

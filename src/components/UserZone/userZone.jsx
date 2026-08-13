@@ -134,7 +134,7 @@ export default function UserZone() {
                                 })()}
                             </Text>
                             <Flex align="center" color="gray.300">
-                                <Image src={chips} alt="Chips" boxSize="1em" mr={2} />
+                                <Image src={chips} alt="Fichas" boxSize="1em" mr={2} />
                                 <Text whiteSpace="nowrap">
                                     {(() => {
                                         const chipsValue = memoizedUser?.chips ?? 0;

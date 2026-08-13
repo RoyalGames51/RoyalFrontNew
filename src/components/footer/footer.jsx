@@ -13,7 +13,7 @@ function Footer() {
             src={rgamesLogo}
           />
           <p className="text-on-surface-variant text-sm font-light leading-relaxed mb-6">
-            The pinnacle of digital luxury gaming. Providing a secure, fair, and sophisticated platform for the world's most elite players.
+            La cúspide del juego de lujo digital. Ofrecemos una plataforma segura, justa y sofisticada para los jugadores más exigentes del mundo.
           </p>
           <div className="flex gap-4">
             <a
@@ -34,39 +34,39 @@ function Footer() {
         {/* Links grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-12 text-sm uppercase tracking-widest font-bold">
           <div className="flex flex-col gap-4">
-            <h5 className="text-white mb-2 font-black">Heritage</h5>
+            <h5 className="text-white mb-2 font-black">Legado</h5>
             <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/about">
-              Our Story
+              Nuestra Historia
             </Link>
             <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="#">
-              Responsible Play
+              Juego Responsable
             </a>
             <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="#">
-              VIP Lounge
+              Lounge VIP
             </a>
           </div>
           <div className="flex flex-col gap-4">
-            <h5 className="text-white mb-2 font-black">Concierge</h5>
+            <h5 className="text-white mb-2 font-black">Conserjería</h5>
             <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="mailto:royalgames2025@gmail.com">
-              Contact
+              Contacto
             </a>
             <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="#">
-              FAQ
+              Preguntas Frecuentes
             </a>
             <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="#">
-              Help Desk
+              Mesa de Ayuda
             </a>
           </div>
           <div className="flex flex-col gap-4">
-            <h5 className="text-white mb-2 font-black">Protocol</h5>
+            <h5 className="text-white mb-2 font-black">Protocolo</h5>
             <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/terminos-y-condiciones">
-              Privacy
+              Privacidad
             </Link>
             <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/terminos-y-condiciones">
-              Terms
+              Términos
             </Link>
             <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/terminos-y-condiciones">
-              Compliance
+              Cumplimiento
             </Link>
           </div>
         </div>
@@ -74,11 +74,11 @@ function Footer() {
 
       {/* Footer bottom bar */}
       <div className="max-w-container-max mx-auto mt-20 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-on-surface-variant font-bold tracking-widest uppercase">
-        <p>© 2026 RGAMES. All Rights Reserved.</p>
+        <p>© 2026 RGAMES. Todos los Derechos Reservados.</p>
         <div className="flex gap-8 items-center opacity-50">
-          <span>Verified by eCOGRA</span>
-          <span>Licensed in Curacao</span>
-          <span>SSL Secured</span>
+          <span>Verificado por eCOGRA</span>
+          <span>Licenciado en Curazao</span>
+          <span>Seguridad SSL</span>
         </div>
       </div>
     </footer>

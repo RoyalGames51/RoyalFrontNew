@@ -54,7 +54,7 @@ const UserManagement = () => {
     // Sin campo KYC en el backend, mostrar role en su lugar
     return (
       <span className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded-full border border-primary/30 uppercase">
-        {user.role === 'admin' ? 'Admin' : 'User'}
+        {user.role === 'admin' ? 'Admin' : 'Usuario'}
       </span>
     );
   };
@@ -63,20 +63,20 @@ const UserManagement = () => {
     if (user.banned) {
       return (
         <span className="bg-error/10 text-error text-[10px] font-bold px-2 py-1 rounded-full border border-error/30 uppercase">
-          Banned
+          Bloqueado
         </span>
       );
     }
     if (user.inactive) {
       return (
         <span className="bg-gray-500/10 text-gray-500 text-[10px] font-bold px-2 py-1 rounded-full border border-gray-500/30 uppercase">
-          Inactive
+          Inactivo
         </span>
       );
     }
     return (
       <span className="bg-green-500/10 text-green-500 text-[10px] font-bold px-2 py-1 rounded-full border border-green-500/30 uppercase">
-        Active
+        Activo
       </span>
     );
   };
@@ -131,19 +131,19 @@ const UserManagement = () => {
         <header className="flex justify-between items-end mb-10">
           <div>
             <h1 className="font-headline-lg text-headline-lg text-on-surface mb-2">
-              User Management
+              Gestión de Usuarios
             </h1>
             <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl">
-              Monitor player activity, manage account statuses, and oversee platform liquidity from a centralized command center.
+              Monitorea la actividad de los jugadores, gestiona el estado de las cuentas y supervisa la liquidez de la plataforma desde un centro de comando centralizado.
             </p>
           </div>
           <div className="flex gap-4">
             <div className="bg-surface-container-high px-6 py-4 rounded-xl border border-outline-variant/20 flex flex-col">
-              <span className="text-[10px] uppercase tracking-widest text-primary">Total Players</span>
+              <span className="text-[10px] uppercase tracking-widest text-primary">Jugadores Totales</span>
               <span className="font-headline-md text-headline-md">{users.length}</span>
             </div>
             <div className="bg-surface-container-high px-6 py-4 rounded-xl border border-outline-variant/20 flex flex-col">
-              <span className="text-[10px] uppercase tracking-widest text-primary">Active Users</span>
+              <span className="text-[10px] uppercase tracking-widest text-primary">Usuarios Activos</span>
               <span className="font-headline-md text-headline-md">
                 {users.filter((u) => !u.banned && !u.inactive).length}
               </span>
@@ -164,7 +164,7 @@ const UserManagement = () => {
             {/* Search */}
             <div className="md:col-span-1">
               <label className="font-label-md text-label-md text-on-surface-variant mb-2 block">
-                Search Identity
+                Buscar Identidad
               </label>
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
@@ -172,7 +172,7 @@ const UserManagement = () => {
                 </span>
                 <input
                   type="text"
-                  placeholder="Name, Email, or ID..."
+                  placeholder="Nombre, Email o ID..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full bg-background border border-outline-variant/30 rounded-xl px-10 py-2.5 text-body-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface"
@@ -183,15 +183,15 @@ const UserManagement = () => {
             {/* Role Filter */}
             <div>
               <label className="font-label-md text-label-md text-on-surface-variant mb-2 block">
-                User Role
+                Rol de Usuario
               </label>
               <select
                 value={kycFilter}
                 onChange={(e) => setKycFilter(e.target.value)}
                 className="w-full bg-background border border-outline-variant/30 rounded-xl px-4 py-2.5 text-body-sm focus:border-primary outline-none appearance-none text-on-surface"
               >
-                <option value="all">All Roles</option>
-                <option value="user">User</option>
+                <option value="all">Todos los Roles</option>
+                <option value="user">Usuario</option>
                 <option value="admin">Admin</option>
               </select>
             </div>
@@ -199,17 +199,17 @@ const UserManagement = () => {
             {/* Country */}
             <div>
               <label className="font-label-md text-label-md text-on-surface-variant mb-2 block">
-                Country
+                País
               </label>
               <select
                 value={countryFilter}
                 onChange={(e) => setCountryFilter(e.target.value)}
                 className="w-full bg-background border border-outline-variant/30 rounded-xl px-4 py-2.5 text-body-sm focus:border-primary outline-none appearance-none text-on-surface"
               >
-                <option value="all">All Locations</option>
-                <option value="UK">United Kingdom</option>
-                <option value="ES">Spain</option>
-                <option value="DE">Germany</option>
+                <option value="all">Todas las Ubicaciones</option>
+                <option value="UK">Reino Unido</option>
+                <option value="ES">España</option>
+                <option value="DE">Alemania</option>
                 <option value="MT">Malta</option>
               </select>
             </div>
@@ -217,17 +217,17 @@ const UserManagement = () => {
             {/* Balance Filter */}
             <div>
               <label className="font-label-md text-label-md text-on-surface-variant mb-2 block">
-                Balance Tier
+                Nivel de Saldo
               </label>
               <div className="flex gap-2">
                 <input
                   type="number"
-                  placeholder="Min"
+                  placeholder="Mín"
                   className="w-full bg-background border border-outline-variant/30 rounded-xl px-4 py-2.5 text-body-sm focus:border-primary outline-none text-on-surface"
                 />
                 <input
                   type="number"
-                  placeholder="Max"
+                  placeholder="Máx"
                   className="w-full bg-background border border-outline-variant/30 rounded-xl px-4 py-2.5 text-body-sm focus:border-primary outline-none text-on-surface"
                 />
               </div>
@@ -253,25 +253,25 @@ const UserManagement = () => {
                   <thead>
                     <tr className="bg-surface-container-high border-b border-outline-variant/30">
                       <th className="px-6 py-4 font-label-lg text-label-lg text-primary uppercase tracking-wider">
-                        User Identity
+                        Identidad del Usuario
                       </th>
                       <th className="px-6 py-4 font-label-lg text-label-lg text-primary uppercase tracking-wider">
-                        Contact
+                        Contacto
                       </th>
                       <th className="px-6 py-4 font-label-lg text-label-lg text-primary uppercase tracking-wider text-center">
-                        Country
+                        País
                       </th>
                       <th className="px-6 py-4 font-label-lg text-label-lg text-primary uppercase tracking-wider">
-                        Balance
+                        Saldo
                       </th>
                       <th className="px-6 py-4 font-label-lg text-label-lg text-primary uppercase tracking-wider text-center">
-                        Role
+                        Rol
                       </th>
                       <th className="px-6 py-4 font-label-lg text-label-lg text-primary uppercase tracking-wider text-center">
-                        Status
+                        Estado
                       </th>
                       <th className="px-6 py-4 font-label-lg text-label-lg text-primary uppercase tracking-wider text-right">
-                        Actions
+                        Acciones
                       </th>
                     </tr>
                   </thead>
@@ -360,7 +360,7 @@ const UserManagement = () => {
               {/* Pagination */}
               <div className="px-6 py-4 bg-surface-container-high border-t border-outline-variant/10 flex justify-between items-center">
                 <p className="font-body-sm text-body-sm text-on-surface-variant">
-                  Showing {filteredUsers.length} of {users.length} entries
+                  Mostrando {filteredUsers.length} de {users.length} registros
                 </p>
                 <div className="flex gap-1">
                   <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant/30 text-on-surface-variant hover:border-primary hover:text-primary transition-colors">

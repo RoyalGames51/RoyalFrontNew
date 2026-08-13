@@ -7,7 +7,7 @@ const AdminDashboard = () => {
   const kpis = [
     {
       id: 1,
-      title: 'Total Users',
+      title: 'Usuarios Totales',
       value: '1,284,302',
       change: '+12%',
       icon: 'group',
@@ -15,7 +15,7 @@ const AdminDashboard = () => {
     },
     {
       id: 2,
-      title: 'Active Today',
+      title: 'Activos Hoy',
       value: '84,291',
       change: '+4%',
       icon: 'bolt',
@@ -23,7 +23,7 @@ const AdminDashboard = () => {
     },
     {
       id: 3,
-      title: 'GGR Today',
+      title: 'GGR Hoy',
       value: '$412.5k',
       change: '-2.4%',
       icon: 'payments',
@@ -31,7 +31,7 @@ const AdminDashboard = () => {
     },
     {
       id: 4,
-      title: 'Deposits',
+      title: 'Depósitos',
       value: '$892.1k',
       change: '+18%',
       icon: 'account_balance_wallet',
@@ -39,7 +39,7 @@ const AdminDashboard = () => {
     },
     {
       id: 5,
-      title: 'Pending',
+      title: 'Pendientes',
       value: '142',
       change: null,
       icon: 'hourglass_empty',
@@ -48,7 +48,7 @@ const AdminDashboard = () => {
     },
     {
       id: 6,
-      title: 'New Signups',
+      title: 'Nuevos Registros',
       value: '1,042',
       change: '+31%',
       icon: 'person_add',
@@ -61,9 +61,9 @@ const AdminDashboard = () => {
       id: 1,
       type: 'deposit',
       user: 'MarcoR_88',
-      action: 'successfully deposited',
+      action: 'depositó exitosamente',
       amount: '$2,500.00',
-      time: '2 minutes ago',
+      time: 'hace 2 minutos',
       id_ref: 'TR-98231',
       icon: 'person',
     },
@@ -71,9 +71,9 @@ const AdminDashboard = () => {
       id: 2,
       type: 'jackpot',
       user: 'VegasKing',
-      action: 'Jackpot hit on Royal Slots Platinum',
+      action: 'Jackpot ganado en Royal Slots Platinum',
       amount: '$12,400.00',
-      time: '14 minutes ago',
+      time: 'hace 14 minutos',
       id_ref: null,
       icon: 'casino',
     },
@@ -81,9 +81,9 @@ const AdminDashboard = () => {
       id: 3,
       type: 'vip',
       user: 'ElitePlayer_01',
-      action: 'New VIP level assigned',
-      amount: 'Gold',
-      time: '45 minutes ago',
+      action: 'Nuevo nivel VIP asignado',
+      amount: 'Oro',
+      time: 'hace 45 minutos',
       id_ref: null,
       icon: 'security',
     },
@@ -91,10 +91,10 @@ const AdminDashboard = () => {
       id: 4,
       type: 'maintenance',
       user: null,
-      action: 'System maintenance scheduled for UTC 02:00',
+      action: 'Mantenimiento del sistema programado para las 02:00 UTC',
       amount: null,
-      time: '1 hour ago',
-      id_ref: '15 mins',
+      time: 'hace 1 hora',
+      id_ref: '15 min',
       icon: 'history',
     },
   ];
@@ -103,22 +103,22 @@ const AdminDashboard = () => {
     {
       id: 1,
       severity: 'critical',
-      title: 'Withdrawal Delay - Gateway 04',
-      description: 'Latency exceeding 5000ms. Investigating connection.',
+      title: 'Retraso en Retiros - Pasarela 04',
+      description: 'Latencia superando los 5000ms. Investigando la conexión.',
       icon: 'warning',
     },
     {
       id: 2,
       severity: 'warning',
-      title: 'Multiple Failed Logins',
-      description: 'IP: 192.168.1.45 flagged for brute force attempts.',
+      title: 'Múltiples Inicios de Sesión Fallidos',
+      description: 'IP: 192.168.1.45 marcada por intentos de fuerza bruta.',
       icon: 'notifications_active',
     },
     {
       id: 3,
       severity: 'info',
-      title: 'DB Vacuum Required',
-      description: 'System performance can be improved by 5%.',
+      title: 'Se Requiere Mantenimiento de BD',
+      description: 'El rendimiento del sistema puede mejorar un 5%.',
       icon: 'info',
     },
   ];
@@ -145,20 +145,20 @@ const AdminDashboard = () => {
         <div className="flex justify-between items-end mb-8">
           <div>
             <h1 className="font-headline-lg text-headline-lg text-on-background mb-2">
-              Operational Insights
+              Panel de Operaciones
             </h1>
             <p className="text-on-surface-variant font-body-sm">
-              Real-time performance metrics and system health monitoring.
+              Métricas de rendimiento en tiempo real y monitoreo de salud del sistema.
             </p>
           </div>
           <div className="flex gap-3">
             <button className="px-6 py-2.5 rounded-xl border border-outline-variant/30 text-on-surface font-label-lg hover:bg-surface-variant/20 transition-all active:scale-95 flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px]">download</span>
-              Export Report
+              Exportar Reporte
             </button>
             <button className="px-6 py-2.5 rounded-xl bg-primary text-on-primary font-bold font-label-lg hover:brightness-110 transition-all active:scale-95 flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px]">add</span>
-              New Campaign
+              Nueva Campaña
             </button>
           </div>
         </div>
@@ -204,10 +204,10 @@ const AdminDashboard = () => {
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h4 className="font-headline-sm text-headline-sm text-on-surface">
-                  Revenue Trend (30 Days)
+                  Tendencia de Ingresos (30 Días)
                 </h4>
                 <p className="text-body-sm text-on-surface-variant">
-                  Gross gaming revenue tracking across all sectors.
+                  Seguimiento de ingresos brutos de juego en todos los sectores.
                 </p>
               </div>
               <div className="flex gap-2">
@@ -219,7 +219,7 @@ const AdminDashboard = () => {
                       : 'hover:bg-surface-variant/50 text-on-surface-variant'
                   }`}
                 >
-                  Line
+                  Línea
                 </button>
                 <button
                   onClick={() => setSelectedMetric('area')}
@@ -229,7 +229,7 @@ const AdminDashboard = () => {
                       : 'hover:bg-surface-variant/50 text-on-surface-variant'
                   }`}
                 >
-                  Area
+                  Área
                 </button>
               </div>
             </div>
@@ -243,7 +243,7 @@ const AdminDashboard = () => {
                 >
                   {height > 75 && (
                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-surface-bright px-2 py-1 border border-primary/40 rounded-lg text-[10px] whitespace-nowrap shadow-xl">
-                      Peak: $52,300
+                      Pico: $52,300
                     </div>
                   )}
                 </div>
@@ -252,25 +252,25 @@ const AdminDashboard = () => {
             </div>
 
             <div className="flex justify-between mt-4 px-2">
-              <span className="text-[10px] text-on-surface-variant font-bold">MAY 01</span>
-              <span className="text-[10px] text-on-surface-variant font-bold">MAY 15</span>
-              <span className="text-[10px] text-on-surface-variant font-bold">TODAY</span>
+              <span className="text-[10px] text-on-surface-variant font-bold">01 MAY</span>
+              <span className="text-[10px] text-on-surface-variant font-bold">15 MAY</span>
+              <span className="text-[10px] text-on-surface-variant font-bold">HOY</span>
             </div>
           </div>
 
           {/* Liquidity Ratio */}
           <div className="lg:col-span-4 bg-surface-container border border-outline-variant/20 rounded-xl p-6">
             <h4 className="font-headline-sm text-headline-sm text-on-surface mb-2">
-              Liquidity Ratio
+              Ratio de Liquidez
             </h4>
             <p className="text-body-sm text-on-surface-variant mb-6">
-              Comparison of cash flow inputs vs outputs.
+              Comparación entre ingresos y egresos de flujo de caja.
             </p>
 
             <div className="space-y-6">
               <div>
                 <div className="flex justify-between text-label-md mb-2">
-                  <span className="text-on-surface uppercase">Deposits</span>
+                  <span className="text-on-surface uppercase">Depósitos</span>
                   <span className="text-primary">$892,100</span>
                 </div>
                 <div className="w-full h-2 bg-surface-container-low rounded-full overflow-hidden">
@@ -280,7 +280,7 @@ const AdminDashboard = () => {
 
               <div>
                 <div className="flex justify-between text-label-md mb-2">
-                  <span className="text-on-surface uppercase">Withdrawals</span>
+                  <span className="text-on-surface uppercase">Retiros</span>
                   <span className="text-on-surface-variant">$241,500</span>
                 </div>
                 <div className="w-full h-2 bg-surface-container-low rounded-full overflow-hidden">
@@ -296,9 +296,9 @@ const AdminDashboard = () => {
                 </div>
                 <div>
                   <p className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">
-                    Health Score
+                    Puntaje de Salud
                   </p>
-                  <p className="font-headline-sm text-green-500">94% Optimal</p>
+                  <p className="font-headline-sm text-green-500">94% Óptimo</p>
                 </div>
               </div>
             </div>
@@ -311,10 +311,10 @@ const AdminDashboard = () => {
           <div className="bg-surface-container border border-outline-variant/20 rounded-xl flex flex-col overflow-hidden">
             <div className="p-6 border-b border-outline-variant/10 flex justify-between items-center">
               <h4 className="font-headline-sm text-headline-sm text-on-surface">
-                Recent Activity
+                Actividad Reciente
               </h4>
               <button className="text-primary text-label-md hover:underline">
-                View All
+                Ver Todo
               </button>
             </div>
 
@@ -352,10 +352,10 @@ const AdminDashboard = () => {
           <div className="bg-surface-container border border-outline-variant/20 rounded-xl flex flex-col overflow-hidden">
             <div className="p-6 border-b border-outline-variant/10 flex justify-between items-center">
               <h4 className="font-headline-sm text-headline-sm text-on-surface">
-                System Alerts
+                Alertas del Sistema
               </h4>
               <span className="px-2 py-0.5 bg-error-container text-error rounded-lg text-[10px] font-bold">
-                {alerts.length} ACTIVE
+                {alerts.length} ACTIVAS
               </span>
             </div>
 
@@ -374,10 +374,10 @@ const AdminDashboard = () => {
                       </span>
                       <span className="text-[12px] font-bold uppercase tracking-widest">
                         {alert.severity === 'critical'
-                          ? 'Critical Alert'
+                          ? 'Alerta Crítica'
                           : alert.severity === 'warning'
-                          ? 'Security Warning'
-                          : 'Optimization'}
+                          ? 'Advertencia de Seguridad'
+                          : 'Optimización'}
                       </span>
                     </div>
                     <h5 className="text-body-md font-bold text-on-surface">

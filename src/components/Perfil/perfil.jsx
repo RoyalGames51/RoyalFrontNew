@@ -246,7 +246,7 @@ const Perfil = ({ isPublic = false }) => {
             <div className="w-44 h-44 md:w-52 md:h-52 flex items-center justify-center relative bg-transparent overflow-visible">
               {avatarSrc ? (
                 <img
-                  alt="User Avatar"
+                  alt="Avatar de Usuario"
                   className="w-full h-full object-contain"
                   src={avatarSrc}
                   onError={(e) => {
@@ -257,7 +257,7 @@ const Perfil = ({ isPublic = false }) => {
                 />
               ) : user.image ? (
                 <img
-                  alt="User Avatar"
+                  alt="Avatar de Usuario"
                   className="w-full h-full object-contain"
                   src={user.image}
                 />
@@ -365,7 +365,7 @@ const Perfil = ({ isPublic = false }) => {
 
           <div className="hidden lg:flex flex-col items-end gap-2 pb-4">
             <div className="text-right">
-              <span className="font-label-md text-label-md text-on-surface-variant uppercase block">Total Chips</span>
+              <span className="font-label-md text-label-md text-on-surface-variant uppercase block">Fichas Totales</span>
               <span className="font-headline-sm text-headline-sm royal-gold-text">
                 {new Intl.NumberFormat('es-ES').format(totalChips)}
               </span>
@@ -456,7 +456,7 @@ const Perfil = ({ isPublic = false }) => {
 
             <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
               <div className="space-y-2">
-                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Username</label>
+                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Nombre de Usuario</label>
                 <input
                   className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
                   type="text"
@@ -468,7 +468,7 @@ const Perfil = ({ isPublic = false }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Age / Edad</label>
+                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Edad</label>
                 <input
                   className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
                   type="number"
@@ -479,7 +479,7 @@ const Perfil = ({ isPublic = false }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Country / País</label>
+                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">País</label>
                 <select
                   className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
                   name="country"
@@ -496,7 +496,7 @@ const Perfil = ({ isPublic = false }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Avatar Image URL</label>
+                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">URL de Imagen de Avatar</label>
                 <input
                   className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
                   type="text"
@@ -507,7 +507,7 @@ const Perfil = ({ isPublic = false }) => {
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Biography / Descripción</label>
+                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Descripción</label>
                 <textarea
                   rows="3"
                   className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm resize-none"

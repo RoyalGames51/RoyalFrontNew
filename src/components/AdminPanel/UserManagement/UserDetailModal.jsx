@@ -268,7 +268,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                   className="flex-1 bg-background border border-outline-variant/30 rounded-lg px-4 py-2 text-on-surface focus:border-primary outline-none appearance-none"
                   disabled={loading}
                 >
-                  <option value="user">User</option>
+                  <option value="user">Usuario</option>
                   <option value="admin">Admin</option>
                 </select>
                 <button

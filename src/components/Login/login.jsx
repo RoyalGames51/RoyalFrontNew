@@ -188,13 +188,13 @@ export default function Login({ className, children }) {
                 {/* Brand Identity */}
                 <div className="flex flex-col items-center relative z-10">
                   <div className="w-32 h-auto mb-6 transform hover:scale-105 transition-transform duration-300">
-                    <img alt="RGAMES Logo" className="w-full h-auto object-contain" src={logo} />
+                    <img alt="Logo RGAMES" className="w-full h-auto object-contain" src={logo} />
                   </div>
                   <h2 className="font-headline-lg text-headline-lg text-on-surface tracking-tight text-center">
-                    Welcome back
+                    Bienvenido de nuevo
                   </h2>
                   <p className="mt-2 font-body-md text-body-md text-on-surface-variant text-center">
-                    The elite gaming lounge awaits.
+                    El lounge de juego de élite te espera.
                   </p>
                 </div>
 
@@ -204,7 +204,7 @@ export default function Login({ className, children }) {
                     {/* Email / Nickname Field */}
                     <div className="space-y-2">
                       <label className="block font-label-lg text-label-lg text-on-surface-variant" htmlFor="email">
-                        Email Address or Username
+                        Correo Electrónico o Nombre de Usuario
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -227,7 +227,7 @@ export default function Login({ className, children }) {
                     {/* Password Field */}
                     <div className="space-y-2">
                       <label className="block font-label-lg text-label-lg text-on-surface-variant" htmlFor="password">
-                        Password
+                        Contraseña
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -283,7 +283,7 @@ export default function Login({ className, children }) {
                             });
                           }}
                         >
-                          Forgot password?
+                          ¿Olvidaste tu contraseña?
                         </a>
                       </div>
                     </div>
@@ -306,7 +306,7 @@ export default function Login({ className, children }) {
                     </div>
                     <div className="relative flex justify-center text-sm">
                       <span className="px-4 bg-[#12121A] text-on-surface-variant font-label-md uppercase tracking-widest">
-                        or
+                        o
                       </span>
                     </div>
                   </div>
@@ -323,7 +323,7 @@ export default function Login({ className, children }) {
 
                 {/* Footer Link */}
                 <p className="mt-8 text-center font-body-md text-body-md text-on-surface-variant relative z-10">
-                  New here?{" "}
+                  ¿Nuevo por aquí?{" "}
                   <a
                     className="font-bold text-primary hover:text-primary-fixed transition-colors underline-offset-4 hover:underline"
                     href="#"

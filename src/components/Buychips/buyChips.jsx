@@ -584,9 +584,9 @@ export default function BuyChips() {
                         <div className="flex justify-between items-center text-sm border-b border-outline-variant/10 pb-4">
                           <span className="text-on-surface-variant">Bono Adicional</span>
                           <span className="text-green-400 font-bold">
-                            {selectedBonus === "welcome" && "+100% Reload Match"}
-                            {selectedBonus === "crypto" && "+10% Crypto Bonus"}
-                            {selectedBonus === "weekly" && "+25 Free Spins"}
+                            {selectedBonus === "welcome" && "+100% de Recarga"}
+                            {selectedBonus === "crypto" && "+10% Bono Cripto"}
+                            {selectedBonus === "weekly" && "+25 Giros Gratis"}
                             {selectedBonus === "none" && "Ninguno"}
                           </span>
                         </div>
@@ -610,9 +610,9 @@ export default function BuyChips() {
                             className="w-full bg-[#0A0A0F] border border-outline-variant/30 rounded-xl py-3 px-4 text-sm text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all cursor-pointer appearance-none"
                           >
                             <option value="none">Sin Bono (Continuar sin bono)</option>
-                            <option value="welcome">100% Reload Match (Hasta $500)</option>
-                            <option value="crypto">10% Crypto Cashback Reward</option>
-                            <option value="weekly">Weekend Warrior (25 Giros Gratis)</option>
+                            <option value="welcome">100% de Recarga (Hasta $500)</option>
+                            <option value="crypto">10% de Reembolso Cripto</option>
+                            <option value="weekly">Guerrero del Fin de Semana (25 Giros Gratis)</option>
                           </select>
                           <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-primary">
                             <span className="material-symbols-outlined text-sm">expand_more</span>
@@ -644,7 +644,7 @@ export default function BuyChips() {
                               } catch (err) {
                                 Swal.fire({
                                   icon: "error",
-                                  title: "PayPal Error",
+                                  title: "Error de PayPal",
                                   text: "No se pudo iniciar el pago en los servidores de PayPal.",
                                   confirmButtonColor: "#C9A84C",
                                 });

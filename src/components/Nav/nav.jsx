@@ -81,7 +81,7 @@ export default function Navbar() {
                     }`
                   }
                 >
-                  Lobby
+                  Inicio
                 </NavLink>
 
                 <NavLink
@@ -145,7 +145,7 @@ export default function Navbar() {
                     }`
                   }
                 >
-                  Lobby
+                  Inicio
                 </NavLink>
 
                 <NavLink
@@ -205,7 +205,7 @@ export default function Navbar() {
                   style={{ width: '3.2rem', height: '3.2rem' }}
                 >
                   <img
-                    alt="User Avatar"
+                    alt="Avatar de Usuario"
                     className="w-full h-full object-cover"
                     src={avatarSrc}
                     onError={(e) => {
@@ -222,12 +222,12 @@ export default function Navbar() {
                     className="w-full text-left text-white font-semibold text-sm truncate hover:text-blue-100 flex items-center gap-1.5"
                   >
                     <span className="truncate">
-                      {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "User"}
+                      {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "Usuario"}
                     </span>
                     <RankBadge tier={currentUser.rank} size="sm" />
                   </button>
                   <div className="inline-flex items-center gap-2 text-blue-100 text-[11px] tracking-[0.08em] uppercase mt-1">
-                    <img src={chips} alt="Chips" className="w-3.5 h-3.5" />
+                    <img src={chips} alt="Fichas" className="w-3.5 h-3.5" />
                     <span>{formattedChips} fichas</span>
                   </div>
                 </div>
@@ -248,7 +248,7 @@ export default function Navbar() {
                 Entrar
               </Login>
               <RegistroForm className="px-6 py-2.5 rounded-sm gold-gradient text-black text-xs font-bold uppercase tracking-widest transition-all btn-hover-glow cursor-pointer border-0">
-                Join Now
+                Registrarse
               </RegistroForm>
             </div>
           )}
