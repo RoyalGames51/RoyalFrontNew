@@ -10,6 +10,7 @@ import { logout } from "../../redux/actions";
 import Swal from "sweetalert2";
 import API_URL from "../../api/rutaApi";
 import { formatChips, swalThemeConfig } from "../../utils/formatters";
+import RankBadge from "../ui/RankBadge/rankBadge";
 
 export default function Navbar() {
   const { currentUser } = useSelector((state) => state);
@@ -218,9 +219,12 @@ export default function Navbar() {
                   <button
                     type="button"
                     onClick={() => navigate('/perfil')}
-                    className="w-full text-left text-white font-semibold text-sm truncate hover:text-blue-100"
+                    className="w-full text-left text-white font-semibold text-sm truncate hover:text-blue-100 flex items-center gap-1.5"
                   >
-                    {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "User"}
+                    <span className="truncate">
+                      {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "User"}
+                    </span>
+                    <RankBadge tier={currentUser.rank} size="sm" />
                   </button>
                   <div className="inline-flex items-center gap-2 text-blue-100 text-[11px] tracking-[0.08em] uppercase mt-1">
                     <img src={chips} alt="Chips" className="w-3.5 h-3.5" />

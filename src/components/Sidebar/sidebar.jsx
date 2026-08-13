@@ -1,14 +1,29 @@
-import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useLocation } from "react-router-dom";
+import { fetchConversations } from "../../redux/actions/index";
 
 export default function Sidebar() {
-  const { currentUser } = useSelector((state) => state);
+  const dispatch = useDispatch();
+  const { currentUser, messages } = useSelector((state) => state);
   const location = useLocation();
 
   const isAdmin = currentUser?.role === "admin";
+  const unreadTotal = (messages?.conversations || []).reduce((sum, c) => sum + (c.unreadCount || 0), 0);
+
+  useEffect(() => {
+    if (currentUser?.id) {
+      dispatch(fetchConversations());
+    }
+  }, [dispatch, currentUser?.id]);
 
   const accountItems = [
     { to: "/chips", icon: "paid", label: "Comprar Fichas" },
+  ];
+
+  const socialItems = [
+    { to: "/amigos", icon: "group", label: "Amigos" },
+    { to: "/mensajes", icon: "forum", label: "Mensajes", badge: unreadTotal },
   ];
 
   const adminItems = [
@@ -20,7 +35,7 @@ export default function Sidebar() {
     return null;
   }
 
-  const renderLink = ({ to, icon, label }) => (
+  const renderLink = ({ to, icon, label, badge }) => (
     <NavLink
       key={to}
       to={to}
@@ -32,10 +47,20 @@ export default function Sidebar() {
         }`
       }
     >
-      <span className="material-symbols-outlined text-[22px]">{icon}</span>
+      <span className="relative material-symbols-outlined text-[22px]">
+        {icon}
+        {!!badge && (
+          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-error border-2 border-surface" />
+        )}
+      </span>
       <span className="hidden lg:inline font-body-sm text-body-sm whitespace-nowrap">
         {label}
       </span>
+      {!!badge && (
+        <span className="hidden lg:inline-flex ml-auto bg-primary text-black text-[10px] font-bold rounded-full min-w-[18px] h-[18px] items-center justify-center px-1">
+          {badge}
+        </span>
+      )}
       {/* Tooltip for collapsed (icon-only) state */}
       <span className="lg:hidden pointer-events-none absolute left-full ml-2 whitespace-nowrap rounded bg-surface-container-high border border-outline-variant/30 px-2 py-1 text-xs text-on-surface opacity-0 group-hover:opacity-100 transition-opacity z-50">
         {label}
@@ -50,6 +75,13 @@ export default function Sidebar() {
           Cuenta
         </p>
         {accountItems.map(renderLink)}
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <p className="hidden lg:block px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
+          Social
+        </p>
+        {socialItems.map(renderLink)}
       </div>
 
       {isAdmin && (

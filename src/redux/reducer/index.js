@@ -3,7 +3,10 @@ import {
     FETCH_PUBLIC_FAVORITES, REMOVE_FAVORITE_SUCCESS, ADD_FAVORITE_SUCCESS,
     FETCH_FAVORITES_FAILURE, FETCH_FAVORITES_SUCCESS, FETCH_USER_PROFILE,
     UPDATE_USER_PROFILE, USER_ACTION_ERROR, CREATE_GAME_REQUEST, CREATE_GAME_SUCCESS,
-    CREATE_GAME_FAILURE, VIEW_USER_PROFILE, SET_AUTH_TOKEN, CLEAR_AUTH_TOKEN
+    CREATE_GAME_FAILURE, VIEW_USER_PROFILE, SET_AUTH_TOKEN, CLEAR_AUTH_TOKEN,
+    FRIENDS_LIST_SUCCESS, FRIENDS_INCOMING_SUCCESS, FRIENDS_OUTGOING_SUCCESS,
+    FRIENDS_RELATIONSHIP_SUCCESS, FRIENDS_ACTION_ERROR,
+    MESSAGES_CONVERSATIONS_SUCCESS, MESSAGES_THREAD_SUCCESS, MESSAGES_ACTION_ERROR,
 } from "../actions/action.types";
 
 const initialState = {
@@ -17,6 +20,18 @@ const initialState = {
     administradorUser: {},
     counterUser: {},
     authToken: localStorage.getItem('token') || null,
+    friends: {
+        list: [],
+        incoming: [],
+        outgoing: [],
+        relationship: {},
+        error: null,
+    },
+    messages: {
+        conversations: [],
+        threads: {},
+        error: null,
+    },
 };
 
 const reducer = (state = initialState, action) => {
@@ -121,6 +136,50 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 authToken: null,
             };
+
+        // Manejo de amigos
+        case FRIENDS_LIST_SUCCESS:
+            return { ...state, friends: { ...state.friends, list: action.payload } };
+
+        case FRIENDS_INCOMING_SUCCESS:
+            return { ...state, friends: { ...state.friends, incoming: action.payload } };
+
+        case FRIENDS_OUTGOING_SUCCESS:
+            return { ...state, friends: { ...state.friends, outgoing: action.payload } };
+
+        case FRIENDS_RELATIONSHIP_SUCCESS:
+            return {
+                ...state,
+                friends: {
+                    ...state.friends,
+                    relationship: {
+                        ...state.friends.relationship,
+                        [action.payload.userId]: action.payload.data,
+                    },
+                },
+            };
+
+        case FRIENDS_ACTION_ERROR:
+            return { ...state, friends: { ...state.friends, error: action.payload } };
+
+        // Manejo de mensajes
+        case MESSAGES_CONVERSATIONS_SUCCESS:
+            return { ...state, messages: { ...state.messages, conversations: action.payload } };
+
+        case MESSAGES_THREAD_SUCCESS:
+            return {
+                ...state,
+                messages: {
+                    ...state.messages,
+                    threads: {
+                        ...state.messages.threads,
+                        [action.payload.userId]: action.payload.messages,
+                    },
+                },
+            };
+
+        case MESSAGES_ACTION_ERROR:
+            return { ...state, messages: { ...state.messages, error: action.payload } };
 
         default:
             return state;

@@ -4,7 +4,19 @@ import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import GameGrid from "./../Juegos/juegos";
 import API_URL from "../../api/rutaApi";
-import { fetchFavoriteGames, fetchPublicFavorites, viewedUserProfile, updateUserProfile } from "./../../redux/actions/index";
+import {
+  fetchFavoriteGames,
+  fetchPublicFavorites,
+  viewedUserProfile,
+  updateUserProfile,
+  fetchRelationship,
+  sendFriendRequest,
+  acceptFriendRequest,
+  removeFriend,
+} from "./../../redux/actions/index";
+import RankBadge from "../ui/RankBadge/rankBadge";
+import { getRankMeta, getNextRank } from "../../utils/rank";
+import { swalThemeConfig } from "../../utils/formatters";
 
 const countryOptions = [
   { value: "argentina", label: "Argentina (ARS)" },
@@ -23,6 +35,9 @@ const Perfil = ({ isPublic = false }) => {
   
   const currentUser = useSelector((state) => state.currentUser);
   const viewedUser = useSelector((state) => state.viewedUserProfile);
+  const relationship = useSelector((state) =>
+    viewedUser?.id ? state.friends.relationship[viewedUser.id] : null,
+  );
 
   const [activeTab, setActiveTab] = useState("info"); // "info", "favoritos"
   const [isEditing, setIsEditing] = useState(false);
@@ -55,6 +70,12 @@ const Perfil = ({ isPublic = false }) => {
       dispatch(fetchFavoriteGames(currentUser.id));
     }
   }, [dispatch, isPublic, currentUser?.id]);
+
+  useEffect(() => {
+    if (isPublic && viewedUser?.id && currentUser?.id && viewedUser.id !== currentUser.id) {
+      dispatch(fetchRelationship(viewedUser.id));
+    }
+  }, [dispatch, isPublic, viewedUser?.id, currentUser?.id]);
 
   const avatarSrc = user?.id ? `${API_URL}/user/${user.id}/avatar-image` : null;
 
@@ -130,15 +151,59 @@ const Perfil = ({ isPublic = false }) => {
     });
   };
 
+  const handleSendFriendRequest = async () => {
+    try {
+      await dispatch(sendFriendRequest(user.nick, user.id));
+    } catch (error) {
+      Swal.fire({
+        title: "No se pudo enviar la solicitud",
+        text: error.response?.data?.message || "Inténtalo de nuevo más tarde.",
+        icon: "error",
+        ...swalThemeConfig,
+      });
+    }
+  };
+
+  const handleAcceptFriendRequest = async () => {
+    if (!relationship?.friendshipId) return;
+    try {
+      await dispatch(acceptFriendRequest(relationship.friendshipId, user.id));
+    } catch (error) {
+      Swal.fire({ title: "Error", text: "No se pudo aceptar la solicitud.", icon: "error", ...swalThemeConfig });
+    }
+  };
+
+  const handleRemoveFriend = async () => {
+    if (!relationship?.friendshipId) return;
+    const result = await Swal.fire({
+      title: `¿Eliminar a ${user.nick} de tus amigos?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Eliminar",
+      cancelButtonText: "Cancelar",
+      ...swalThemeConfig,
+    });
+    if (!result.isConfirmed) return;
+    try {
+      await dispatch(removeFriend(relationship.friendshipId, user.id));
+    } catch (error) {
+      Swal.fire({ title: "Error", text: "No se pudo eliminar la amistad.", icon: "error", ...swalThemeConfig });
+    }
+  };
+
   // Get user initials for premium avatar fallback
   const getInitials = (nickName) => {
     if (!nickName) return "RG";
     return nickName.slice(0, 2).toUpperCase();
   };
 
-  // Calculate VIP Progress based on chips or static wagered info for immersion
   const totalChips = user.chips || 0;
-  const wageredPercentage = Math.min(Math.round((totalChips / 5000000) * 100), 100);
+  const totalChipsDeposited = Number(user.totalChipsDeposited || 0);
+  const rankMeta = getRankMeta(user.rank);
+  const nextRank = getNextRank(user.rank);
+  const rankProgressPercentage = nextRank
+    ? Math.min(Math.round((totalChipsDeposited / nextRank.threshold) * 100), 100)
+    : 100;
 
   // Get formatted member since date
   const getMemberSince = (createdAt) => {
@@ -229,16 +294,59 @@ const Perfil = ({ isPublic = false }) => {
           <div className="flex-grow text-center md:text-left pb-4">
             <h1 className="font-headline-lg text-headline-lg text-white mb-2">{user.nick}</h1>
             <div className="flex flex-wrap justify-center md:justify-start items-center gap-4">
-              <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/30 rounded-full">
-                <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>stars</span>
-                <span className="font-label-md text-label-md text-primary">
-                  {totalChips > 2000000 ? "Platinum Elite VIP" : "Gold IV VIP"}
-                </span>
-              </div>
+              <RankBadge tier={user.rank} size="md" />
               <span className="text-on-surface-variant font-body-sm text-body-sm">
                 {getMemberSince(user.createdAt || user.created_at || user.created)}
               </span>
             </div>
+
+            {isPublic && currentUser?.id && user.id !== currentUser.id && (
+              <div className="flex flex-wrap justify-center md:justify-start items-center gap-3 mt-4">
+                {relationship?.status === "friends" && (
+                  <button
+                    onClick={handleRemoveFriend}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/30 text-primary text-sm font-bold hover:bg-primary/10 transition-all cursor-pointer bg-transparent"
+                  >
+                    <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>how_to_reg</span>
+                    Amigos
+                  </button>
+                )}
+                {relationship?.status === "pending-sent" && (
+                  <button
+                    disabled
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg border border-outline-variant/30 text-on-surface-variant text-sm font-bold cursor-default bg-transparent opacity-70"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">hourglass_top</span>
+                    Solicitud Enviada
+                  </button>
+                )}
+                {relationship?.status === "pending-received" && (
+                  <button
+                    onClick={handleAcceptFriendRequest}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg gold-gradient text-black text-sm font-bold hover:brightness-110 active:scale-95 transition-all cursor-pointer border-0"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">person_add</span>
+                    Aceptar Solicitud
+                  </button>
+                )}
+                {(!relationship || relationship.status === "none") && (
+                  <button
+                    onClick={handleSendFriendRequest}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/30 text-primary text-sm font-bold hover:bg-primary/10 transition-all cursor-pointer bg-transparent"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">person_add</span>
+                    Agregar Amigo
+                  </button>
+                )}
+                <button
+                  onClick={() => navigate(`/mensajes/${user.nick}`)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-outline-variant/30 text-on-surface hover:bg-surface-variant/40 text-sm font-bold transition-all cursor-pointer bg-transparent"
+                >
+                  <span className="material-symbols-outlined text-[18px]">forum</span>
+                  Enviar Mensaje
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="hidden lg:flex flex-col items-end gap-2 pb-4">
@@ -457,26 +565,29 @@ const Perfil = ({ isPublic = false }) => {
         {/* Right Column: Secondary Info Cards */}
         <div className="lg:col-span-4 flex flex-col gap-gutter">
           
-          {/* VIP Card */}
+          {/* Rank Card */}
           <div className="glass-card p-6 rounded-xl relative overflow-hidden group">
             <div className="absolute -right-8 -bottom-8 w-32 h-32 royal-gold-gradient opacity-10 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
             <div className="relative z-10">
-              <span className="font-label-md text-label-md text-on-surface-variant uppercase mb-2 block">Next Milestone</span>
-              <h4 className="font-headline-sm text-headline-sm text-white">Platinum I</h4>
+              <span className="font-label-md text-label-md text-on-surface-variant uppercase mb-2 block">
+                {nextRank ? "Próximo Rango" : "Rango Máximo Alcanzado"}
+              </span>
+              <h4 className="font-headline-sm text-headline-sm text-white">{nextRank ? nextRank.label : rankMeta.label}</h4>
               <div className="w-full bg-surface-container-lowest h-2 rounded-full mb-2 border border-outline-variant/10 overflow-hidden">
-                <div className="royal-gold-gradient h-full" style={{ width: `${wageredPercentage}%` }}></div>
+                <div className="royal-gold-gradient h-full" style={{ width: `${rankProgressPercentage}%` }}></div>
               </div>
               <div className="flex justify-between font-label-md text-label-md">
                 <span className="text-on-surface-variant">
-                  {new Intl.NumberFormat('es-ES').format(totalChips)} / 5.000.000
+                  {new Intl.NumberFormat('es-ES').format(totalChipsDeposited)}
+                  {nextRank ? ` / ${new Intl.NumberFormat('es-ES').format(nextRank.threshold)}` : ""}
                 </span>
-                <span className="text-primary">{wageredPercentage}%</span>
+                <span className="text-primary">{rankProgressPercentage}%</span>
               </div>
               <button
                 onClick={() => {
                   Swal.fire({
-                    title: "Beneficios VIP",
-                    text: "Por ser miembro Gold IV VIP, disfrutas de retiros express, soporte prioritario 24/7 y multiplicadores de giros gratis en juegos destacados.",
+                    title: "Beneficios de Rango",
+                    text: `Por ser miembro rango ${rankMeta.label}, disfrutas de beneficios exclusivos que mejoran a medida que subes de nivel cargando fichas.`,
                     icon: "info",
                     confirmButtonColor: "#C9A84C",
                   });
@@ -484,7 +595,7 @@ const Perfil = ({ isPublic = false }) => {
                 className="w-full mt-6 py-3 border border-primary/20 rounded-lg font-label-lg text-label-lg text-primary hover:bg-primary/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-sm">workspace_premium</span>
-                View VIP Benefits
+                Ver Beneficios de Rango
               </button>
             </div>
           </div>

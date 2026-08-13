@@ -19,6 +19,14 @@ import {
     CREATE_GAME_REQUEST,
     CREATE_GAME_SUCCESS,
     CREATE_GAME_FAILURE,
+    FRIENDS_LIST_SUCCESS,
+    FRIENDS_INCOMING_SUCCESS,
+    FRIENDS_OUTGOING_SUCCESS,
+    FRIENDS_RELATIONSHIP_SUCCESS,
+    FRIENDS_ACTION_ERROR,
+    MESSAGES_CONVERSATIONS_SUCCESS,
+    MESSAGES_THREAD_SUCCESS,
+    MESSAGES_ACTION_ERROR,
 } from "./action.types";
 import axios from 'axios';
 
@@ -200,4 +208,139 @@ export const promo1millon = () => {
             throw new Error(`Error al añadir las fichas: ${error.message}`);
         }
     };
+};
+
+// ===== Friends =====
+
+export const fetchFriends = () => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`${API_URL}/friends`);
+        dispatch({ type: FRIENDS_LIST_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({ type: FRIENDS_ACTION_ERROR, payload: error.message });
+    }
+};
+
+export const fetchIncomingRequests = () => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`${API_URL}/friends/requests/incoming`);
+        dispatch({ type: FRIENDS_INCOMING_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({ type: FRIENDS_ACTION_ERROR, payload: error.message });
+    }
+};
+
+export const fetchOutgoingRequests = () => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`${API_URL}/friends/requests/outgoing`);
+        dispatch({ type: FRIENDS_OUTGOING_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({ type: FRIENDS_ACTION_ERROR, payload: error.message });
+    }
+};
+
+export const fetchRelationship = (userId) => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`${API_URL}/friends/relationship/${userId}`);
+        dispatch({ type: FRIENDS_RELATIONSHIP_SUCCESS, payload: { userId, data } });
+        return data;
+    } catch (error) {
+        dispatch({ type: FRIENDS_ACTION_ERROR, payload: error.message });
+    }
+};
+
+export const sendFriendRequest = (nick, targetUserId) => async (dispatch) => {
+    try {
+        await axios.post(`${API_URL}/friends/request`, { nick });
+        dispatch(fetchOutgoingRequests());
+        if (targetUserId) dispatch(fetchRelationship(targetUserId));
+    } catch (error) {
+        dispatch({ type: FRIENDS_ACTION_ERROR, payload: error.response?.data?.message || error.message });
+        throw error;
+    }
+};
+
+export const acceptFriendRequest = (friendshipId, otherUserId) => async (dispatch) => {
+    try {
+        await axios.patch(`${API_URL}/friends/${friendshipId}/accept`);
+        dispatch(fetchFriends());
+        dispatch(fetchIncomingRequests());
+        if (otherUserId) dispatch(fetchRelationship(otherUserId));
+    } catch (error) {
+        dispatch({ type: FRIENDS_ACTION_ERROR, payload: error.response?.data?.message || error.message });
+        throw error;
+    }
+};
+
+export const declineFriendRequest = (friendshipId, otherUserId) => async (dispatch) => {
+    try {
+        await axios.patch(`${API_URL}/friends/${friendshipId}/decline`);
+        dispatch(fetchIncomingRequests());
+        if (otherUserId) dispatch(fetchRelationship(otherUserId));
+    } catch (error) {
+        dispatch({ type: FRIENDS_ACTION_ERROR, payload: error.response?.data?.message || error.message });
+        throw error;
+    }
+};
+
+export const cancelFriendRequest = (friendshipId, otherUserId) => async (dispatch) => {
+    try {
+        await axios.delete(`${API_URL}/friends/${friendshipId}/cancel`);
+        dispatch(fetchOutgoingRequests());
+        if (otherUserId) dispatch(fetchRelationship(otherUserId));
+    } catch (error) {
+        dispatch({ type: FRIENDS_ACTION_ERROR, payload: error.response?.data?.message || error.message });
+        throw error;
+    }
+};
+
+export const removeFriend = (friendshipId, otherUserId) => async (dispatch) => {
+    try {
+        await axios.delete(`${API_URL}/friends/${friendshipId}`);
+        dispatch(fetchFriends());
+        if (otherUserId) dispatch(fetchRelationship(otherUserId));
+    } catch (error) {
+        dispatch({ type: FRIENDS_ACTION_ERROR, payload: error.response?.data?.message || error.message });
+        throw error;
+    }
+};
+
+// ===== Messages =====
+
+export const fetchConversations = () => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`${API_URL}/messages/conversations`);
+        dispatch({ type: MESSAGES_CONVERSATIONS_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({ type: MESSAGES_ACTION_ERROR, payload: error.message });
+    }
+};
+
+export const fetchThread = (userId) => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`${API_URL}/messages/thread/${userId}`);
+        dispatch({ type: MESSAGES_THREAD_SUCCESS, payload: { userId, messages: data } });
+    } catch (error) {
+        dispatch({ type: MESSAGES_ACTION_ERROR, payload: error.message });
+    }
+};
+
+export const sendMessage = (recipientNick, content, recipientId) => async (dispatch) => {
+    try {
+        await axios.post(`${API_URL}/messages`, { recipientNick, content });
+        dispatch(fetchConversations());
+        if (recipientId) dispatch(fetchThread(recipientId));
+    } catch (error) {
+        dispatch({ type: MESSAGES_ACTION_ERROR, payload: error.response?.data?.message || error.message });
+        throw error;
+    }
+};
+
+export const markThreadRead = (userId) => async (dispatch) => {
+    try {
+        await axios.patch(`${API_URL}/messages/thread/${userId}/read`);
+        dispatch(fetchConversations());
+    } catch (error) {
+        dispatch({ type: MESSAGES_ACTION_ERROR, payload: error.message });
+    }
 };

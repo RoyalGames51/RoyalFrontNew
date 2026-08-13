@@ -29,6 +29,8 @@ import PaymentSuccess from './components/PaymentStatus/PaymentSuccess';
 import PaymentFailure from './components/PaymentStatus/PaymentFailure';
 import PaymentPending from './components/PaymentStatus/PaymentPending';
 import Bazar from './components/Bazar/bazar';
+import Friends from './components/Friends/friends';
+import Messages from './components/Messages/messages';
 
 function App() {
   const [showWelcomeGift, setShowWelcomeGift] = useState(false);
@@ -94,6 +96,9 @@ function App() {
             <Route path="/play/royaljoker" element={<RoyalJoker />} />
             <Route path="/play/royalpachinka" element={<RoyalPachinka />} />
             <Route path="/bazar" element={<Bazar />} />
+            <Route path="/amigos" element={<Friends />} />
+            <Route path="/mensajes" element={<Messages />} />
+            <Route path="/mensajes/:nick" element={<Messages />} />
             <Route path="/mercadopago/success" element={<PaymentSuccess />} />
             <Route path="/mercadopago/failure" element={<PaymentFailure />} />
             <Route path="/mercadopago/pending" element={<PaymentPending />} />
