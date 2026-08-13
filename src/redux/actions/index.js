@@ -29,6 +29,10 @@ import {
     MESSAGES_ACTION_ERROR,
     ADMIN_OVERVIEW_SUCCESS,
     ADMIN_ACTION_ERROR,
+    SUPPORT_TICKETS_SUCCESS,
+    SUPPORT_ALL_TICKETS_SUCCESS,
+    SUPPORT_TICKET_DETAIL_SUCCESS,
+    SUPPORT_ACTION_ERROR,
 } from "./action.types";
 import axios from 'axios';
 
@@ -379,4 +383,52 @@ export const setUserInactiveStatus = (userId, status) => async () => {
 
 export const deleteUserAccount = (userId) => async () => {
     await axios.delete(`${API_URL}/user-delete/${userId}`);
+};
+
+// ===== Support Tickets =====
+
+export const fetchMyTickets = () => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`${API_URL}/support/tickets`);
+        dispatch({ type: SUPPORT_TICKETS_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({ type: SUPPORT_ACTION_ERROR, payload: error.message });
+    }
+};
+
+export const fetchAllTickets = () => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`${API_URL}/support/tickets/all`);
+        dispatch({ type: SUPPORT_ALL_TICKETS_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({ type: SUPPORT_ACTION_ERROR, payload: error.message });
+    }
+};
+
+export const fetchTicketDetail = (ticketId) => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`${API_URL}/support/tickets/${ticketId}`);
+        dispatch({ type: SUPPORT_TICKET_DETAIL_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({ type: SUPPORT_ACTION_ERROR, payload: error.message });
+    }
+};
+
+export const createTicket = (subject, message) => async (dispatch) => {
+    const { data } = await axios.post(`${API_URL}/support/tickets`, { subject, message });
+    dispatch({ type: SUPPORT_TICKET_DETAIL_SUCCESS, payload: data });
+    dispatch(fetchMyTickets());
+    return data;
+};
+
+export const addTicketMessage = (ticketId, content, isAdmin) => async (dispatch) => {
+    const { data } = await axios.post(`${API_URL}/support/tickets/${ticketId}/messages`, { content });
+    dispatch({ type: SUPPORT_TICKET_DETAIL_SUCCESS, payload: data });
+    dispatch(isAdmin ? fetchAllTickets() : fetchMyTickets());
+};
+
+export const updateTicketStatus = (ticketId, status) => async (dispatch) => {
+    await axios.patch(`${API_URL}/support/tickets/${ticketId}/status`, { status });
+    dispatch(fetchTicketDetail(ticketId));
+    dispatch(fetchAllTickets());
 };

@@ -24,11 +24,13 @@ export default function Sidebar() {
   const socialItems = [
     { to: "/amigos", icon: "group", label: "Amigos" },
     { to: "/mensajes", icon: "forum", label: "Mensajes", badge: unreadTotal },
+    { to: "/ayuda", icon: "support_agent", label: "Ayuda" },
   ];
 
   const adminItems = [
     { to: "/admin/dashboard", icon: "dashboard", label: "Panel Admin" },
     { to: "/admin/users", icon: "manage_accounts", label: "Usuarios" },
+    { to: "/admin/tickets", icon: "support_agent", label: "Tickets" },
   ];
 
   if (!currentUser?.id || location.pathname.includes("/play")) {

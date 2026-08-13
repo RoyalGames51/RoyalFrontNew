@@ -17,6 +17,7 @@ import {
 import RankBadge from "../ui/RankBadge/rankBadge";
 import { getRankMeta, getNextRank } from "../../utils/rank";
 import { swalThemeConfig } from "../../utils/formatters";
+import { getGameByPlayPath } from "../../data/gamesCatalog";
 
 const countryOptions = [
   { value: "argentina", label: "Argentina (ARS)" },
@@ -210,16 +211,33 @@ const Perfil = ({ isPublic = false }) => {
       {/* Profile Header */}
       <section className="relative mb-12">
         <div className="absolute inset-0 royal-gold-gradient opacity-5 blur-[100px] rounded-full -z-10 h-64 w-64 translate-x-1/2"></div>
-        {isOwnProfile && (
-          <button
-            type="button"
-            onClick={() => setIsSettingsOpen(true)}
-            title="Configuración de Perfil"
-            className="absolute top-0 right-0 w-10 h-10 rounded-full bg-surface-container-highest border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary/40 transition-all cursor-pointer z-10"
-          >
-            <span className="material-symbols-outlined text-[20px]">settings</span>
-          </button>
-        )}
+        <div className="absolute top-0 right-0 flex items-center gap-3 z-10">
+          {(() => {
+            // Own profile: currentUser in Redux isn't live-updated by the background heartbeat,
+            // so lastSeen/currentActivity there can lag — but viewing your own profile right now
+            // is itself proof you're online, so skip the staleness check entirely in that case.
+            const isOnline = isOwnProfile || (user.lastSeen && Date.now() - new Date(user.lastSeen).getTime() < 5 * 60 * 1000);
+            const activeGame = isOnline && !isOwnProfile ? getGameByPlayPath(user.currentActivity) : null;
+            return (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-highest border border-outline-variant/30 text-[11px] font-bold whitespace-nowrap">
+                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isOnline ? "bg-green-500 animate-pulse" : "bg-gray-500"}`} />
+                <span className={isOnline ? (activeGame ? "text-primary" : "text-green-500") : "text-on-surface-variant"}>
+                  {activeGame ? `Jugando a ${activeGame.name}` : isOnline ? "Conectado" : "Desconectado"}
+                </span>
+              </div>
+            );
+          })()}
+          {isOwnProfile && (
+            <button
+              type="button"
+              onClick={() => setIsSettingsOpen(true)}
+              title="Configuración de Perfil"
+              className="w-10 h-10 rounded-full bg-surface-container-highest border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary/40 transition-all cursor-pointer flex-shrink-0"
+            >
+              <span className="material-symbols-outlined text-[20px]">settings</span>
+            </button>
+          )}
+        </div>
         <div className="flex flex-col md:flex-row items-center md:items-end gap-8">
           
           <div className="relative group">
@@ -420,6 +438,7 @@ const Perfil = ({ isPublic = false }) => {
                   { label: "Mis Mensajes", icon: "forum", to: "/mensajes" },
                   { label: "Comprar Fichas", icon: "paid", to: "/chips" },
                   { label: "Cambiar Avatar", icon: "face_retouching_natural", to: "/bazar" },
+                  { label: "Ayuda", icon: "support_agent", to: "/ayuda" },
                   ...(user.role === "admin"
                     ? [{ label: "Panel de Administración", icon: "admin_panel_settings", to: "/admin/dashboard" }]
                     : []),

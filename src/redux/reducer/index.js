@@ -8,6 +8,7 @@ import {
     FRIENDS_RELATIONSHIP_SUCCESS, FRIENDS_ACTION_ERROR,
     MESSAGES_CONVERSATIONS_SUCCESS, MESSAGES_THREAD_SUCCESS, MESSAGES_ACTION_ERROR,
     ADMIN_OVERVIEW_SUCCESS, ADMIN_ACTION_ERROR,
+    SUPPORT_TICKETS_SUCCESS, SUPPORT_ALL_TICKETS_SUCCESS, SUPPORT_TICKET_DETAIL_SUCCESS, SUPPORT_ACTION_ERROR,
 } from "../actions/action.types";
 
 const initialState = {
@@ -34,6 +35,12 @@ const initialState = {
         error: null,
     },
     adminOverview: null,
+    support: {
+        myTickets: [],
+        allTickets: [],
+        ticketDetail: null,
+        error: null,
+    },
 };
 
 const reducer = (state = initialState, action) => {
@@ -189,6 +196,19 @@ const reducer = (state = initialState, action) => {
 
         case ADMIN_ACTION_ERROR:
             return { ...state, error: action.payload };
+
+        // Manejo de tickets de soporte
+        case SUPPORT_TICKETS_SUCCESS:
+            return { ...state, support: { ...state.support, myTickets: action.payload } };
+
+        case SUPPORT_ALL_TICKETS_SUCCESS:
+            return { ...state, support: { ...state.support, allTickets: action.payload } };
+
+        case SUPPORT_TICKET_DETAIL_SUCCESS:
+            return { ...state, support: { ...state.support, ticketDetail: action.payload } };
+
+        case SUPPORT_ACTION_ERROR:
+            return { ...state, support: { ...state.support, error: action.payload } };
 
         default:
             return state;

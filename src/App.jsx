@@ -23,6 +23,7 @@ import API_URL from './api/rutaApi';
 import AboutUs from './components/AboutUs/aboutUs';
 import UserManagement from './components/AdminPanel/UserManagement/userManagement';
 import AdminDashboard from './components/AdminPanel/AdminDashboard/adminDashboard';
+import SupportTicketsAdmin from './components/AdminPanel/SupportTickets/supportTickets';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import PaymentSuccess from './components/PaymentStatus/PaymentSuccess';
 import PaymentFailure from './components/PaymentStatus/PaymentFailure';
@@ -31,6 +32,7 @@ import Bazar from './components/Bazar/bazar';
 import Friends from './components/Friends/friends';
 import Messages from './components/Messages/messages';
 import GameDetail from './components/Juegos/GameDetail/gameDetail';
+import Support from './components/Support/support';
 
 function App() {
   const [showWelcomeGift, setShowWelcomeGift] = useState(false);
@@ -85,13 +87,14 @@ function App() {
       minH="100vh"
     >
       <AuthProvider>
-        <div
-          className={`transition-all duration-300 flex flex-col flex-1 ${
-            currentUser?.id && !location.pathname.includes('/play') ? 'md:pl-16 lg:pl-56' : ''
-          }`}
-        >
+        <div className="flex flex-col flex-1">
           {(location.pathname !== "/" || currentUser?.id) && <Nav />}
           <Sidebar />
+          <div
+            className={`transition-all duration-300 flex flex-col flex-1 ${
+              currentUser?.id && !location.pathname.includes('/play') ? 'md:pl-16 lg:pl-56' : ''
+            }`}
+          >
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/perfil" element={<Perfil />} />
@@ -102,6 +105,7 @@ function App() {
             <Route path="/logout" element={<LogOut />} />
             <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin/tickets" element={<ProtectedRoute><SupportTicketsAdmin /></ProtectedRoute>} />
             <Route path="/noticias" element={<News />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/terminos-y-condiciones" element={<TermsAndConditions />} />
@@ -112,11 +116,14 @@ function App() {
             <Route path="/amigos" element={<Friends />} />
             <Route path="/mensajes" element={<Messages />} />
             <Route path="/mensajes/:nick" element={<Messages />} />
+            <Route path="/ayuda" element={<Support />} />
+            <Route path="/ayuda/:ticketId" element={<Support />} />
             <Route path="/mercadopago/success" element={<PaymentSuccess />} />
             <Route path="/mercadopago/failure" element={<PaymentFailure />} />
             <Route path="/mercadopago/pending" element={<PaymentPending />} />
           </Routes>
           {!location.pathname.includes('/play') && <Footer />}
+          </div>
         </div>
         {showWelcomeGift && currentUser?.id && createPortal(
           <div
