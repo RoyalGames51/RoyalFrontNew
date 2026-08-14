@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Swal from "sweetalert2";
 import { useAuth } from "../../context/oauthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { promo1millon, getUserByEmail } from "../../redux/actions";
 import { validateNick, validateEmail, validatePassword } from "./validate";
@@ -10,6 +10,7 @@ import logo from "../../assets/logo.png";
 
 const RegistroForm = ({ className, children }) => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
     const auth = useAuth();
 
@@ -32,6 +33,7 @@ const RegistroForm = ({ className, children }) => {
         password: "",
         confirmPassword: "",
         sexo: "",
+        referredByCode: "",
     });
 
     useEffect(() => {
@@ -43,6 +45,14 @@ const RegistroForm = ({ className, children }) => {
         window.addEventListener("open-register-modal", handleOpen);
         return () => window.removeEventListener("open-register-modal", handleOpen);
     }, []);
+
+    // Prefills the referral code from a shared link like royalgames.lat/?ref=A1B2C3D4
+    useEffect(() => {
+        const ref = searchParams.get("ref");
+        if (ref) {
+            setInput((prev) => ({ ...prev, referredByCode: ref.toUpperCase() }));
+        }
+    }, [searchParams]);
 
     const handleInputChange = (e) => {
         const property = e.target.name;
@@ -96,6 +106,7 @@ const RegistroForm = ({ className, children }) => {
                 input.email,
                 input.password,
                 input.sexo,
+                input.referredByCode.trim() || undefined,
             );
 
             await dispatch(getUserByEmail(input.email));
@@ -284,6 +295,21 @@ const RegistroForm = ({ className, children }) => {
                                     <option value="M">Mujer</option>
                                 </select>
                                 {errors.sexo && <p className="text-red-500 text-[11px] mt-0.5">{errors.sexo}</p>}
+                            </div>
+
+                            {/* Referral Code (optional) */}
+                            <div className="space-y-1">
+                                <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">
+                                    Código de Referido (opcional)
+                                </label>
+                                <input
+                                    className="w-full bg-[#0A0A0F] border border-[#2A2A36] rounded-lg py-2 px-3 text-on-surface font-body-md transition-all text-sm uppercase"
+                                    placeholder="Ej: A1B2C3D4"
+                                    type="text"
+                                    name="referredByCode"
+                                    value={input.referredByCode}
+                                    onChange={handleInputChange}
+                                />
                             </div>
 
                             {/* Checkboxes */}

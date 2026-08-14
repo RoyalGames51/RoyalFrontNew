@@ -34,6 +34,7 @@ export default function Sidebar() {
     { to: "/admin/tickets", icon: "support_agent", label: "Tickets" },
     { to: "/admin/deposits", icon: "payments", label: "Cargas" },
     { to: "/admin/prizes", icon: "emoji_events", label: "Premios" },
+    { to: "/admin/referrals", icon: "diversity_3", label: "Referidos" },
   ];
 
   if (!currentUser?.id || location.pathname.includes("/play")) {

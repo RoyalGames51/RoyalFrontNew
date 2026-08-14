@@ -9,13 +9,14 @@ export const authService = {
   /**
    * Registra un nuevo usuario
    */
-  signup: async (nick, email, password, sexo) => {
+  signup: async (nick, email, password, sexo, referredByCode) => {
     try {
       const response = await axios.post(`${API_URL}/signup`, {
         nick,
         email,
         password,
         sexo,
+        ...(referredByCode ? { referredByCode } : {}),
       });
       return response.data;
     } catch (error) {

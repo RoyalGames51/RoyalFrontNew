@@ -134,9 +134,9 @@ export function AuthProvider({ children }) {
     /**
      * Registra un nuevo usuario
      */
-    const register = async (nick, email, password, sexo) => {
+    const register = async (nick, email, password, sexo, referredByCode) => {
         try {
-            const signupResult = await authService.signup(nick, email, password, sexo);
+            const signupResult = await authService.signup(nick, email, password, sexo, referredByCode);
             const loginResult = await login(email, password);
             return { signup: signupResult, login: loginResult };
         } catch (error) {

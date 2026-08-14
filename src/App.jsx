@@ -26,6 +26,7 @@ import AdminDashboard from './components/AdminPanel/AdminDashboard/adminDashboar
 import SupportTicketsAdmin from './components/AdminPanel/SupportTickets/supportTickets';
 import AdminDeposits from './components/AdminPanel/Deposits/deposits';
 import AdminPrizes from './components/AdminPanel/Prizes/prizes';
+import AdminReferrals from './components/AdminPanel/Referrals/referrals';
 import ResetPassword from './components/ResetPassword/resetPassword';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import RequireAuth from './components/ProtectedRoute/RequireAuth';
@@ -117,6 +118,7 @@ function App() {
             <Route path="/admin/tickets" element={<ProtectedRoute><SupportTicketsAdmin /></ProtectedRoute>} />
             <Route path="/admin/deposits" element={<ProtectedRoute><AdminDeposits /></ProtectedRoute>} />
             <Route path="/admin/prizes" element={<ProtectedRoute><AdminPrizes /></ProtectedRoute>} />
+            <Route path="/admin/referrals" element={<ProtectedRoute><AdminReferrals /></ProtectedRoute>} />
             <Route path="/noticias" element={<News />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/terminos-y-condiciones" element={<TermsAndConditions />} />

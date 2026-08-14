@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import API_URL from "../../api/rutaApi";
 import axios from "axios";
 import chipsIcon from "../../assets/chips.png";
+import bannerPerfil from "../../assets/bannerperfil.png";
 import {
   viewedUserProfile,
   updateUserProfile,
@@ -330,126 +331,137 @@ const Perfil = ({ isPublic = false }) => {
       {/* Profile Header */}
       <section className="relative mb-10">
         <div className="absolute inset-0 royal-gold-gradient opacity-5 blur-[100px] rounded-full -z-10 h-64 w-64 translate-x-1/2"></div>
-        <div className="flex items-center justify-end gap-3 mb-4">
-          {(() => {
-            // Own profile: currentUser in Redux isn't live-updated by the background heartbeat,
-            // so lastSeen/currentActivity there can lag — but viewing your own profile right now
-            // is itself proof you're online, so skip the staleness check entirely in that case.
-            const isOnline = isOwnProfile || (user.lastSeen && Date.now() - new Date(user.lastSeen).getTime() < 5 * 60 * 1000);
-            const activeGame = isOnline && !isOwnProfile ? getGameByPlayPath(user.currentActivity) : null;
-            return (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-highest border border-outline-variant/30 text-[11px] font-bold whitespace-nowrap">
-                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isOnline ? "bg-green-500 animate-pulse" : "bg-gray-500"}`} />
-                <span className={isOnline ? (activeGame ? "text-primary" : "text-green-500") : "text-on-surface-variant"}>
-                  {activeGame ? `Jugando a ${activeGame.name}` : isOnline ? "Conectado" : "Desconectado"}
-                </span>
-              </div>
-            );
-          })()}
-          {isOwnProfile && (
-            <button
-              type="button"
-              onClick={() => setIsSettingsOpen(true)}
-              title="Configuración de Perfil"
-              className="w-10 h-10 rounded-full bg-surface-container-highest border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary/40 transition-all cursor-pointer flex-shrink-0"
-            >
-              <span className="material-symbols-outlined text-[20px]">settings</span>
-            </button>
-          )}
-        </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 items-center lg:items-start">
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
 
-          {/* Avatar / Photo */}
-          <div className="relative group flex-shrink-0">
-            <div className="w-40 h-40 md:w-48 md:h-48 flex items-center justify-center relative bg-transparent overflow-visible">
-              {avatarSrc ? (
-                <img
-                  alt="Avatar de Usuario"
-                  className="w-full h-full object-contain"
-                  src={avatarSrc}
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    target.onerror = null;
-                    target.src = user.image || "https://via.placeholder.com/300";
-                  }}
-                />
-              ) : user.image ? (
-                <img
-                  alt="Avatar de Usuario"
-                  className="w-full h-full object-contain"
-                  src={user.image}
-                />
-              ) : (
-                <div className="w-full h-full rounded-full royal-gold-gradient flex items-center justify-center text-surface-container-lowest text-4xl font-bold">
-                  {getInitials(user.nick)}
-                </div>
-              )}
+          {/* Banner + Avatar + Identity */}
+          <div className="flex-1 min-w-0 w-full relative rounded-xl overflow-hidden border border-outline-variant/20 aspect-[16/9]">
+            <img src={bannerPerfil} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/30 to-black/75"></div>
+
+            {/* Status badge + settings gear */}
+            <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center gap-2 sm:gap-3 z-10">
+              {(() => {
+                // Own profile: currentUser in Redux isn't live-updated by the background heartbeat,
+                // so lastSeen/currentActivity there can lag — but viewing your own profile right now
+                // is itself proof you're online, so skip the staleness check entirely in that case.
+                const isOnline = isOwnProfile || (user.lastSeen && Date.now() - new Date(user.lastSeen).getTime() < 5 * 60 * 1000);
+                const activeGame = isOnline && !isOwnProfile ? getGameByPlayPath(user.currentActivity) : null;
+                return (
+                  <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 text-[10px] sm:text-[11px] font-bold whitespace-nowrap">
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isOnline ? "bg-green-500 animate-pulse" : "bg-gray-500"}`} />
+                    <span className={isOnline ? (activeGame ? "text-primary" : "text-green-500") : "text-on-surface-variant"}>
+                      {activeGame ? `Jugando a ${activeGame.name}` : isOnline ? "Conectado" : "Desconectado"}
+                    </span>
+                  </div>
+                );
+              })()}
               {isOwnProfile && (
                 <button
                   type="button"
-                  onClick={() => {
-                    Swal.fire({
-                      title: "Cambiar Foto de Perfil",
-                      input: "text",
-                      inputLabel: "Pega la URL de tu nueva imagen de perfil:",
-                      inputValue: formData.image,
-                      showCancelButton: true,
-                      confirmButtonColor: "#C9A84C",
-                      confirmButtonText: "Guardar",
-                      cancelButtonText: "Cancelar",
-                      inputValidator: (value) => {
-                        if (!value) {
-                          return "¡Debes escribir una URL!";
-                        }
-                      }
-                    }).then((result) => {
-                      if (result.isConfirmed) {
-                        const updatedData = { ...formData, image: result.value };
-                        setFormData(updatedData);
-                        dispatch(updateUserProfile(user.id, updatedData));
-                        Swal.fire({
-                          icon: "success",
-                          title: "¡Imagen actualizada!",
-                          confirmButtonColor: "#C9A84C",
-                        });
-                      }
-                    });
-                  }}
-                  className="absolute bottom-1 right-1 bg-surface-container-highest border border-outline-variant w-9 h-9 rounded-full flex items-center justify-center hover:bg-primary hover:text-surface-container-lowest transition-all group-hover:scale-110 cursor-pointer"
+                  onClick={() => setIsSettingsOpen(true)}
+                  title="Configuración de Perfil"
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary/40 transition-all cursor-pointer flex-shrink-0"
                 >
-                  <span className="material-symbols-outlined text-[16px]">edit</span>
+                  <span className="material-symbols-outlined text-[18px] sm:text-[20px]">settings</span>
                 </button>
               )}
             </div>
-          </div>
 
-          {/* Identity + Bio */}
-          <div className="flex-1 min-w-0 text-center lg:text-left">
-            <h1 className="font-headline-md text-headline-md text-white mb-2">{capitalize(user.nick)}</h1>
-            <div className="flex flex-wrap justify-center lg:justify-start items-center gap-3 mb-1">
-              <RankBadge tier={user.rank} size="md" />
-              <span className="text-on-surface-variant font-body-sm text-body-sm">
-                {getMemberSince(user.createdAt || user.created_at || user.created)}
-              </span>
-              <span className="text-on-surface-variant font-body-sm text-body-sm flex items-center gap-1">
-                <img src={chipsIcon} alt="Fichas" className="w-4 h-4" />
-                {new Intl.NumberFormat('es-ES').format(totalChips)}
-              </span>
+            {/* Avatar / Photo, positioned inside the banner's frame */}
+            <div
+              className="absolute group"
+              style={{ left: "21%", top: "50%", width: "24%", transform: "translate(-50%, -50%)" }}
+            >
+              <div className="relative aspect-square w-full flex items-center justify-center bg-transparent overflow-visible">
+                {avatarSrc ? (
+                  <img
+                    alt="Avatar de Usuario"
+                    className="w-full h-full object-contain"
+                    src={avatarSrc}
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      target.onerror = null;
+                      target.src = user.image || "https://via.placeholder.com/300";
+                    }}
+                  />
+                ) : user.image ? (
+                  <img
+                    alt="Avatar de Usuario"
+                    className="w-full h-full object-contain"
+                    src={user.image}
+                  />
+                ) : (
+                  <div className="w-full h-full rounded-full royal-gold-gradient flex items-center justify-center text-surface-container-lowest text-2xl sm:text-4xl font-bold">
+                    {getInitials(user.nick)}
+                  </div>
+                )}
+                {isOwnProfile && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      Swal.fire({
+                        title: "Cambiar Foto de Perfil",
+                        input: "text",
+                        inputLabel: "Pega la URL de tu nueva imagen de perfil:",
+                        inputValue: formData.image,
+                        showCancelButton: true,
+                        confirmButtonColor: "#C9A84C",
+                        confirmButtonText: "Guardar",
+                        cancelButtonText: "Cancelar",
+                        inputValidator: (value) => {
+                          if (!value) {
+                            return "¡Debes escribir una URL!";
+                          }
+                        }
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          const updatedData = { ...formData, image: result.value };
+                          setFormData(updatedData);
+                          dispatch(updateUserProfile(user.id, updatedData));
+                          Swal.fire({
+                            icon: "success",
+                            title: "¡Imagen actualizada!",
+                            confirmButtonColor: "#C9A84C",
+                          });
+                        }
+                      });
+                    }}
+                    className="absolute bottom-0 right-0 bg-surface-container-highest border border-outline-variant w-6 h-6 sm:w-9 sm:h-9 rounded-full flex items-center justify-center hover:bg-primary hover:text-surface-container-lowest transition-all group-hover:scale-110 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[12px] sm:text-[16px]">edit</span>
+                  </button>
+                )}
+              </div>
             </div>
 
-            {(user.description || isOwnProfile) && (
-              <div className="mt-4 inline-block max-w-xl w-full glass-card rounded-xl rounded-tl-none px-5 py-4 text-left">
-                {bioMeta && (
-                  <p className="text-primary text-xs font-bold uppercase tracking-wider mb-1">{bioMeta}</p>
-                )}
-                <p className="text-on-surface text-sm leading-relaxed whitespace-pre-line">
-                  {user.description
-                    ? `Me gustaría decirles: ${user.description}`
-                    : "Este usuario todavía no escribió una biografía. Podés agregar la tuya desde Configuración."}
-                </p>
+            {/* Identity + Bio */}
+            <div className="absolute inset-y-0 flex flex-col justify-center gap-1 sm:gap-2 text-left" style={{ left: "37%", right: "4%" }}>
+              <h1 className="font-headline-sm sm:font-headline-md text-headline-sm sm:text-headline-md text-white truncate">{capitalize(user.nick)}</h1>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <RankBadge tier={user.rank} size="sm" />
+                <span className="hidden sm:inline text-on-surface-variant font-body-sm text-body-sm">
+                  {getMemberSince(user.createdAt || user.created_at || user.created)}
+                </span>
+                <span className="text-on-surface-variant font-body-sm text-body-sm flex items-center gap-1">
+                  <img src={chipsIcon} alt="Fichas" className="w-4 h-4" />
+                  {new Intl.NumberFormat('es-ES').format(totalChips)}
+                </span>
               </div>
-            )}
+
+              {(user.description || isOwnProfile) && (
+                <div className="hidden md:block mt-1 max-w-xl w-full glass-card rounded-xl px-4 py-3 text-left">
+                  {bioMeta && (
+                    <p className="text-primary text-[10px] font-bold uppercase tracking-wider mb-1">{bioMeta}</p>
+                  )}
+                  <p className="text-on-surface text-xs leading-relaxed whitespace-pre-line line-clamp-3">
+                    {user.description
+                      ? `Me gustaría decirles: ${user.description}`
+                      : "Este usuario todavía no escribió una biografía. Podés agregar la tuya desde Configuración."}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Action Panel */}
@@ -597,9 +609,58 @@ const Perfil = ({ isPublic = false }) => {
                 </button>
               </div>
             </div>
+
+            {/* Referral Code */}
+            {isOwnProfile && user.referralCode && (
+              <div className="glass-card p-6 rounded-xl relative overflow-hidden mt-6">
+                <h4 className="font-headline-sm text-headline-sm text-white mb-1">Referí Amigos</h4>
+                <p className="text-on-surface-variant text-xs mb-4">
+                  Compartí tu código: si alguien se registra con él, recibe 1.000.000 de fichas de regalo.
+                </p>
+                <div className="flex items-center justify-between gap-2 bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3 mb-3">
+                  <span className="font-bold text-primary tracking-widest">{user.referralCode}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(user.referralCode);
+                      Swal.fire({ icon: "success", title: "¡Código copiado!", confirmButtonColor: "#C9A84C", timer: 1500, showConfirmButton: false });
+                    }}
+                    className="text-on-surface-variant hover:text-primary transition-colors cursor-pointer bg-transparent border-0"
+                    title="Copiar código"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">content_copy</span>
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${window.location.origin}/?ref=${user.referralCode}`);
+                    Swal.fire({ icon: "success", title: "¡Enlace copiado!", confirmButtonColor: "#C9A84C", timer: 1500, showConfirmButton: false });
+                  }}
+                  className="w-full py-2.5 rounded-lg border border-primary/20 text-primary font-label-lg text-label-lg hover:bg-primary/10 transition-all flex items-center justify-center gap-2 cursor-pointer bg-transparent"
+                >
+                  <span className="material-symbols-outlined text-sm">link</span>
+                  Copiar Enlace de Invitación
+                </button>
+              </div>
+            )}
           </div>
 
         </div>
+
+        {/* Bio: shown below the banner on small screens, where there's no room to overlay it */}
+        {(user.description || isOwnProfile) && (
+          <div className="md:hidden mt-4 glass-card rounded-xl px-5 py-4 text-left">
+            {bioMeta && (
+              <p className="text-primary text-xs font-bold uppercase tracking-wider mb-1">{bioMeta}</p>
+            )}
+            <p className="text-on-surface text-sm leading-relaxed whitespace-pre-line">
+              {user.description
+                ? `Me gustaría decirles: ${user.description}`
+                : "Este usuario todavía no escribió una biografía. Podés agregar la tuya desde Configuración."}
+            </p>
+          </div>
+        )}
       </section>
 
       {isSettingsOpen && isOwnProfile && (

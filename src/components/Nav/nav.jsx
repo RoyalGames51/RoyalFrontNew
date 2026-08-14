@@ -110,19 +110,6 @@ export default function Navbar() {
                 >
                   Noticias
                 </NavLink>
-
-                <NavLink
-                  to="/chips?tab=history"
-                  className={({ isActive }) =>
-                    `font-body-md text-body-md transition-colors duration-200 ${
-                      isActive
-                        ? "text-primary font-bold border-b-2 border-primary pb-1"
-                        : "text-on-surface-variant hover:text-primary"
-                    }`
-                  }
-                >
-                  Historial
-                </NavLink>
               </nav>
             </>
           ) : (
