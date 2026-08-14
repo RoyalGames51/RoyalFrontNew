@@ -287,7 +287,7 @@ const Perfil = ({ isPublic = false }) => {
       {/* Profile Header */}
       <section className="relative mb-10">
         <div className="absolute inset-0 royal-gold-gradient opacity-5 blur-[100px] rounded-full -z-10 h-64 w-64 translate-x-1/2"></div>
-        <div className="absolute top-0 right-0 flex items-center gap-3 z-10">
+        <div className="flex items-center justify-end gap-3 mb-4">
           {(() => {
             // Own profile: currentUser in Redux isn't live-updated by the background heartbeat,
             // so lastSeen/currentActivity there can lag — but viewing your own profile right now
@@ -315,7 +315,7 @@ const Perfil = ({ isPublic = false }) => {
           )}
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 items-center lg:items-start pt-14 lg:pt-2">
+        <div className="flex flex-col lg:flex-row gap-8 items-center lg:items-start">
 
           {/* Avatar / Photo */}
           <div className="relative group flex-shrink-0">
@@ -520,42 +520,42 @@ const Perfil = ({ isPublic = false }) => {
                 </div>
               )
             )}
+
+            {/* Rank Progress */}
+            <div className="glass-card p-6 rounded-xl relative overflow-hidden group mt-6">
+              <div className="absolute -right-8 -bottom-8 w-32 h-32 royal-gold-gradient opacity-10 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="font-label-md text-label-md text-on-surface-variant uppercase">Rango Actual</span>
+                  <RankBadge tier={user.rank} size="sm" />
+                </div>
+                <span className="font-label-md text-label-md text-on-surface-variant uppercase mb-2 block">
+                  {nextRank ? "Próximo Rango" : "Rango Máximo Alcanzado"}
+                </span>
+                <h4 className="font-headline-sm text-headline-sm text-white">{nextRank ? nextRank.label : rankMeta.label}</h4>
+                <div className="w-full bg-surface-container-lowest h-2 rounded-full mb-2 border border-outline-variant/10 overflow-hidden">
+                  <div className="royal-gold-gradient h-full" style={{ width: `${rankProgressPercentage}%` }}></div>
+                </div>
+                <div className="flex justify-between font-label-md text-label-md">
+                  <span className="text-on-surface-variant">
+                    {new Intl.NumberFormat('es-ES').format(totalChipsDeposited)}
+                    {nextRank ? ` / ${new Intl.NumberFormat('es-ES').format(nextRank.threshold)}` : ""}
+                  </span>
+                  <span className="text-primary">{rankProgressPercentage}%</span>
+                </div>
+                <button
+                  onClick={showRankBenefits}
+                  className="w-full mt-6 py-3 border border-primary/20 rounded-lg font-label-lg text-label-lg text-primary hover:bg-primary/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-sm">workspace_premium</span>
+                  Ver Beneficios de Rango
+                </button>
+              </div>
+            </div>
           </div>
 
         </div>
       </section>
-
-      {/* Rank Progress */}
-      <div className="glass-card p-6 rounded-xl relative overflow-hidden group max-w-xl">
-        <div className="absolute -right-8 -bottom-8 w-32 h-32 royal-gold-gradient opacity-10 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-4">
-            <span className="font-label-md text-label-md text-on-surface-variant uppercase">Rango Actual</span>
-            <RankBadge tier={user.rank} size="sm" />
-          </div>
-          <span className="font-label-md text-label-md text-on-surface-variant uppercase mb-2 block">
-            {nextRank ? "Próximo Rango" : "Rango Máximo Alcanzado"}
-          </span>
-          <h4 className="font-headline-sm text-headline-sm text-white">{nextRank ? nextRank.label : rankMeta.label}</h4>
-          <div className="w-full bg-surface-container-lowest h-2 rounded-full mb-2 border border-outline-variant/10 overflow-hidden">
-            <div className="royal-gold-gradient h-full" style={{ width: `${rankProgressPercentage}%` }}></div>
-          </div>
-          <div className="flex justify-between font-label-md text-label-md">
-            <span className="text-on-surface-variant">
-              {new Intl.NumberFormat('es-ES').format(totalChipsDeposited)}
-              {nextRank ? ` / ${new Intl.NumberFormat('es-ES').format(nextRank.threshold)}` : ""}
-            </span>
-            <span className="text-primary">{rankProgressPercentage}%</span>
-          </div>
-          <button
-            onClick={showRankBenefits}
-            className="w-full mt-6 py-3 border border-primary/20 rounded-lg font-label-lg text-label-lg text-primary hover:bg-primary/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-sm">workspace_premium</span>
-            Ver Beneficios de Rango
-          </button>
-        </div>
-      </div>
 
       {isSettingsOpen && isOwnProfile && (
         <div
