@@ -5,6 +5,8 @@ import API_URL from '../../api/rutaApi';
 import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import RankBadge from "../ui/RankBadge/rankBadge";
+import { getRankMeta, getNextRank } from "../../utils/rank";
 
 // Import local image assets representing chip packages
 import quinientosmil from "../../assets/500000.jpg";
@@ -44,6 +46,12 @@ export default function BuyChips() {
   const { currentUser } = useSelector((state) => state);
   // Country is taken from the user's profile; if missing, purchases are blocked
   const userCountry = currentUser?.country || null;
+  const totalChipsDeposited = Number(currentUser?.totalChipsDeposited || 0);
+  const rankMeta = getRankMeta(currentUser?.rank);
+  const nextRank = getNextRank(currentUser?.rank);
+  const rankProgressPercentage = nextRank
+    ? Math.min(Math.round((totalChipsDeposited / nextRank.threshold) * 100), 100)
+    : 100;
   const [selectedChip, setSelectedChip] = useState(chipOptions[0]);
   
   // Navigation tabs state: "deposit", "withdraw", "history"
@@ -328,8 +336,8 @@ export default function BuyChips() {
         </header>
 
         {/* Metric Cards Row */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+
           {/* Card 1: Real Chips Balance */}
           <div className="glass-card p-6 rounded-xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -348,40 +356,30 @@ export default function BuyChips() {
             </div>
           </div>
 
-          {/* Card 2: Active Bonus */}
-          <div className="glass-card p-6 rounded-xl relative overflow-hidden group border-primary/20">
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <span className="material-symbols-outlined text-[72px]">card_giftcard</span>
-            </div>
-            <p className="font-label-md text-label-md text-on-surface-variant mb-2 uppercase tracking-wider">Crédito de Bono</p>
-            <div className="flex items-baseline gap-2 mb-2">
-              <span className="font-headline-lg text-headline-lg text-primary">
-                {symbol}{new Intl.NumberFormat('es-ES').format(1200 * exchangeRate)}
-              </span>
-            </div>
-            <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-full h-2 w-full overflow-hidden">
-              <div className="royal-gold-gradient h-full rounded-full w-2/3"></div>
-            </div>
-            <p className="mt-2 text-[10px] text-on-surface-variant uppercase tracking-wider">
-              Requisito de Apuesta: 65% Completado
-            </p>
-          </div>
-
-          {/* Card 3: VIP Club Level */}
+          {/* Card 2: Real Rank */}
           <div className="glass-card p-6 rounded-xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <span className="material-symbols-outlined text-[72px]">stars</span>
+              <span className="material-symbols-outlined text-[72px]">{rankMeta.icon}</span>
             </div>
-            <p className="font-label-md text-label-md text-on-surface-variant mb-2 uppercase tracking-wider">Rango Club VIP</p>
-            <div className="flex items-baseline gap-2">
-              <span className="font-headline-lg text-headline-lg text-white">
-                {currentUser?.chips > 2000000 ? "Platinum I" : "Gold IV VIP"}
-              </span>
+            <div className="flex items-center justify-between mb-2">
+              <p className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Mi Rango</p>
+              <RankBadge tier={currentUser?.rank} size="sm" />
             </div>
-            <div className="mt-4 flex items-center text-xs text-primary">
-              <span className="material-symbols-outlined text-[14px] mr-1">workspace_premium</span>
-              Beneficios VIP activos y retiros prioritarios
-            </div>
+            {nextRank ? (
+              <>
+                <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-full h-2 w-full overflow-hidden mt-4">
+                  <div className="royal-gold-gradient h-full rounded-full" style={{ width: `${rankProgressPercentage}%` }}></div>
+                </div>
+                <p className="mt-2 text-[10px] text-on-surface-variant uppercase tracking-wider">
+                  {new Intl.NumberFormat('es-ES').format(totalChipsDeposited)} / {new Intl.NumberFormat('es-ES').format(nextRank.threshold)} hacia {nextRank.label} ({rankProgressPercentage}%)
+                </p>
+              </>
+            ) : (
+              <div className="mt-4 flex items-center text-xs text-primary">
+                <span className="material-symbols-outlined text-[14px] mr-1">workspace_premium</span>
+                Rango máximo alcanzado
+              </div>
+            )}
           </div>
 
         </section>

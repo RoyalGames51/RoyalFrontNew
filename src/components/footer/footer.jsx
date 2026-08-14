@@ -32,19 +32,7 @@ function Footer() {
         </div>
 
         {/* Links grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-12 text-sm uppercase tracking-widest font-bold">
-          <div className="flex flex-col gap-4">
-            <h5 className="text-white mb-2 font-black">Legado</h5>
-            <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/about">
-              Nuestra Historia
-            </Link>
-            <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="#">
-              Juego Responsable
-            </a>
-            <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="#">
-              Lounge VIP
-            </a>
-          </div>
+        <div className="grid grid-cols-2 gap-12 text-sm uppercase tracking-widest font-bold">
           <div className="flex flex-col gap-4">
             <h5 className="text-white mb-2 font-black">Conserjería</h5>
             <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="mailto:royalgames2025@gmail.com">
