@@ -3,7 +3,7 @@ import LegalPage from "./LegalPage";
 const sections = [
   {
     title: "1. Qué datos recopilamos",
-    content: "Al crear tu cuenta guardamos tu nick, correo electrónico y contraseña (encriptada, nunca en texto plano). Si vos elegís completarlos, también guardamos tu edad, país, avatar y descripción de perfil. Si te registrás con Google, recibimos tu nombre, correo y foto de perfil desde tu cuenta de Google.",
+    content: "Al crear tu cuenta guardamos solo tu nick, correo electrónico. Si vos elegís completarlos, también guardamos tu edad, país, avatar y descripción de perfil. Si te registrás con Google, recibimos tu nombre, correo y foto de perfil desde tu cuenta de Google.",
   },
   {
     title: "2. Qué datos generamos mientras jugás",
@@ -23,7 +23,7 @@ const sections = [
   },
   {
     title: "6. Seguridad de tu cuenta",
-    content: "Tu contraseña se guarda encriptada (hash), nunca en texto plano. El acceso a la plataforma se maneja con tokens de sesión (JWT) que expiran, y podés cambiar tu contraseña o correo en cualquier momento desde Configuración de Perfil.",
+    content: "Tu contraseña se encripta al momento de registrarte. El acceso a la plataforma se maneja con tokens de sesión (JWT) que expiran, y podés cambiar tu contraseña o correo en cualquier momento desde Configuración de Perfil.",
   },
   {
     title: "7. Tus derechos sobre tu información",
