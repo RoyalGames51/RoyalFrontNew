@@ -490,13 +490,13 @@ export default function Home() {
         </div> */}
 
         {/* Dashboard Main Content */}
-        <main className="pt-4 px-4 md:px-margin-desktop max-w-container-max mx-auto space-y-6 pb-10">
+        <main className="pt-6 px-4 md:px-margin-desktop max-w-container-max mx-auto space-y-12 pb-16">
           {/* Promo Carousel Bento Grid */}
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-auto lg:h-[220px]">
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:h-[400px]">
             {/* Main Slide */}
             <div
               onClick={handleClaimWelcomePackage}
-              className="lg:col-span-8 relative rounded-xl overflow-hidden border border-outline-variant/30 group cursor-pointer h-[180px] lg:h-full"
+              className="lg:col-span-8 relative rounded-xl overflow-hidden border border-outline-variant/30 group cursor-pointer h-[320px] lg:h-full"
             >
               <img
                 alt="Banner de Bienvenida"
@@ -507,7 +507,7 @@ export default function Home() {
             </div>
 
             {/* Secondary promo slides/widgets */}
-            <div className="lg:col-span-4 flex flex-col gap-4 h-[180px] lg:h-full">
+            <div className="lg:col-span-4 flex flex-col gap-6 h-[320px] lg:h-full">
               <div 
                 onClick={() => handleSoonAlert('Recarga Semanal')}
                 className="relative flex-1 rounded-xl overflow-hidden border border-outline-variant/30 group cursor-pointer"
@@ -541,10 +541,10 @@ export default function Home() {
           </section>
 
           {/* Popular Games & Active Tournament */}
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
             {/* Popular Games List */}
             <section className="xl:col-span-8">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-6">
                 <h2 className="font-headline-sm text-headline-sm flex items-center gap-2 text-white">
                   <span className="material-symbols-outlined text-primary">star</span> Juegos Populares
                 </h2>
@@ -564,36 +564,36 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {GAMES_CATALOG.filter((game) => game.status === "active").map((game) => (
                   <div
                     key={game.slug}
                     className="group relative bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant/20 hover:border-primary/50 transition-all hover:-translate-y-1"
                   >
-                    <div className="aspect-[4/3] overflow-hidden">
+                    <div className="aspect-[3/4] overflow-hidden">
                       <img
                         className="w-full h-full object-cover"
                         src={game.image}
                         alt={game.name}
                       />
                     </div>
-                    <div className="p-2 text-left">
-                      <span className={`text-[9px] font-bold uppercase tracking-wider ${CATEGORY_META[game.category].className}`}>
+                    <div className="p-3 text-left">
+                      <span className={`text-[10px] font-bold uppercase tracking-wider ${CATEGORY_META[game.category].className}`}>
                         {CATEGORY_META[game.category].label}
                       </span>
-                      <h4 className="font-bold text-label-md font-label-md truncate text-white">{game.name}</h4>
+                      <h4 className="font-bold text-label-lg font-label-lg truncate text-white">{game.name}</h4>
                     </div>
                     {/* Hover Overlay */}
-                    <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => handlePlayGame(game.playPath, game.name)}
-                        className="gold-gradient w-3/4 py-1.5 rounded font-bold text-on-primary text-label-md cursor-pointer border-0"
+                        className="gold-gradient w-3/4 py-2 rounded font-bold text-on-primary text-label-md cursor-pointer border-0"
                       >
                         JUGAR
                       </button>
                       <button
                         onClick={() => navigate(`/juegos/${game.slug}`)}
-                        className="border border-primary bg-transparent text-primary w-3/4 py-1.5 rounded font-bold text-label-md hover:bg-primary/10 cursor-pointer"
+                        className="border border-primary bg-transparent text-primary w-3/4 py-2 rounded font-bold text-label-md hover:bg-primary/10 cursor-pointer"
                       >
                         INFO
                       </button>
@@ -604,31 +604,31 @@ export default function Home() {
             </section>
 
             {/* Top Winners + Online Players */}
-            <aside className="xl:col-span-4 flex flex-col gap-4 text-left">
+            <aside className="xl:col-span-4 flex flex-col gap-6 text-left">
               {/* Top Winners Leaderboard */}
               <div className="bg-surface-container-high rounded-xl border border-primary/30 overflow-hidden flex flex-col gold-glow">
-                <div className="gold-gradient px-4 py-2.5 flex justify-between items-center">
-                  <h3 className="text-on-primary font-bold text-label-lg font-label-lg">Top Ganadores</h3>
-                  <span className="bg-black/20 text-on-primary px-2 py-0.5 rounded text-[10px] font-bold">EN VIVO</span>
+                <div className="gold-gradient p-4 flex justify-between items-center">
+                  <h3 className="text-on-primary font-bold text-headline-sm font-headline-sm">Top Ganadores</h3>
+                  <span className="bg-black/20 text-on-primary px-2 py-1 rounded text-label-md font-label-md font-bold">EN VIVO</span>
                 </div>
-                <div className="p-3 space-y-1.5">
+                <div className="p-6 space-y-3">
                   {topWinners.length === 0 ? (
-                    <p className="text-on-surface-variant text-sm text-center py-2">
+                    <p className="text-on-surface-variant text-sm text-center py-4">
                       Todavía no hay premios registrados. ¡Sé el primero en ganar!
                     </p>
                   ) : (
-                    topWinners.slice(0, 3).map((player, index) => (
+                    topWinners.map((player, index) => (
                       <div
                         key={player.id}
-                        className={`flex items-center justify-between px-3 py-2 rounded ${index === 0 ? "bg-surface border-l-4 border-primary" : "bg-surface/50"}`}
+                        className={`flex items-center justify-between p-3 rounded ${index === 0 ? "bg-surface border-l-4 border-primary" : "bg-surface/50"}`}
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <span className={`font-bold flex-shrink-0 text-sm ${index === 0 ? "text-primary" : "text-on-surface-variant"}`}>
+                          <span className={`font-bold flex-shrink-0 ${index === 0 ? "text-primary" : "text-on-surface-variant"}`}>
                             {index + 1}
                           </span>
-                          <span className="font-bold text-white text-sm truncate">{player.nick}</span>
+                          <span className="font-bold text-white truncate">{player.nick}</span>
                         </div>
-                        <span className={`font-bold flex-shrink-0 text-sm ${index === 0 ? "text-primary" : "text-on-surface-variant"}`}>
+                        <span className={`font-bold flex-shrink-0 ${index === 0 ? "text-primary" : "text-on-surface-variant"}`}>
                           {new Intl.NumberFormat('es-ES').format(player.totalWon)}
                         </span>
                       </div>
@@ -639,24 +639,24 @@ export default function Home() {
 
               {/* Online Players */}
               <div className="bg-surface-container-high rounded-xl border border-outline-variant/20 overflow-hidden flex flex-col">
-                <div className="px-4 py-2.5 border-b border-outline-variant/10 flex items-center gap-2">
+                <div className="p-4 border-b border-outline-variant/10 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0"></span>
-                  <h3 className="font-bold text-label-lg font-label-lg text-white">
+                  <h3 className="font-bold text-headline-sm font-headline-sm text-white">
                     {otherOnlineUsers.length} {otherOnlineUsers.length === 1 ? "Jugador Conectado" : "Jugadores Conectados"}
                   </h3>
                 </div>
-                <div className="max-h-40 overflow-y-auto divide-y divide-outline-variant/10">
+                <div className="max-h-80 overflow-y-auto divide-y divide-outline-variant/10">
                   {otherOnlineUsers.length === 0 ? (
-                    <p className="text-on-surface-variant text-sm text-center py-4 px-4">
+                    <p className="text-on-surface-variant text-sm text-center py-6 px-4">
                       No hay otros jugadores conectados ahora mismo.
                     </p>
                   ) : (
                     otherOnlineUsers.map((player) => {
                       const activeGame = getGameByPlayPath(player.currentActivity);
                       return (
-                        <div key={player.id} className="flex items-center justify-between gap-3 px-3 py-2">
+                        <div key={player.id} className="flex items-center justify-between gap-3 p-3">
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-8 h-8 rounded-full royal-gold-gradient flex items-center justify-center text-surface-container-lowest font-bold text-xs flex-shrink-0">
+                            <div className="w-9 h-9 rounded-full royal-gold-gradient flex items-center justify-center text-surface-container-lowest font-bold text-xs flex-shrink-0">
                               {(player.nick || "RG").slice(0, 2).toUpperCase()}
                             </div>
                             <div className="min-w-0">
@@ -684,13 +684,16 @@ export default function Home() {
               {/* Side Promo Daily Spin */}
               <div
                 onClick={handleClaimDailySpin}
-                className="bg-surface-container rounded-xl p-3 border border-outline-variant/20 flex items-center gap-3 relative overflow-hidden group cursor-pointer text-left"
+                className="bg-surface-container rounded-xl p-6 border border-outline-variant/20 flex items-center gap-4 relative overflow-hidden group cursor-pointer text-left"
               >
                 <div className="relative z-10 flex-1">
-                  <h4 className="font-bold text-label-lg text-white">Giro Diario VIP</h4>
-                  <p className="text-on-surface-variant text-xs">Tu regalo diario está listo para reclamar.</p>
+                  <h4 className="font-bold text-headline-sm text-white">Giro Diario VIP</h4>
+                  <p className="text-on-surface-variant text-body-sm font-body-sm">Tu regalo diario está listo para reclamar.</p>
                 </div>
-                <span className="material-symbols-outlined text-primary text-3xl relative z-10 group-hover:scale-110 transition-transform">redeem</span>
+                <span className="material-symbols-outlined text-primary text-5xl relative z-10 group-hover:scale-110 transition-transform">redeem</span>
+                <div className="absolute -right-4 -bottom-4 opacity-5">
+                  <span className="material-symbols-outlined text-9xl">redeem</span>
+                </div>
               </div>
             </aside>
           </div>
