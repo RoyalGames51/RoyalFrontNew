@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -20,7 +20,11 @@ import API_URL from "../../api/rutaApi";
 
 export default function Home() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { currentUser } = useSelector((state) => state);
+  // "Entrar como Invitado": shows the same dashboard a logged-in user sees, but with no
+  // account behind it — the nav still offers Iniciar Sesión / Registrarse.
+  const isGuestPreview = !currentUser?.id && searchParams.get("vista") === "invitado";
   const particlesContainerRef = useRef(null);
   const shaderCanvasRef = useRef(null);
   const threeDChipRef = useRef(null);
@@ -38,7 +42,7 @@ export default function Home() {
 
   // WebGL shader background effect
   useEffect(() => {
-    if (currentUser?.id) return;
+    if (currentUser?.id || isGuestPreview) return;
 
     const canvas = shaderCanvasRef.current;
     if (!canvas) return;
@@ -173,7 +177,7 @@ export default function Home() {
 
   // Three.js 3D Chip Animation
   useEffect(() => {
-    if (currentUser?.id) return;
+    if (currentUser?.id || isGuestPreview) return;
 
     const container = threeDChipRef.current;
     if (!container) return;
@@ -282,7 +286,7 @@ export default function Home() {
 
   // Scroll reveal animation observer
   useEffect(() => {
-    if (currentUser?.id) return;
+    if (currentUser?.id || isGuestPreview) return;
 
     const observerOptions = {
       threshold: 0.1,
@@ -306,7 +310,7 @@ export default function Home() {
 
   // Parallax effect for cards
   useEffect(() => {
-    if (currentUser?.id) return;
+    if (currentUser?.id || isGuestPreview) return;
 
     const handleMouseMove = (e) => {
       const cards = document.querySelectorAll(".glass-card-hover");
@@ -387,10 +391,11 @@ export default function Home() {
 
   // --- RENDERING CONFIG ---
 
-  // 1. Authenticated User Lobby Dashboard
-  if (currentUser?.id) {
+  // 1. Authenticated User Lobby Dashboard (also shown, with no account data, for the
+  // "Entrar como Invitado" preview)
+  if (currentUser?.id || isGuestPreview) {
     const formattedChipsValue = formatChips(currentUser?.chips);
-    const otherOnlineUsers = onlineUsers.filter((u) => u.id !== currentUser.id);
+    const otherOnlineUsers = onlineUsers.filter((u) => u.id !== currentUser?.id);
 
     let vipLevel = "Bronce I";
     if (currentUser?.chips >= 1000000) {
@@ -710,7 +715,7 @@ export default function Home() {
               </div>
 
               <button
-                onClick={() => scrollToSection('guest-explore')}
+                onClick={() => navigate('/?vista=invitado')}
                 className="px-14 py-3 rounded-full text-on-surface-variant font-bold text-sm uppercase tracking-[0.2em] hover:text-primary transition-all cursor-pointer bg-transparent border-0"
               >
                 Entrar como Invitado
@@ -746,9 +751,7 @@ export default function Home() {
       )}
 
       {/* Games Catalog by Category */}
-      <div id="guest-explore">
-        <GamesCatalog />
-      </div>
+      <GamesCatalog />
 
       {/* Por qué jugar con nosotros */}
       <section className="py-32 px-6 border-t border-white/5">
