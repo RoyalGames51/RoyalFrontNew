@@ -695,21 +695,23 @@ export default function Home() {
             <p className="text-on-surface-variant text-lg md:text-xl font-light tracking-tight mb-6">
               La mejor pagina de juegos
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 relative">
-              <RegistroForm className="px-14 py-5 rounded-full gold-gradient text-black font-bold text-sm uppercase tracking-[0.2em] shadow-2xl btn-hover-glow transition-all cursor-pointer border-0">
-                Crear Cuenta
-              </RegistroForm>
+            <div className="flex flex-col items-center gap-6 relative">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <RegistroForm className="px-14 py-5 rounded-full gold-gradient text-black font-bold text-sm uppercase tracking-[0.2em] shadow-2xl btn-hover-glow transition-all cursor-pointer border-0">
+                  Crear Cuenta
+                </RegistroForm>
 
-              <button
-                onClick={() => window.dispatchEvent(new Event('open-login-modal'))}
-                className="px-14 py-5 rounded-full border-2 border-primary/50 text-primary font-bold text-sm uppercase tracking-[0.2em] hover:bg-primary/5 transition-all cursor-pointer bg-transparent"
-              >
-                Iniciar Sesión
-              </button>
+                <button
+                  onClick={() => window.dispatchEvent(new Event('open-login-modal'))}
+                  className="px-14 py-5 rounded-full border-2 border-primary/50 text-primary font-bold text-sm uppercase tracking-[0.2em] hover:bg-primary/5 transition-all cursor-pointer bg-transparent"
+                >
+                  Iniciar Sesión
+                </button>
+              </div>
 
               <button
                 onClick={() => scrollToSection('guest-explore')}
-                className="px-14 py-5 rounded-full text-on-surface-variant font-bold text-sm uppercase tracking-[0.2em] hover:text-primary transition-all cursor-pointer bg-transparent border-0"
+                className="px-14 py-3 rounded-full text-on-surface-variant font-bold text-sm uppercase tracking-[0.2em] hover:text-primary transition-all cursor-pointer bg-transparent border-0"
               >
                 Entrar como Invitado
               </button>
@@ -771,7 +773,7 @@ export default function Home() {
             <span className="material-symbols-outlined text-primary text-5xl mb-6">support_agent</span>
             <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Te Acompañamos Siempre</h4>
             <p className="text-on-surface-variant font-light text-sm leading-relaxed">
-              ¿Dudas o algún problema? Nuestro equipo real está a un mensaje de distancia, sin letra chica ni vueltas.
+              ¿Dudas o algún problema? Nuestro equipo real está a un mensaje de distancia, mandanos tu consulta y responderemos enseguida.
             </p>
           </div>
         </div>

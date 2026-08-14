@@ -13,7 +13,7 @@ function Footer() {
             src={rgamesLogo}
           />
           <p className="text-on-surface-variant text-sm font-light leading-relaxed mb-6">
-            Jugá, subí de rango y disfrutá con fichas virtuales en un lugar pensado para pasarla bien, sin vueltas.
+            Jugá, subí de rango y disfrutá con fichas virtuales en un lugar pensado para pasarla bien y divertirse con tus amigos.
           </p>
         </div>
 
