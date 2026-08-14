@@ -33,6 +33,9 @@ import {
     SUPPORT_ALL_TICKETS_SUCCESS,
     SUPPORT_TICKET_DETAIL_SUCCESS,
     SUPPORT_ACTION_ERROR,
+    BLOCKS_STATUS_SUCCESS,
+    BLOCKS_LIST_SUCCESS,
+    BLOCKS_ACTION_ERROR,
 } from "./action.types";
 import axios from 'axios';
 
@@ -347,6 +350,59 @@ export const markThreadRead = (userId) => async (dispatch) => {
         dispatch(fetchConversations());
     } catch (error) {
         dispatch({ type: MESSAGES_ACTION_ERROR, payload: error.message });
+    }
+};
+
+// ===== Blocks =====
+
+export const fetchBlockStatus = (userId) => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`${API_URL}/blocks/status/${userId}`);
+        dispatch({ type: BLOCKS_STATUS_SUCCESS, payload: { userId, data } });
+        return data;
+    } catch (error) {
+        dispatch({ type: BLOCKS_ACTION_ERROR, payload: error.message });
+    }
+};
+
+export const fetchBlockedUsers = () => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`${API_URL}/blocks`);
+        dispatch({ type: BLOCKS_LIST_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({ type: BLOCKS_ACTION_ERROR, payload: error.message });
+    }
+};
+
+export const blockUser = (userId) => async (dispatch) => {
+    try {
+        await axios.post(`${API_URL}/blocks/${userId}`);
+        dispatch(fetchBlockStatus(userId));
+    } catch (error) {
+        dispatch({ type: BLOCKS_ACTION_ERROR, payload: error.response?.data?.message || error.message });
+        throw error;
+    }
+};
+
+export const unblockUser = (userId) => async (dispatch) => {
+    try {
+        await axios.delete(`${API_URL}/blocks/${userId}`);
+        dispatch(fetchBlockStatus(userId));
+    } catch (error) {
+        dispatch({ type: BLOCKS_ACTION_ERROR, payload: error.response?.data?.message || error.message });
+        throw error;
+    }
+};
+
+// ===== Chips (gift) =====
+
+export const giftChips = (toUserId, amount) => async (dispatch, getState) => {
+    try {
+        await axios.post(`${API_URL}/chips/gift`, { toUserId, amount });
+        const nick = getState().currentUser?.nick;
+        if (nick) dispatch(getUserByNick(nick));
+    } catch (error) {
+        throw error;
     }
 };
 

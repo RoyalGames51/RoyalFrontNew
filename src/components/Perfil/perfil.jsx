@@ -10,6 +10,10 @@ import {
   sendFriendRequest,
   acceptFriendRequest,
   removeFriend,
+  fetchBlockStatus,
+  blockUser,
+  unblockUser,
+  giftChips,
 } from "./../../redux/actions/index";
 import RankBadge from "../ui/RankBadge/rankBadge";
 import { getRankMeta, getNextRank } from "../../utils/rank";
@@ -30,11 +34,14 @@ const Perfil = ({ isPublic = false }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { userNick } = useParams();
-  
+
   const currentUser = useSelector((state) => state.currentUser);
   const viewedUser = useSelector((state) => state.viewedUserProfile);
   const relationship = useSelector((state) =>
     viewedUser?.id ? state.friends.relationship[viewedUser.id] : null,
+  );
+  const blockStatus = useSelector((state) =>
+    viewedUser?.id ? state.blocks.status[viewedUser.id] : null,
   );
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -58,10 +65,11 @@ const Perfil = ({ isPublic = false }) => {
       dispatch(viewedUserProfile(userNick));
     }
   }, [dispatch, userNick, isPublic]);
-  
+
   useEffect(() => {
     if (isPublic && viewedUser?.id && currentUser?.id && viewedUser.id !== currentUser.id) {
       dispatch(fetchRelationship(viewedUser.id));
+      dispatch(fetchBlockStatus(viewedUser.id));
     }
   }, [dispatch, isPublic, viewedUser?.id, currentUser?.id]);
 
@@ -159,6 +167,68 @@ const Perfil = ({ isPublic = false }) => {
     }
   };
 
+  const handleGiftChips = async () => {
+    const { value: amount } = await Swal.fire({
+      title: `Regalar fichas a ${capitalize(user.nick)}`,
+      input: "number",
+      inputLabel: "Cantidad de fichas",
+      inputAttributes: { min: 1, step: 1 },
+      showCancelButton: true,
+      confirmButtonText: "Regalar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#C9A84C",
+      ...swalThemeConfig,
+      inputValidator: (value) => {
+        if (!value || Number(value) < 1) return "Ingresá una cantidad válida.";
+        if (Number(value) > (currentUser?.chips || 0)) return "No tenés fichas suficientes.";
+      },
+    });
+    if (!amount) return;
+    try {
+      await dispatch(giftChips(user.id, Number(amount)));
+      Swal.fire({
+        icon: "success",
+        title: "¡Fichas enviadas!",
+        text: `Le regalaste ${new Intl.NumberFormat('es-ES').format(Number(amount))} fichas a ${capitalize(user.nick)}.`,
+        confirmButtonColor: "#C9A84C",
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "No se pudo completar el regalo",
+        text: error.response?.data?.message || "Inténtalo de nuevo más tarde.",
+        icon: "error",
+        ...swalThemeConfig,
+      });
+    }
+  };
+
+  const handleBlockToggle = async () => {
+    const isBlocked = !!blockStatus?.blockedByMe;
+    if (isBlocked) {
+      try {
+        await dispatch(unblockUser(user.id));
+      } catch (error) {
+        Swal.fire({ title: "Error", text: "No se pudo desbloquear al usuario.", icon: "error", ...swalThemeConfig });
+      }
+      return;
+    }
+    const result = await Swal.fire({
+      title: `¿Bloquear a ${capitalize(user.nick)}?`,
+      text: "No podrá enviarte mensajes ni solicitudes de amistad.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Bloquear",
+      cancelButtonText: "Cancelar",
+      ...swalThemeConfig,
+    });
+    if (!result.isConfirmed) return;
+    try {
+      await dispatch(blockUser(user.id));
+    } catch (error) {
+      Swal.fire({ title: "Error", text: "No se pudo bloquear al usuario.", icon: "error", ...swalThemeConfig });
+    }
+  };
+
   // Get user initials for premium avatar fallback
   const getInitials = (nickName) => {
     if (!nickName) return "RG";
@@ -178,6 +248,17 @@ const Perfil = ({ isPublic = false }) => {
     ? Math.min(Math.round((totalChipsDeposited / nextRank.threshold) * 100), 100)
     : 100;
 
+  const showRankBenefits = () => {
+    Swal.fire({
+      title: "Beneficios de Rango",
+      text: isOwnProfile
+        ? `Por ser miembro rango ${rankMeta.label}, disfrutas de beneficios exclusivos que mejoran a medida que subes de nivel cargando fichas.`
+        : `${capitalize(user.nick)} es miembro rango ${rankMeta.label}, con beneficios exclusivos que mejoran al subir de nivel cargando fichas.`,
+      icon: "info",
+      confirmButtonColor: "#C9A84C",
+    });
+  };
+
   // Get formatted member since date
   const getMemberSince = (createdAt) => {
     if (!createdAt) return "Miembro desde 2023";
@@ -185,7 +266,7 @@ const Perfil = ({ isPublic = false }) => {
       const date = new Date(createdAt);
       if (isNaN(date.getTime())) return "Miembro desde 2023";
       const monthNames = [
-        "Ene", "Feb", "Mar", "Abr", "May", "Jun", 
+        "Ene", "Feb", "Mar", "Abr", "May", "Jun",
         "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
       ];
       return `Miembro desde ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
@@ -194,10 +275,17 @@ const Perfil = ({ isPublic = false }) => {
     }
   };
 
+  const countryLabel = user.country
+    ? countryOptions.find((c) => c.value === user.country)?.label || user.country
+    : null;
+  const bioMeta = [user.age ? `${user.age} años` : null, countryLabel].filter(Boolean).join(" · ");
+
+  const isBlocked = !!blockStatus?.blockedByMe;
+
   return (
     <main className="flex-grow p-6 md:p-margin-desktop max-w-container-max mx-auto w-full select-none text-on-surface pt-20 md:pt-24">
       {/* Profile Header */}
-      <section className="relative mb-6">
+      <section className="relative mb-10">
         <div className="absolute inset-0 royal-gold-gradient opacity-5 blur-[100px] rounded-full -z-10 h-64 w-64 translate-x-1/2"></div>
         <div className="absolute top-0 right-0 flex items-center gap-3 z-10">
           {(() => {
@@ -226,10 +314,12 @@ const Perfil = ({ isPublic = false }) => {
             </button>
           )}
         </div>
-        <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
 
-          <div className="relative group">
-            <div className="w-24 h-24 md:w-28 md:h-28 flex items-center justify-center relative bg-transparent overflow-visible">
+        <div className="flex flex-col lg:flex-row gap-8 items-center lg:items-start pt-14 lg:pt-2">
+
+          {/* Avatar / Photo */}
+          <div className="relative group flex-shrink-0">
+            <div className="w-40 h-40 md:w-48 md:h-48 flex items-center justify-center relative bg-transparent overflow-visible">
               {avatarSrc ? (
                 <img
                   alt="Avatar de Usuario"
@@ -248,7 +338,7 @@ const Perfil = ({ isPublic = false }) => {
                   src={user.image}
                 />
               ) : (
-                <div className="w-full h-full rounded-full royal-gold-gradient flex items-center justify-center text-surface-container-lowest text-2xl md:text-3xl font-bold">
+                <div className="w-full h-full rounded-full royal-gold-gradient flex items-center justify-center text-surface-container-lowest text-4xl font-bold">
                   {getInitials(user.nick)}
                 </div>
               )}
@@ -283,155 +373,188 @@ const Perfil = ({ isPublic = false }) => {
                       }
                     });
                   }}
-                  className="absolute bottom-0 right-0 bg-surface-container-highest border border-outline-variant w-7 h-7 rounded-full flex items-center justify-center hover:bg-primary hover:text-surface-container-lowest transition-all group-hover:scale-110 cursor-pointer"
+                  className="absolute bottom-1 right-1 bg-surface-container-highest border border-outline-variant w-9 h-9 rounded-full flex items-center justify-center hover:bg-primary hover:text-surface-container-lowest transition-all group-hover:scale-110 cursor-pointer"
                 >
-                  <span className="material-symbols-outlined text-[14px]">edit</span>
+                  <span className="material-symbols-outlined text-[16px]">edit</span>
                 </button>
               )}
             </div>
           </div>
 
-          <div className="flex-grow text-center md:text-left pb-1">
-            <h1 className="font-headline-md text-headline-md text-white mb-1">{capitalize(user.nick)}</h1>
-            <div className="flex flex-wrap justify-center md:justify-start items-center gap-3">
+          {/* Identity + Bio */}
+          <div className="flex-1 min-w-0 text-center lg:text-left">
+            <h1 className="font-headline-md text-headline-md text-white mb-2">{capitalize(user.nick)}</h1>
+            <div className="flex flex-wrap justify-center lg:justify-start items-center gap-3 mb-1">
               <RankBadge tier={user.rank} size="md" />
               <span className="text-on-surface-variant font-body-sm text-body-sm">
                 {getMemberSince(user.createdAt || user.created_at || user.created)}
               </span>
+              <span className="text-on-surface-variant font-body-sm text-body-sm flex items-center gap-1">
+                <span className="material-symbols-outlined text-[16px] text-primary">monetization_on</span>
+                {new Intl.NumberFormat('es-ES').format(totalChips)}
+              </span>
             </div>
 
-            {!isOwnProfile && currentUser?.id && (
-              <div className="flex flex-wrap justify-center md:justify-start items-center gap-3 mt-4">
-                {relationship?.status === "friends" && (
-                  <button
-                    onClick={handleRemoveFriend}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/30 text-primary text-sm font-bold hover:bg-primary/10 transition-all cursor-pointer bg-transparent"
-                  >
-                    <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>how_to_reg</span>
-                    Amigos
-                  </button>
+            {(user.description || isOwnProfile) && (
+              <div className="mt-4 inline-block max-w-xl w-full glass-card rounded-xl rounded-tl-none px-5 py-4 text-left">
+                {bioMeta && (
+                  <p className="text-primary text-xs font-bold uppercase tracking-wider mb-1">{bioMeta}</p>
                 )}
-                {relationship?.status === "pending-sent" && (
-                  <button
-                    disabled
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg border border-outline-variant/30 text-on-surface-variant text-sm font-bold cursor-default bg-transparent opacity-70"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">hourglass_top</span>
-                    Solicitud Enviada
-                  </button>
-                )}
-                {relationship?.status === "pending-received" && (
-                  <button
-                    onClick={handleAcceptFriendRequest}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg gold-gradient text-black text-sm font-bold hover:brightness-110 active:scale-95 transition-all cursor-pointer border-0"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">person_add</span>
-                    Aceptar Solicitud
-                  </button>
-                )}
-                {(!relationship || relationship.status === "none") && (
-                  <button
-                    onClick={handleSendFriendRequest}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/30 text-primary text-sm font-bold hover:bg-primary/10 transition-all cursor-pointer bg-transparent"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">person_add</span>
-                    Agregar Amigo
-                  </button>
-                )}
-                <button
-                  onClick={() => navigate(`/mensajes/${user.nick}`)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-outline-variant/30 text-on-surface hover:bg-surface-variant/40 text-sm font-bold transition-all cursor-pointer bg-transparent"
-                >
-                  <span className="material-symbols-outlined text-[18px]">forum</span>
-                  Enviar Mensaje
-                </button>
+                <p className="text-on-surface text-sm leading-relaxed whitespace-pre-line">
+                  {user.description || "Este usuario todavía no escribió una biografía. Podés agregar la tuya desde Configuración."}
+                </p>
               </div>
             )}
           </div>
 
-          <div className="hidden lg:flex flex-col items-end gap-2 pb-1">
-            <div className="text-right">
-              <span className="font-label-md text-label-md text-on-surface-variant uppercase block">Fichas Totales</span>
-              <span className="font-headline-sm text-headline-sm royal-gold-text">
-                {new Intl.NumberFormat('es-ES').format(totalChips)}
-              </span>
-            </div>
+          {/* Action Panel */}
+          <div className="w-full lg:w-64 flex-shrink-0">
+            {isOwnProfile ? (
+              <div className="glass-card rounded-xl overflow-hidden">
+                <h4 className="font-headline-sm text-headline-sm text-white px-6 pt-6 pb-3">Accesos Rápidos</h4>
+                <div className="flex flex-col">
+                  {[
+                    { label: "Mis Amigos", icon: "group", to: "/amigos" },
+                    { label: "Mis Mensajes", icon: "forum", to: "/mensajes" },
+                    { label: "Comprar Fichas", icon: "paid", to: "/chips" },
+                    { label: "Cambiar Avatar", icon: "face_retouching_natural", to: "/bazar" },
+                    { label: "Ayuda", icon: "support_agent", to: "/ayuda" },
+                    ...(user.role === "admin"
+                      ? [{ label: "Panel de Administración", icon: "admin_panel_settings", to: "/admin/dashboard" }]
+                      : []),
+                  ].map((item) => (
+                    <button
+                      key={item.to}
+                      type="button"
+                      onClick={() => navigate(item.to)}
+                      className="flex items-center gap-3 px-6 py-3 text-left bg-transparent border-0 border-t border-outline-variant/10 first:border-t-0 hover:bg-surface-variant/30 transition-colors cursor-pointer text-on-surface"
+                    >
+                      <span className="material-symbols-outlined text-primary text-[20px]">{item.icon}</span>
+                      <span className="font-label-lg text-label-lg">{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              currentUser?.id && (
+                <div className="glass-card rounded-xl overflow-hidden">
+                  <h4 className="font-headline-sm text-headline-sm text-white px-6 pt-6 pb-3">Acciones</h4>
+                  <div className="flex flex-col">
+                    <button
+                      type="button"
+                      onClick={handleGiftChips}
+                      className="flex items-center gap-3 px-6 py-3 text-left bg-transparent border-0 border-t border-outline-variant/10 first:border-t-0 hover:bg-surface-variant/30 transition-colors cursor-pointer text-on-surface"
+                    >
+                      <span className="material-symbols-outlined text-primary text-[20px]">redeem</span>
+                      <span className="font-label-lg text-label-lg">Regalar Fichas</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={showRankBenefits}
+                      className="flex items-center gap-3 px-6 py-3 text-left bg-transparent border-0 border-t border-outline-variant/10 hover:bg-surface-variant/30 transition-colors cursor-pointer text-on-surface"
+                    >
+                      <span className="material-symbols-outlined text-primary text-[20px]">workspace_premium</span>
+                      <span className="font-label-lg text-label-lg">Ver Puntuación</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/mensajes/${user.nick}`)}
+                      className="flex items-center gap-3 px-6 py-3 text-left bg-transparent border-0 border-t border-outline-variant/10 hover:bg-surface-variant/30 transition-colors cursor-pointer text-on-surface"
+                    >
+                      <span className="material-symbols-outlined text-primary text-[20px]">forum</span>
+                      <span className="font-label-lg text-label-lg">Enviar Mensaje</span>
+                    </button>
+
+                    {relationship?.status === "friends" && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveFriend}
+                        className="flex items-center gap-3 px-6 py-3 text-left bg-transparent border-0 border-t border-outline-variant/10 hover:bg-surface-variant/30 transition-colors cursor-pointer text-primary"
+                      >
+                        <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>how_to_reg</span>
+                        <span className="font-label-lg text-label-lg">Amigos</span>
+                      </button>
+                    )}
+                    {relationship?.status === "pending-sent" && (
+                      <button
+                        type="button"
+                        disabled
+                        className="flex items-center gap-3 px-6 py-3 text-left bg-transparent border-0 border-t border-outline-variant/10 cursor-default text-on-surface-variant opacity-70"
+                      >
+                        <span className="material-symbols-outlined text-[20px]">hourglass_top</span>
+                        <span className="font-label-lg text-label-lg">Solicitud Enviada</span>
+                      </button>
+                    )}
+                    {relationship?.status === "pending-received" && (
+                      <button
+                        type="button"
+                        onClick={handleAcceptFriendRequest}
+                        className="flex items-center gap-3 px-6 py-3 text-left bg-transparent border-0 border-t border-outline-variant/10 hover:bg-surface-variant/30 transition-colors cursor-pointer text-primary"
+                      >
+                        <span className="material-symbols-outlined text-[20px]">person_add</span>
+                        <span className="font-label-lg text-label-lg">Aceptar Solicitud</span>
+                      </button>
+                    )}
+                    {(!relationship || relationship.status === "none") && (
+                      <button
+                        type="button"
+                        onClick={handleSendFriendRequest}
+                        className="flex items-center gap-3 px-6 py-3 text-left bg-transparent border-0 border-t border-outline-variant/10 hover:bg-surface-variant/30 transition-colors cursor-pointer text-on-surface"
+                      >
+                        <span className="material-symbols-outlined text-primary text-[20px]">person_add</span>
+                        <span className="font-label-lg text-label-lg">Añadir como Amigo</span>
+                      </button>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={handleBlockToggle}
+                      className="flex items-center gap-3 px-6 py-3 text-left bg-transparent border-0 border-t border-outline-variant/10 hover:bg-surface-variant/30 transition-colors cursor-pointer text-error"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">{isBlocked ? "how_to_reg" : "block"}</span>
+                      <span className="font-label-lg text-label-lg">{isBlocked ? "Desbloquear Usuario" : "Bloquear Usuario"}</span>
+                    </button>
+                  </div>
+                </div>
+              )
+            )}
           </div>
 
         </div>
       </section>
 
-      {/* Profile Content */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-        {/* Rank Card */}
-        <div className="glass-card p-6 rounded-xl relative overflow-hidden group">
-            <div className="absolute -right-8 -bottom-8 w-32 h-32 royal-gold-gradient opacity-10 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-4">
-                <span className="font-label-md text-label-md text-on-surface-variant uppercase">Rango Actual</span>
-                <RankBadge tier={user.rank} size="sm" />
-              </div>
-              <span className="font-label-md text-label-md text-on-surface-variant uppercase mb-2 block">
-                {nextRank ? "Próximo Rango" : "Rango Máximo Alcanzado"}
-              </span>
-              <h4 className="font-headline-sm text-headline-sm text-white">{nextRank ? nextRank.label : rankMeta.label}</h4>
-              <div className="w-full bg-surface-container-lowest h-2 rounded-full mb-2 border border-outline-variant/10 overflow-hidden">
-                <div className="royal-gold-gradient h-full" style={{ width: `${rankProgressPercentage}%` }}></div>
-              </div>
-              <div className="flex justify-between font-label-md text-label-md">
-                <span className="text-on-surface-variant">
-                  {new Intl.NumberFormat('es-ES').format(totalChipsDeposited)}
-                  {nextRank ? ` / ${new Intl.NumberFormat('es-ES').format(nextRank.threshold)}` : ""}
-                </span>
-                <span className="text-primary">{rankProgressPercentage}%</span>
-              </div>
-              <button
-                onClick={() => {
-                  Swal.fire({
-                    title: "Beneficios de Rango",
-                    text: `Por ser miembro rango ${rankMeta.label}, disfrutas de beneficios exclusivos que mejoran a medida que subes de nivel cargando fichas.`,
-                    icon: "info",
-                    confirmButtonColor: "#C9A84C",
-                  });
-                }}
-                className="w-full mt-6 py-3 border border-primary/20 rounded-lg font-label-lg text-label-lg text-primary hover:bg-primary/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-sm">workspace_premium</span>
-                Ver Beneficios de Rango
-              </button>
-            </div>
+      {/* Rank Progress */}
+      <div className="glass-card p-6 rounded-xl relative overflow-hidden group max-w-xl">
+        <div className="absolute -right-8 -bottom-8 w-32 h-32 royal-gold-gradient opacity-10 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-4">
+            <span className="font-label-md text-label-md text-on-surface-variant uppercase">Rango Actual</span>
+            <RankBadge tier={user.rank} size="sm" />
           </div>
-
-          {/* Quick Access */}
-          {isOwnProfile && (
-            <div className="glass-card rounded-xl overflow-hidden">
-              <h4 className="font-headline-sm text-headline-sm text-white px-6 pt-6 pb-3">Accesos Rápidos</h4>
-              <div className="flex flex-col">
-                {[
-                  { label: "Mis Amigos", icon: "group", to: "/amigos" },
-                  { label: "Mis Mensajes", icon: "forum", to: "/mensajes" },
-                  { label: "Comprar Fichas", icon: "paid", to: "/chips" },
-                  { label: "Cambiar Avatar", icon: "face_retouching_natural", to: "/bazar" },
-                  { label: "Ayuda", icon: "support_agent", to: "/ayuda" },
-                  ...(user.role === "admin"
-                    ? [{ label: "Panel de Administración", icon: "admin_panel_settings", to: "/admin/dashboard" }]
-                    : []),
-                ].map((item) => (
-                  <button
-                    key={item.to}
-                    type="button"
-                    onClick={() => navigate(item.to)}
-                    className="flex items-center gap-3 px-6 py-3 text-left bg-transparent border-0 border-t border-outline-variant/10 first:border-t-0 hover:bg-surface-variant/30 transition-colors cursor-pointer text-on-surface"
-                  >
-                    <span className="material-symbols-outlined text-primary text-[20px]">{item.icon}</span>
-                    <span className="font-label-lg text-label-lg">{item.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
+          <span className="font-label-md text-label-md text-on-surface-variant uppercase mb-2 block">
+            {nextRank ? "Próximo Rango" : "Rango Máximo Alcanzado"}
+          </span>
+          <h4 className="font-headline-sm text-headline-sm text-white">{nextRank ? nextRank.label : rankMeta.label}</h4>
+          <div className="w-full bg-surface-container-lowest h-2 rounded-full mb-2 border border-outline-variant/10 overflow-hidden">
+            <div className="royal-gold-gradient h-full" style={{ width: `${rankProgressPercentage}%` }}></div>
+          </div>
+          <div className="flex justify-between font-label-md text-label-md">
+            <span className="text-on-surface-variant">
+              {new Intl.NumberFormat('es-ES').format(totalChipsDeposited)}
+              {nextRank ? ` / ${new Intl.NumberFormat('es-ES').format(nextRank.threshold)}` : ""}
+            </span>
+            <span className="text-primary">{rankProgressPercentage}%</span>
+          </div>
+          <button
+            onClick={showRankBenefits}
+            className="w-full mt-6 py-3 border border-primary/20 rounded-lg font-label-lg text-label-lg text-primary hover:bg-primary/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-sm">workspace_premium</span>
+            Ver Beneficios de Rango
+          </button>
+        </div>
       </div>
 
       {isSettingsOpen && isOwnProfile && (

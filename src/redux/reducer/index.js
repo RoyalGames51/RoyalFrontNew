@@ -9,6 +9,7 @@ import {
     MESSAGES_CONVERSATIONS_SUCCESS, MESSAGES_THREAD_SUCCESS, MESSAGES_ACTION_ERROR,
     ADMIN_OVERVIEW_SUCCESS, ADMIN_ACTION_ERROR,
     SUPPORT_TICKETS_SUCCESS, SUPPORT_ALL_TICKETS_SUCCESS, SUPPORT_TICKET_DETAIL_SUCCESS, SUPPORT_ACTION_ERROR,
+    BLOCKS_STATUS_SUCCESS, BLOCKS_LIST_SUCCESS, BLOCKS_ACTION_ERROR,
 } from "../actions/action.types";
 
 const initialState = {
@@ -39,6 +40,11 @@ const initialState = {
         myTickets: [],
         allTickets: [],
         ticketDetail: null,
+        error: null,
+    },
+    blocks: {
+        status: {},
+        list: [],
         error: null,
     },
 };
@@ -209,6 +215,25 @@ const reducer = (state = initialState, action) => {
 
         case SUPPORT_ACTION_ERROR:
             return { ...state, support: { ...state.support, error: action.payload } };
+
+        // Manejo de bloqueos
+        case BLOCKS_STATUS_SUCCESS:
+            return {
+                ...state,
+                blocks: {
+                    ...state.blocks,
+                    status: {
+                        ...state.blocks.status,
+                        [action.payload.userId]: action.payload.data,
+                    },
+                },
+            };
+
+        case BLOCKS_LIST_SUCCESS:
+            return { ...state, blocks: { ...state.blocks, list: action.payload } };
+
+        case BLOCKS_ACTION_ERROR:
+            return { ...state, blocks: { ...state.blocks, error: action.payload } };
 
         default:
             return state;
