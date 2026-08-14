@@ -1,12 +1,24 @@
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 import Swal from "sweetalert2";
 import { CATEGORY_META, getGameBySlug } from "../../../data/gamesCatalog";
 import { swalThemeConfig } from "../../../utils/formatters";
+import API_URL from "../../../api/rutaApi";
 
 export default function GameDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const game = getGameBySlug(slug);
+  const [topPlayers, setTopPlayers] = useState([]);
+
+  useEffect(() => {
+    if (!game || game.status !== "active") return;
+    axios
+      .get(`${API_URL}/leaderboard/top-winners/${game.slug}?limit=5`)
+      .then(({ data }) => setTopPlayers(data))
+      .catch(() => {});
+  }, [game]);
 
   if (!game) {
     return (
@@ -74,9 +86,46 @@ export default function GameDetail() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8">
-          <h2 className="font-headline-sm text-headline-sm text-white mb-4">Sobre este juego</h2>
-          <p className="text-on-surface-variant leading-relaxed">{game.description}</p>
+        <div className="lg:col-span-8 space-y-8">
+          <div>
+            <h2 className="font-headline-sm text-headline-sm text-white mb-4">Sobre este juego</h2>
+            <p className="text-on-surface-variant leading-relaxed">{game.description}</p>
+          </div>
+
+          {isActive && (
+            <div className="bg-surface-container-high rounded-xl border border-primary/30 overflow-hidden gold-glow">
+              <div className="gold-gradient p-4 flex justify-between items-center">
+                <h3 className="text-on-primary font-bold text-headline-sm font-headline-sm">
+                  Top Ganadores de {game.name}
+                </h3>
+                <span className="bg-black/20 text-on-primary px-2 py-1 rounded text-label-md font-label-md font-bold">EN VIVO</span>
+              </div>
+              <div className="p-6 space-y-3">
+                {topPlayers.length === 0 ? (
+                  <p className="text-on-surface-variant text-sm text-center py-4">
+                    Todavía no hay ganadores registrados en este juego. ¡Sé el primero!
+                  </p>
+                ) : (
+                  topPlayers.map((player, index) => (
+                    <div
+                      key={player.id}
+                      className={`flex items-center justify-between p-3 rounded ${index === 0 ? "bg-surface border-l-4 border-primary" : "bg-surface/50"}`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className={`font-bold flex-shrink-0 ${index === 0 ? "text-primary" : "text-on-surface-variant"}`}>
+                          {index + 1}
+                        </span>
+                        <span className="font-bold text-white truncate">{player.nick}</span>
+                      </div>
+                      <span className={`font-bold flex-shrink-0 ${index === 0 ? "text-primary" : "text-on-surface-variant"}`}>
+                        {new Intl.NumberFormat('es-ES').format(player.totalWon)}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="lg:col-span-4">

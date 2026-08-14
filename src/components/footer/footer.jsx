@@ -13,48 +13,40 @@ function Footer() {
             src={rgamesLogo}
           />
           <p className="text-on-surface-variant text-sm font-light leading-relaxed mb-6">
-            La cúspide del juego de lujo digital. Ofrecemos una plataforma segura, justa y sofisticada para los jugadores más exigentes del mundo.
+            Jugá, subí de rango y disfrutá con fichas virtuales en un lugar pensado para pasarla bien, sin vueltas.
           </p>
-          <div className="flex gap-4">
-            <a
-              className="w-10 h-10 rounded border border-white/10 flex items-center justify-center hover:bg-white/5 hover:text-primary transition-all"
-              href="#"
-            >
-              <span className="material-symbols-outlined text-on-surface-variant text-lg">public</span>
-            </a>
-            <a
-              className="w-10 h-10 rounded border border-white/10 flex items-center justify-center hover:bg-white/5 hover:text-primary transition-all"
-              href="#"
-            >
-              <span className="material-symbols-outlined text-on-surface-variant text-lg">share</span>
-            </a>
-          </div>
         </div>
 
         {/* Links grid */}
-        <div className="grid grid-cols-2 gap-12 text-sm uppercase tracking-widest font-bold">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-12 text-sm uppercase tracking-widest font-bold">
           <div className="flex flex-col gap-4">
             <h5 className="text-white mb-2 font-black">Conserjería</h5>
-            <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="mailto:royalgames2025@gmail.com">
+            <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/contacto">
               Contacto
-            </a>
-            <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="#">
+            </Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/preguntas-frecuentes">
               Preguntas Frecuentes
-            </a>
-            <a className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" href="#">
+            </Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/ayuda">
               Mesa de Ayuda
-            </a>
+            </Link>
           </div>
           <div className="flex flex-col gap-4">
             <h5 className="text-white mb-2 font-black">Protocolo</h5>
-            <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/terminos-y-condiciones">
+            <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/privacidad">
               Privacidad
             </Link>
             <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/terminos-y-condiciones">
               Términos
             </Link>
-            <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/terminos-y-condiciones">
+            <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/cumplimiento">
               Cumplimiento
+            </Link>
+          </div>
+          <div className="flex flex-col gap-4">
+            <h5 className="text-white mb-2 font-black">Empresa</h5>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/trabaja-con-nosotros">
+              Trabaja con Nosotros
             </Link>
           </div>
         </div>
@@ -63,11 +55,6 @@ function Footer() {
       {/* Footer bottom bar */}
       <div className="max-w-container-max mx-auto mt-20 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-on-surface-variant font-bold tracking-widest uppercase">
         <p>© 2026 RGAMES. Todos los Derechos Reservados.</p>
-        <div className="flex gap-8 items-center opacity-50">
-          <span>Verificado por eCOGRA</span>
-          <span>Licenciado en Curazao</span>
-          <span>Seguridad SSL</span>
-        </div>
       </div>
     </footer>
   );

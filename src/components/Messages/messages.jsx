@@ -38,7 +38,7 @@ export default function Messages() {
 
   const [activePartner, setActivePartner] = useState(null); // { id, nick, rank }
   const [messageText, setMessageText] = useState("");
-  const threadEndRef = useRef(null);
+  const threadContainerRef = useRef(null);
 
   useEffect(() => {
     if (currentUser?.id) {
@@ -95,8 +95,12 @@ export default function Messages() {
 
   const activeMessages = activePartner?.id ? threads[activePartner.id] || [] : [];
 
+  // Scroll only the message list itself into its latest position — never the outer
+  // page. scrollIntoView() would bubble up to every scrollable ancestor, including
+  // the whole document, which is what was yanking the page down to the footer.
   useEffect(() => {
-    threadEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = threadContainerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [activeMessages.length]);
 
   if (!currentUser?.id) {
@@ -190,7 +194,7 @@ export default function Messages() {
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              <div ref={threadContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3">
                 {activeMessages.length === 0 ? (
                   <p className="text-on-surface-variant text-sm text-center mt-8">
                     Todavía no hay mensajes. ¡Escribe el primero!
@@ -209,7 +213,6 @@ export default function Messages() {
                     </div>
                   ))
                 )}
-                <div ref={threadEndRef} />
               </div>
 
               <form onSubmit={handleSend} className="flex items-center gap-3 p-4 border-t border-outline-variant/10">

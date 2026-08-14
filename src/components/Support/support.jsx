@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { swalThemeConfig } from "../../utils/formatters";
-import { fetchMyTickets, fetchTicketDetail, createTicket, addTicketMessage } from "../../redux/actions/index";
+import { fetchMyTickets, fetchTicketDetail, createTicket, addTicketMessage, createGuestTicket } from "../../redux/actions/index";
 
 const STATUS_META = {
   open: { label: "Abierto", className: "bg-primary/10 text-primary border-primary/30" },
@@ -30,6 +30,11 @@ export default function Support() {
   const [reply, setReply] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  // Guest (no account) ticket form state
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+  const [guestSent, setGuestSent] = useState(false);
+
   useEffect(() => {
     if (currentUser?.id) {
       dispatch(fetchMyTickets());
@@ -43,17 +48,101 @@ export default function Support() {
     }
   }, [dispatch, ticketId]);
 
+  const handleGuestSubmit = async (e) => {
+    e.preventDefault();
+    if (!guestName.trim() || !guestEmail.trim() || !subject.trim() || !message.trim()) return;
+    setSubmitting(true);
+    try {
+      await dispatch(createGuestTicket(guestName.trim(), guestEmail.trim(), subject.trim(), message.trim()));
+      setGuestSent(true);
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: error.response?.data?.message || "No se pudo enviar tu consulta. Intenta de nuevo.",
+        icon: "error",
+        ...swalThemeConfig,
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (!currentUser?.id) {
+    if (guestSent) {
+      return (
+        <div className="w-full max-w-lg mx-auto p-8 text-center my-16 pt-20 md:pt-24">
+          <span className="material-symbols-outlined text-6xl text-primary mb-4 block">mark_email_read</span>
+          <h2 className="font-headline-md text-headline-md text-white mb-3">¡Consulta enviada!</h2>
+          <p className="text-on-surface-variant mb-6">
+            Te vamos a responder a <strong className="text-white">{guestEmail}</strong> a la brevedad.
+          </p>
+          <button
+            onClick={() => navigate("/")}
+            className="px-6 py-2.5 rounded-lg gold-gradient text-[#0A0A0F] font-bold uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all"
+          >
+            Ir al Lobby
+          </button>
+        </div>
+      );
+    }
     return (
-      <div className="w-full max-w-4xl mx-auto p-8 text-center my-16 pt-20 md:pt-24">
-        <h2 className="text-2xl font-bold text-error mb-4">Debes iniciar sesión para abrir un ticket de ayuda.</h2>
-        <button
-          onClick={() => navigate("/")}
-          className="px-6 py-2.5 rounded-lg gold-gradient text-[#0A0A0F] font-bold uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all"
-        >
-          Ir al Lobby
-        </button>
-      </div>
+      <main className="w-full max-w-lg mx-auto p-6 md:p-8 my-16 pt-20 md:pt-24">
+        <h1 className="font-headline-lg text-headline-lg text-white mb-2">Ayuda</h1>
+        <p className="text-on-surface-variant text-sm mb-6">
+          No tenés cuenta todavía, no hay problema: dejanos tu consulta y un correo de contacto, te respondemos ahí mismo.
+        </p>
+        <form onSubmit={handleGuestSubmit} className="glass-card rounded-xl p-6 space-y-4">
+          <div className="space-y-2">
+            <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Nombre</label>
+            <input
+              type="text"
+              value={guestName}
+              onChange={(e) => setGuestName(e.target.value)}
+              className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Correo Electrónico</label>
+            <input
+              type="email"
+              value={guestEmail}
+              onChange={(e) => setGuestEmail(e.target.value)}
+              className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Asunto</label>
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="¿Sobre qué necesitas ayuda?"
+              className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Mensaje</label>
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Contanos con el mayor detalle posible..."
+              rows={5}
+              className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm resize-none"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full py-3 rounded-lg gold-gradient text-black font-bold uppercase tracking-wider cursor-pointer border-0 disabled:opacity-50"
+          >
+            {submitting ? "Enviando..." : "Enviar Consulta"}
+          </button>
+        </form>
+      </main>
     );
   }
 

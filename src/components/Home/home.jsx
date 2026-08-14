@@ -15,7 +15,7 @@ import RegistroForm from "../Register/register";
 import { ShaderAnimation } from "../ui/shader-animation";
 import { formatChips, swalThemeConfig } from "../../utils/formatters";
 import GamesCatalog from "../GamesCatalog/gamesCatalog";
-import { GAMES_CATALOG, CATEGORY_META, getGameByPlayPath } from "../../data/gamesCatalog";
+import { GAMES_CATALOG, CATEGORY_META, getGameByPlayPath, getGameBySlug } from "../../data/gamesCatalog";
 import API_URL from "../../api/rutaApi";
 
 export default function Home() {
@@ -28,73 +28,13 @@ export default function Home() {
 
   const [topWinners, setTopWinners] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [recentWins, setRecentWins] = useState([]);
 
-  // Ticker items for recent wins
-  const tickerItems = [
-    { user: "User_992", amount: "$1,240.00", game: "Sweet Bonanza" },
-    { user: "VIP_King", amount: "$5,500.00", game: "Blackjack en Vivo" },
-    { user: "SlotMaster", amount: "$820.50", game: "Gates of Olympus" },
-    { user: "Elena_G", amount: "$12,000.00", game: "Mega Moolah" },
-    { user: "PlayerOne", amount: "$450.00", game: "Ruleta" },
-  ];
-
-  // Featured games configuration matching the new design layout
-  const featuredGames = [
-    {
-      id: "empire-roulette",
-      title: "Empire Roulette",
-      category: "Premium",
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuD_XM-5gOSoZ-Nx1kEgMkizy64GDZGL-n51pbx110tNwTaaALceWNPAKH2DmbTkFmop_Av2OK236264M85GHmnhvnoJNqWGmZUGWJ0xRwql7JtvwFWeCJ7l6UEWanE7jXShjftw2_TfvOyCUfiMtBum84AibwaKyA9ezimQhliCUy-CJyxpfKOp0itrJYE6AW3sEcW-5l_4KaZHUPf8Qi5oOqnLQpe5p4dnzkV-SvdCmcbO22XaIshl",
-      path: null,
-      actionText: "Unirse a la Mesa",
-      subActionText: "Espectar",
-    },
-    {
-      id: "midnight-poker",
-      title: "Midnight Poker",
-      category: "Exclusivo",
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuB5rNtRzJR2KsWje6yXo4bqDyBhlZ9A1Q_ts_KdpHxSGIFhxUqX9UawI2pg6yEi7BNugsGHCQ5l0eLDPPOmH3S0a6gtrEthJH9yxoYIQIqBrivGdM0n9BiY_2RtYUFOjWbcBrEUlFh_4KOIGO_UtWkAWo3jgjP7XR2mnu0KWvt-jf3fYtu8Jnf3_duMyJ9ID5r8wJQn70TBPFTt32lJQkkQB07UTe85Nk5xbQp68f7F4jJLjO73wysp",
-      path: null,
-      actionText: "Unirse a la Mesa",
-      subActionText: "Espectar",
-    },
-    {
-      id: "royal-baccarat",
-      title: "Royal Baccarat",
-      category: "Clásico",
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuDB39KZuadJcJPpam6nUfIj5qRO-xDXqrO-ePAYczj3bvNGfH1ucEKvfr1mcz8rxjwdIhvKayjq4P5HIJp86uMT1Lsa2wn40XeAjR47spehrACItvJc_EAr2la7TrB40BxL4NI96Vk23iF9xRvnwZnKs8vs9LzLLCpSsbeaiAj2ez5CtA204-bZ76-jUFozh_iemlQcjvEJ7GiOcJ_He-mWKYxSlyBCg-pvQs1lNGfc_EM8MUHAF_3z",
-      path: null,
-      actionText: "Unirse a la Mesa",
-      subActionText: "Espectar",
-    },
-    {
-      id: "grand-slots",
-      title: "Grand Slots",
-      category: "Destacado",
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuB8WoEOn9qEXeg8cSyJceGPMIkCSO3wS4WCtbabeF7cG7cgOUHQwI8sguXKp-RdH82oLK1Dqq9n5PgNwpUopMsxTulKNlbxk991MkyhPjc7deP80d82_HSr6NVaqsaTDax8ADKHYz9minCkrRRId-zpnvzyXBp7W-XfJ0Du5SZvSydCyebjSvhfIUGB82rs2pSXUv7XBGi3POMCx1TGVcHGed54eMBVOFTU_1vENfIJLfhmi73sTlG-",
-      path: "/play/royalpachinka",
-      actionText: "Girar Ahora",
-      subActionText: "Juego Gratis",
-    },
-    {
-      id: "neon-blackjack",
-      title: "Neon Blackjack",
-      category: "En Vivo",
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuDNA4WUrDQGa5zpBBkrA4GuHzRMiyQ8QtktL8ImimFsM_X6GwK36SahiAVMNAmggQ-Xf9E6YPR7EcDUn6dFl4cgV_6TMkDn6_YOlu0NIPzexb_-C0-m5681ui-S7UM40qhXhovjlCtEfk9zsPFMtc5CmtPO1xT4hRu7tqIDsfnojJN63k3qyIT9djmqpMGls6tBxFFG8yPzsF3i3dB9VCOcYTVLpMayhnPIpDhBdoNuze5DFgnMlGjx",
-      path: "/play/royaljoker",
-      actionText: "Unirse a la Mesa",
-      subActionText: "Espectar",
-    },
-    {
-      id: "gold-dice",
-      title: "Gold Dice",
-      category: "Nuevo",
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuC9wuspkm5e8dzW_u5shrePV2VGwWiJ0rEdM9ZFxMi6ZXwRVkUIylGoUNKZqIFZdJH7wMqj__d9OiKb3pgzI4s-qP2T04A9GRTP0tV7xW3jtzBKoRkGqlO8IWkF-h2MnlzO0JR_GV_qq6pOiaRUlEWobz6CafYSC_FOBINc2M0w6kYmT5ucqsQUSClrrkYJzmo47tUW4cs4ENBpp4FunLui8RckkebgLKfsQU9WuElRlrT0XcxzA-qI",
-      path: "/play/minas",
-      actionText: "Lanzar Dados",
-      subActionText: "Juego Gratis",
-    },
-  ];
+  // Real recent wins (chips actually won in games) for the guest landing page ticker.
+  useEffect(() => {
+    if (currentUser?.id) return;
+    axios.get(`${API_URL}/leaderboard/recent-wins?limit=12`).then(({ data }) => setRecentWins(data)).catch(() => {});
+  }, [currentUser?.id]);
 
   // WebGL shader background effect
   useEffect(() => {
@@ -746,8 +686,8 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background z-[1] pointer-events-none"></div>
         <div className="relative z-10 max-w-6xl w-full px-6 flex flex-col items-center justify-center">
           <div className="text-center reveal" style={{ transitionDelay: "0.2s" }}>
-            <h1 className="relative inline-block text-6xl md:text-8xl font-extrabold tracking-tighter mb-4 leading-normal text-white">
-              <span className="gold-shimmer italic inline-block pb-2" translate="no">RoyalGames</span>
+            <h1 className="relative inline-block text-6xl md:text-8xl font-extrabold tracking-tighter mb-4 leading-[1.3] text-white overflow-visible">
+              <span className="gold-shimmer italic inline-block pb-4 md:pb-6 overflow-visible" translate="no">RoyalGames</span>
               <span className="absolute top-1/2 -translate-y-1/2 -right-32 md:-right-44 w-32 h-32 md:w-40 md:h-40 pointer-events-none">
                 <div ref={threeDChipRef} id="three-d-chip" className="absolute inset-0 w-full h-full pointer-events-auto" />
               </span>
@@ -766,171 +706,72 @@ export default function Home() {
               >
                 Iniciar Sesión
               </button>
+
+              <button
+                onClick={() => scrollToSection('guest-explore')}
+                className="px-14 py-5 rounded-full text-on-surface-variant font-bold text-sm uppercase tracking-[0.2em] hover:text-primary transition-all cursor-pointer bg-transparent border-0"
+              >
+                Entrar como Invitado
+              </button>
             </div>
           </div>
         </div>
       </section>
 
       {/* Live Winners Ticker */}
-      <div className="bg-surface border-y border-white/5 py-5 overflow-hidden reveal">
-        <div className="animate-ticker">
-          <div className="flex gap-16 items-center px-8">
-            {tickerItems.map((item, i) => (
-              <div key={i} className="flex items-center gap-4 whitespace-nowrap">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span className="text-on-surface-variant font-medium">El jugador <span className="text-primary font-bold">{item.user}</span> ganó</span>
-                <span className="text-white font-bold bg-white/5 px-3 py-1 rounded border border-white/10">{item.amount}</span>
-                <span className="text-on-surface-variant/80 text-xs">en {item.game}</span>
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-16 items-center px-8">
-            {tickerItems.map((item, i) => (
-              <div key={`dup-${i}`} className="flex items-center gap-4 whitespace-nowrap">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span className="text-on-surface-variant font-medium">El jugador <span className="text-primary font-bold">{item.user}</span> ganó</span>
-                <span className="text-white font-bold bg-white/5 px-3 py-1 rounded border border-white/10">{item.amount}</span>
-                <span className="text-on-surface-variant/80 text-xs">en {item.game}</span>
+      {recentWins.length > 0 && (
+        <div className="bg-surface border-y border-white/5 py-5 overflow-hidden reveal">
+          <div className="animate-ticker">
+            {[0, 1].map((dup) => (
+              <div key={dup} className="flex gap-16 items-center px-8">
+                {recentWins.map((win, i) => {
+                  const gameName = getGameBySlug(win.game)?.name || "un juego";
+                  return (
+                    <div key={`${dup}-${win.id || i}`} className="flex items-center gap-4 whitespace-nowrap">
+                      <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                      <span className="text-on-surface-variant font-medium">El jugador <span className="text-primary font-bold">{win.nick}</span> ganó</span>
+                      <span className="text-white font-bold bg-white/5 px-3 py-1 rounded border border-white/10">
+                        {new Intl.NumberFormat('es-ES').format(win.amount)} fichas
+                      </span>
+                      <span className="text-on-surface-variant/80 text-xs">en {gameName}</span>
+                    </div>
+                  );
+                })}
               </div>
             ))}
           </div>
         </div>
-      </div>
-
-      {/* Category Grid */}
-      <section className="py-32 px-6 max-w-container-max mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div
-            onClick={() => scrollToSection("featured-games")}
-            className="glass-card glass-card-hover p-10 flex flex-col items-center text-center reveal cursor-pointer"
-            style={{ transitionDelay: "0.1s" }}
-          >
-            <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mb-6 shadow-xl">
-              <span className="material-symbols-outlined text-black text-3xl">casino</span>
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Tragamonedas Clásicas</h3>
-            <p className="text-on-surface-variant text-sm font-light">Vive la emoción atemporal de la elegancia mecánica.</p>
-          </div>
-
-          <div
-            onClick={() => scrollToSection("featured-games")}
-            className="glass-card glass-card-hover p-10 flex flex-col items-center text-center reveal cursor-pointer"
-            style={{ transitionDelay: "0.2s" }}
-          >
-            <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mb-6 shadow-xl">
-              <span className="material-symbols-outlined text-black text-3xl">person_play</span>
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Casino en Vivo</h3>
-            <p className="text-on-surface-variant text-sm font-light">Acción en tiempo real con nuestros crupieres de clase mundial.</p>
-          </div>
-
-          <div
-            onClick={() => scrollToSection("featured-games")}
-            className="glass-card glass-card-hover p-10 flex flex-col items-center text-center reveal cursor-pointer"
-            style={{ transitionDelay: "0.3s" }}
-          >
-            <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mb-6 shadow-xl">
-              <span className="material-symbols-outlined text-black text-3xl">table_restaurant</span>
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Mesas Altas</h3>
-            <p className="text-on-surface-variant text-sm font-light">Apuestas exclusivas para el entusiasta exigente del póker.</p>
-          </div>
-
-          <div
-            onClick={() => scrollToSection("featured-games")}
-            className="glass-card glass-card-hover p-10 flex flex-col items-center text-center reveal cursor-pointer"
-            style={{ transitionDelay: "0.4s" }}
-          >
-            <div className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mb-6 shadow-xl">
-              <span className="material-symbols-outlined text-black text-3xl">sports_soccer</span>
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Royal Sports</h3>
-            <p className="text-on-surface-variant text-sm font-light">Cobertura de apuestas deportivas de élite en eventos globales.</p>
-          </div>
-        </div>
-      </section>
+      )}
 
       {/* Games Catalog by Category */}
-      <GamesCatalog />
+      <div id="guest-explore">
+        <GamesCatalog />
+      </div>
 
-      {/* Featured Games */}
-      <section id="featured-games" className="py-32 bg-surface/30 px-6">
-        <div className="max-w-container-max mx-auto">
-          <div className="flex justify-between items-end mb-16 reveal">
-            <div className="text-left">
-              <h2 className="text-4xl font-extrabold text-white tracking-tighter mb-2 uppercase">Favoritos Seleccionados</h2>
-              <p className="text-on-surface-variant font-light">Una selección de títulos premium elegidos para nuestra comunidad de élite.</p>
-            </div>
-            <button
-              onClick={() => navigate("/juegos")}
-              className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest hover:translate-x-2 transition-transform bg-transparent border-0 cursor-pointer"
-            >
-              Ver Todos los Juegos <span className="material-symbols-outlined text-sm">arrow_forward</span>
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-8 reveal" style={{ transitionDelay: "0.2s" }}>
-            {featuredGames.map((game) => (
-              <div
-                key={game.id}
-                className="group relative aspect-[3/4] overflow-hidden rounded shadow-2xl border border-white/5 hover:border-primary/50 transition-all bg-surface-container-high"
-              >
-                <img
-                  className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110"
-                  src={game.src}
-                  alt={game.title}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80"></div>
-                <div className="absolute bottom-0 left-0 p-6 w-full translate-y-4 group-hover:translate-y-0 transition-transform text-left">
-                  <p className="text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-1">
-                    {game.category}
-                  </p>
-                  <h4 className="text-white font-bold text-lg">{game.title}</h4>
-                </div>
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-6 gap-3">
-                  <button
-                    onClick={() => handlePlayGame(game.path, game.title)}
-                    className="w-full py-3 gold-gradient text-black font-black text-[10px] uppercase tracking-widest rounded-sm cursor-pointer border-0"
-                  >
-                    {game.actionText}
-                  </button>
-                  <button
-                    onClick={() => handlePlayGame(game.path, game.title)}
-                    className="w-full py-3 border border-white/20 text-white font-black text-[10px] uppercase tracking-widest rounded-sm bg-transparent cursor-pointer hover:bg-white/5"
-                  >
-                    {game.subActionText}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Trust & Licensing */}
+      {/* Por qué jugar con nosotros */}
       <section className="py-32 px-6 border-t border-white/5">
         <div className="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-3 gap-20">
           <div className="text-center reveal" style={{ transitionDelay: "0.1s" }}>
-            <span className="material-symbols-outlined text-primary text-5xl mb-6">verified_user</span>
-            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Certificados Globalmente</h4>
+            <span className="material-symbols-outlined text-primary text-5xl mb-6">casino</span>
+            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Juego Limpio y Parejo</h4>
             <p className="text-on-surface-variant font-light text-sm leading-relaxed">
-              Cumplimos con los estándares internacionales más estrictos de juego justo y excelencia operativa.
+              Los resultados son siempre al azar, iguales para todos. Acá se juega por diversión, sin trampas de la casa.
             </p>
           </div>
 
           <div className="text-center reveal" style={{ transitionDelay: "0.2s" }}>
-            <span className="material-symbols-outlined text-primary text-5xl mb-6">security</span>
-            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Seguridad Fortificada</h4>
+            <span className="material-symbols-outlined text-primary text-5xl mb-6">shield_lock</span>
+            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Tu Cuenta, Segura</h4>
             <p className="text-on-surface-variant font-light text-sm leading-relaxed">
-              Tus activos y datos están protegidos con encriptación de última generación y monitoreo continuo.
+              Cuidamos tus datos y tu progreso con buenas prácticas de seguridad, para que solo te preocupes por jugar.
             </p>
           </div>
 
           <div className="text-center reveal" style={{ transitionDelay: "0.3s" }}>
-            <span className="material-symbols-outlined text-primary text-5xl mb-6">workspace_premium</span>
-            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Soporte de Élite</h4>
+            <span className="material-symbols-outlined text-primary text-5xl mb-6">support_agent</span>
+            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Te Acompañamos Siempre</h4>
             <p className="text-on-surface-variant font-light text-sm leading-relaxed">
-              Un equipo de conserjería personal disponible 24/7 para atender cada solicitud con absoluta discreción.
+              ¿Dudas o algún problema? Nuestro equipo real está a un mensaje de distancia, sin letra chica ni vueltas.
             </p>
           </div>
         </div>

@@ -98,7 +98,14 @@ export default function SupportTicketsAdmin() {
                       {STATUS_META[ticket.status].label}
                     </span>
                   </div>
-                  <span className="text-on-surface-variant text-xs">{ticket.userNick}</span>
+                  <span className="text-on-surface-variant text-xs flex items-center gap-1.5">
+                    {ticket.userNick}
+                    {ticket.isGuest && (
+                      <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-outline-variant/20 text-on-surface-variant">
+                        Invitado
+                      </span>
+                    )}
+                  </span>
                 </button>
               ))
             )}

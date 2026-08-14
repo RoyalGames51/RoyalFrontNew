@@ -25,8 +25,10 @@ import UserManagement from './components/AdminPanel/UserManagement/userManagemen
 import AdminDashboard from './components/AdminPanel/AdminDashboard/adminDashboard';
 import SupportTicketsAdmin from './components/AdminPanel/SupportTickets/supportTickets';
 import AdminDeposits from './components/AdminPanel/Deposits/deposits';
+import AdminPrizes from './components/AdminPanel/Prizes/prizes';
 import ResetPassword from './components/ResetPassword/resetPassword';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import RequireAuth from './components/ProtectedRoute/RequireAuth';
 import PaymentSuccess from './components/PaymentStatus/PaymentSuccess';
 import PaymentFailure from './components/PaymentStatus/PaymentFailure';
 import PaymentPending from './components/PaymentStatus/PaymentPending';
@@ -35,6 +37,11 @@ import Friends from './components/Friends/friends';
 import Messages from './components/Messages/messages';
 import GameDetail from './components/Juegos/GameDetail/gameDetail';
 import Support from './components/Support/support';
+import Contact from './components/Contact/contact';
+import Faq from './components/Faq/faq';
+import Privacidad from './components/Legal/privacidad';
+import Cumplimiento from './components/Legal/cumplimiento';
+import Careers from './components/Careers/careers';
 
 function App() {
   const [showWelcomeGift, setShowWelcomeGift] = useState(false);
@@ -101,26 +108,32 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/perfil/:userNick" element={<Perfil isPublic={true} />} />
-            <Route path="/juegos" element={<GameGrid />} />
-            <Route path="/juegos/:slug" element={<GameDetail />} />
+            <Route path="/juegos" element={<RequireAuth><GameGrid /></RequireAuth>} />
+            <Route path="/juegos/:slug" element={<RequireAuth><GameDetail /></RequireAuth>} />
             <Route path="/chips" element={<BuyChips />} />
             <Route path="/logout" element={<LogOut />} />
             <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/tickets" element={<ProtectedRoute><SupportTicketsAdmin /></ProtectedRoute>} />
             <Route path="/admin/deposits" element={<ProtectedRoute><AdminDeposits /></ProtectedRoute>} />
+            <Route path="/admin/prizes" element={<ProtectedRoute><AdminPrizes /></ProtectedRoute>} />
             <Route path="/noticias" element={<News />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/terminos-y-condiciones" element={<TermsAndConditions />} />
-            <Route path="/play/minas" element={<Diamantes />} />
-            <Route path="/play/royaljoker" element={<RoyalJoker />} />
-            <Route path="/play/royalpachinka" element={<RoyalPachinka />} />
+            <Route path="/privacidad" element={<Privacidad />} />
+            <Route path="/cumplimiento" element={<Cumplimiento />} />
+            <Route path="/trabaja-con-nosotros" element={<Careers />} />
+            <Route path="/play/minas" element={<RequireAuth><Diamantes /></RequireAuth>} />
+            <Route path="/play/royaljoker" element={<RequireAuth><RoyalJoker /></RequireAuth>} />
+            <Route path="/play/royalpachinka" element={<RequireAuth><RoyalPachinka /></RequireAuth>} />
             <Route path="/bazar" element={<Bazar />} />
             <Route path="/amigos" element={<Friends />} />
             <Route path="/mensajes" element={<Messages />} />
             <Route path="/mensajes/:nick" element={<Messages />} />
             <Route path="/ayuda" element={<Support />} />
             <Route path="/ayuda/:ticketId" element={<Support />} />
+            <Route path="/contacto" element={<Contact />} />
+            <Route path="/preguntas-frecuentes" element={<Faq />} />
             <Route path="/restablecer-contrasena" element={<ResetPassword />} />
             <Route path="/mercadopago/success" element={<PaymentSuccess />} />
             <Route path="/mercadopago/failure" element={<PaymentFailure />} />

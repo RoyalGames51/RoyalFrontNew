@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import API_URL from "../../api/rutaApi";
+import axios from "axios";
+import chipsIcon from "../../assets/chips.png";
 import {
   viewedUserProfile,
   updateUserProfile,
@@ -54,11 +56,15 @@ const Perfil = ({ isPublic = false }) => {
   // Form states for updates
   const [formData, setFormData] = useState({
     nick: "",
+    email: "",
     age: "",
     description: "",
     country: "",
     image: "",
   });
+
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   useEffect(() => {
     if (isPublic) {
@@ -79,6 +85,7 @@ const Perfil = ({ isPublic = false }) => {
     if (user) {
       setFormData({
         nick: user.nick || "",
+        email: user.email || "",
         age: user.age || "",
         description: user.description || "",
         country: user.country || "",
@@ -125,6 +132,42 @@ const Perfil = ({ isPublic = false }) => {
       text: "Tus datos se han guardado con éxito.",
       confirmButtonColor: "#C9A84C",
     });
+  };
+
+  const handlePasswordInputChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordForm({ ...passwordForm, [name]: value });
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (!user?.id) return;
+    if (passwordForm.newPassword.length < 6) {
+      Swal.fire({ title: "Contraseña muy corta", text: "Debe tener al menos 6 caracteres.", icon: "warning", ...swalThemeConfig });
+      return;
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      Swal.fire({ title: "Las contraseñas no coinciden", icon: "warning", ...swalThemeConfig });
+      return;
+    }
+    setIsChangingPassword(true);
+    try {
+      await axios.patch(`${API_URL}/users/${user.id}/password`, {
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+      });
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      Swal.fire({ icon: "success", title: "¡Contraseña actualizada!", confirmButtonColor: "#C9A84C" });
+    } catch (error) {
+      Swal.fire({
+        title: "No se pudo cambiar la contraseña",
+        text: error.response?.data?.message || "Verificá tu contraseña actual e inténtalo de nuevo.",
+        icon: "error",
+        ...swalThemeConfig,
+      });
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   const handleSendFriendRequest = async () => {
@@ -390,7 +433,7 @@ const Perfil = ({ isPublic = false }) => {
                 {getMemberSince(user.createdAt || user.created_at || user.created)}
               </span>
               <span className="text-on-surface-variant font-body-sm text-body-sm flex items-center gap-1">
-                <span className="material-symbols-outlined text-[16px] text-primary">monetization_on</span>
+                <img src={chipsIcon} alt="Fichas" className="w-4 h-4" />
                 {new Intl.NumberFormat('es-ES').format(totalChips)}
               </span>
             </div>
@@ -401,7 +444,9 @@ const Perfil = ({ isPublic = false }) => {
                   <p className="text-primary text-xs font-bold uppercase tracking-wider mb-1">{bioMeta}</p>
                 )}
                 <p className="text-on-surface text-sm leading-relaxed whitespace-pre-line">
-                  {user.description || "Este usuario todavía no escribió una biografía. Podés agregar la tuya desde Configuración."}
+                  {user.description
+                    ? `Me gustaría decirles: ${user.description}`
+                    : "Este usuario todavía no escribió una biografía. Podés agregar la tuya desde Configuración."}
                 </p>
               </div>
             )}
@@ -591,6 +636,18 @@ const Perfil = ({ isPublic = false }) => {
               </div>
 
               <div className="space-y-2">
+                <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Correo Electrónico</label>
+                <input
+                  className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
                 <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Edad</label>
                 <input
                   className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
@@ -646,6 +703,7 @@ const Perfil = ({ isPublic = false }) => {
                     if (user) {
                       setFormData({
                         nick: user.nick || "",
+                        email: user.email || "",
                         age: user.age || "",
                         description: user.description || "",
                         country: user.country || "",
@@ -667,6 +725,54 @@ const Perfil = ({ isPublic = false }) => {
                 </button>
               </div>
             </form>
+
+            <div className="mt-8 pt-6 border-t border-outline-variant/10">
+              <h4 className="font-headline-sm text-headline-sm text-white font-bold mb-4">Cambiar Contraseña</h4>
+              <form onSubmit={handleChangePassword} className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                <div className="space-y-2">
+                  <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Contraseña Actual</label>
+                  <input
+                    className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
+                    type="password"
+                    name="currentPassword"
+                    value={passwordForm.currentPassword}
+                    onChange={handlePasswordInputChange}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Nueva Contraseña</label>
+                  <input
+                    className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
+                    type="password"
+                    name="newPassword"
+                    value={passwordForm.newPassword}
+                    onChange={handlePasswordInputChange}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Confirmar Nueva Contraseña</label>
+                  <input
+                    className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface input-glow font-body-md text-sm"
+                    type="password"
+                    name="confirmPassword"
+                    value={passwordForm.confirmPassword}
+                    onChange={handlePasswordInputChange}
+                    required
+                  />
+                </div>
+                <div className="md:col-span-3 flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={isChangingPassword}
+                    className="px-8 py-3 border border-primary/30 rounded-lg font-bold font-label-lg text-label-lg text-primary hover:bg-primary/10 transition-all cursor-pointer bg-transparent disabled:opacity-50"
+                  >
+                    {isChangingPassword ? "Guardando..." : "Cambiar Contraseña"}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

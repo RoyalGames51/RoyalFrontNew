@@ -470,6 +470,11 @@ export const fetchTicketDetail = (ticketId) => async (dispatch) => {
     }
 };
 
+export const createGuestTicket = (name, email, subject, message) => async () => {
+    const { data } = await axios.post(`${API_URL}/support/guest-tickets`, { name, email, subject, message });
+    return data;
+};
+
 export const createTicket = (subject, message) => async (dispatch) => {
     const { data } = await axios.post(`${API_URL}/support/tickets`, { subject, message });
     dispatch({ type: SUPPORT_TICKET_DETAIL_SUCCESS, payload: data });

@@ -4,7 +4,7 @@ import axios from "axios";
 import API_URL from '../../api/rutaApi';
 import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import RankBadge from "../ui/RankBadge/rankBadge";
 import { getRankMeta, getNextRank } from "../../utils/rank";
 
@@ -43,6 +43,7 @@ const chipOptions = [
 
 export default function BuyChips() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { currentUser } = useSelector((state) => state);
   // Country is taken from the user's profile; if missing, purchases are blocked
   const userCountry = currentUser?.country || null;
@@ -55,7 +56,7 @@ export default function BuyChips() {
   const [selectedChip, setSelectedChip] = useState(chipOptions[0]);
   
   // Navigation tabs state: "deposit", "withdraw", "history"
-  const [activeTab, setActiveTab] = useState("deposit");
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") === "history" ? "history" : "deposit");
   
   // Active payment method: "paypal", "mercadopago", "visa", "crypto"
   const [paymentMethod, setPaymentMethod] = useState("paypal");

@@ -19,6 +19,7 @@ export default function Sidebar() {
 
   const accountItems = [
     { to: "/chips", icon: "paid", label: "Comprar Fichas" },
+    { to: "/chips?tab=history", icon: "receipt_long", label: "Historial de Movimientos" },
   ];
 
   const socialItems = [
@@ -32,6 +33,7 @@ export default function Sidebar() {
     { to: "/admin/users", icon: "manage_accounts", label: "Usuarios" },
     { to: "/admin/tickets", icon: "support_agent", label: "Tickets" },
     { to: "/admin/deposits", icon: "payments", label: "Cargas" },
+    { to: "/admin/prizes", icon: "emoji_events", label: "Premios" },
   ];
 
   if (!currentUser?.id || location.pathname.includes("/play")) {
