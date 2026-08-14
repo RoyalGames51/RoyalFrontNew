@@ -335,7 +335,7 @@ const Perfil = ({ isPublic = false }) => {
         <div className="flex flex-col lg:flex-row gap-8 items-start">
 
           {/* Banner + Avatar + Identity */}
-          <div className="flex-1 min-w-0 w-full relative rounded-xl overflow-hidden border border-outline-variant/20 aspect-[16/9]">
+          <div className="flex-1 min-w-0 w-full relative rounded-2xl overflow-hidden border border-outline-variant/20 aspect-[16/9]">
             <img src={bannerPerfil} alt="" className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/30 to-black/75"></div>
 
