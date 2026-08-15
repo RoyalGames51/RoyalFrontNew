@@ -420,11 +420,13 @@ const Perfil = ({ isPublic = false }) => {
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/30 to-black/75"></div>
 
             {roleInsignia && (
-              <img
-                src={roleInsignia}
-                alt={user.role === "admin" ? "Admin" : "Mod"}
-                className="absolute top-2 left-2 sm:top-4 sm:left-4 h-10 sm:h-16 w-auto object-contain drop-shadow-lg z-10"
-              />
+              <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-10 bg-black/60 backdrop-blur-sm border border-white/15 rounded-xl p-1.5 sm:p-2 shadow-lg">
+                <img
+                  src={roleInsignia}
+                  alt={user.role === "admin" ? "Admin" : "Mod"}
+                  className="h-12 sm:h-20 w-auto object-contain"
+                />
+              </div>
             )}
 
             {/* Status badge + settings gear */}
