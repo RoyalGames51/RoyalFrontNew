@@ -113,6 +113,23 @@ export const getUserByNick = (nick) => {
     };
 };
 
+// Read-only nick lookup that does NOT touch currentUser in the store. Used to resolve a nick
+// to its email before a login attempt — dispatching getUserByNick there would populate
+// currentUser with a full account's data before the password is ever checked, which is exactly
+// what let anyone "log in" as any known nick with a wrong password (the UI would then render as
+// that user even though the real auth.login() call below failed and no token was ever issued).
+export const lookupEmailByNick = (nick) => {
+    return async () => {
+        try {
+            const { data } = await axios.get(`${API_URL}/user-nick?nick=${nick}`);
+            if (data.banned) throw new Error("El usuario se encuentra bloqueado.");
+            return data;
+        } catch (error) {
+            throw new Error(`Error al buscar usuario: ${error.message}`);
+        }
+    };
+};
+
 export const viewedUserProfile = (nick) => async (dispatch) => {
     try {
         const response = await axios.get(`${API_URL}/user-nick?nick=${nick}`);
@@ -439,6 +456,15 @@ export const setUserInactiveStatus = (userId, status) => async () => {
 
 export const deleteUserAccount = (userId) => async () => {
     await axios.delete(`${API_URL}/user-delete/${userId}`);
+};
+
+export const adminSetUserEmail = (userId, email) => async () => {
+    const { data } = await axios.patch(`${API_URL}/admin/users/${userId}/email`, { email });
+    return data;
+};
+
+export const adminSetUserPassword = (userId, newPassword) => async () => {
+    await axios.patch(`${API_URL}/admin/users/${userId}/password`, { newPassword });
 };
 
 // ===== Support Tickets =====

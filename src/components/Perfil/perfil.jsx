@@ -6,6 +6,10 @@ import API_URL from "../../api/rutaApi";
 import axios from "axios";
 import chipsIcon from "../../assets/chips.png";
 import bannerPerfil from "../../assets/bannerperfil.png";
+import bannerPerfilDorado from "../../assets/BannerPerfilDorado.png";
+import bannerPerfilVerde from "../../assets/BannerPerfilVerde.png";
+import insigniaAdmin from "../../assets/InsigniaAdmin.png";
+import insigniaMod from "../../assets/InsigniaMod.png";
 import {
   viewedUserProfile,
   updateUserProfile,
@@ -48,6 +52,11 @@ const Perfil = ({ isPublic = false }) => {
   );
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  // Only meaningful for public profiles (isPublic=true) — tracks whether the nick lookup is
+  // still in flight, failed (no such user), or resolved, since redux's viewedUserProfile
+  // starts as an empty array (truthy!) so a plain `!user` check can't tell "not found" apart
+  // from "not loaded yet".
+  const [viewStatus, setViewStatus] = useState(isPublic ? "loading" : "ready");
 
   const user = isPublic ? viewedUser : currentUser;
   // Ownership is always derived from comparing IDs, never from which route/prop was used to
@@ -68,9 +77,22 @@ const Perfil = ({ isPublic = false }) => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   useEffect(() => {
-    if (isPublic) {
-      dispatch(viewedUserProfile(userNick));
+    if (!isPublic) {
+      setViewStatus("ready");
+      return;
     }
+    let cancelled = false;
+    setViewStatus("loading");
+    dispatch(viewedUserProfile(userNick))
+      .then(() => {
+        if (!cancelled) setViewStatus("ready");
+      })
+      .catch(() => {
+        if (!cancelled) setViewStatus("not-found");
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [dispatch, userNick, isPublic]);
 
   useEffect(() => {
@@ -95,11 +117,67 @@ const Perfil = ({ isPublic = false }) => {
     }
   }, [user]);
 
-  if (!user) {
+  if (isPublic && viewStatus === "loading") {
     return (
-      <div className="w-full max-w-4xl mx-auto p-8 text-center my-16">
+      <div className="w-full max-w-4xl mx-auto p-8 text-center my-16 pt-20 md:pt-24">
+        <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+      </div>
+    );
+  }
+
+  if (isPublic && viewStatus === "not-found") {
+    return (
+      <div className="w-full max-w-lg mx-auto p-8 text-center my-16 pt-20 md:pt-24">
+        <span className="material-symbols-outlined text-6xl text-on-surface-variant mb-4 block">person_search</span>
+        <h2 className="font-headline-md text-headline-md text-white mb-3">Usuario Inexistente</h2>
+        <p className="text-on-surface-variant mb-6">
+          El nick <strong className="text-white">{userNick}</strong> no corresponde a ningún jugador registrado en RoyalGames.
+        </p>
+        <button
+          onClick={() => navigate("/")}
+          className="px-6 py-2.5 rounded-lg gold-gradient text-[#0A0A0F] font-bold uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all"
+        >
+          Ir al Lobby
+        </button>
+      </div>
+    );
+  }
+
+  if (viewStatus === "ready" && user?.banned) {
+    return (
+      <div className="w-full max-w-lg mx-auto p-8 text-center my-16 pt-20 md:pt-24">
+        <span className="material-symbols-outlined text-6xl text-error mb-4 block">block</span>
+        <h2 className="font-headline-md text-headline-md text-white mb-3">Usuario Baneado</h2>
+        <p className="text-on-surface-variant mb-6">
+          {isOwnProfile
+            ? "Tu cuenta fue suspendida. Si creés que es un error, contactá a soporte."
+            : <>La cuenta <strong className="text-white">{capitalize(user.nick)}</strong> fue suspendida por incumplir las normas de la plataforma.</>}
+        </p>
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={() => navigate("/")}
+            className="px-6 py-2.5 rounded-lg gold-gradient text-[#0A0A0F] font-bold uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all"
+          >
+            Ir al Lobby
+          </button>
+          {isOwnProfile && (
+            <button
+              onClick={() => navigate("/contacto")}
+              className="px-6 py-2.5 rounded-lg border border-outline-variant/30 text-on-surface font-bold uppercase tracking-wider hover:bg-surface-variant/20 transition-all"
+            >
+              Contactar Soporte
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (!user || (isPublic && !user?.id)) {
+    return (
+      <div className="w-full max-w-4xl mx-auto p-8 text-center my-16 pt-20 md:pt-24">
         <h2 className="text-2xl font-bold text-error mb-4">
-          {isPublic ? "Perfil no encontrado." : "Debes iniciar sesión para ver tu perfil."}
+          {isPublic ? "Usuario Inexistente" : "Debes iniciar sesión para ver tu perfil."}
         </h2>
         <button
           onClick={() => navigate("/")}
@@ -287,6 +365,8 @@ const Perfil = ({ isPublic = false }) => {
   const totalChips = user.chips || 0;
   const totalChipsDeposited = Number(user.totalChipsDeposited || 0);
   const rankMeta = getRankMeta(user.rank);
+  const profileBanner = user.role === "admin" ? bannerPerfilDorado : user.role === "mod" ? bannerPerfilVerde : bannerPerfil;
+  const roleInsignia = user.role === "admin" ? insigniaAdmin : user.role === "mod" ? insigniaMod : null;
   const nextRank = getNextRank(user.rank);
   const rankProgressPercentage = nextRank
     ? Math.min(Math.round((totalChipsDeposited / nextRank.threshold) * 100), 100)
@@ -336,8 +416,16 @@ const Perfil = ({ isPublic = false }) => {
 
           {/* Banner + Avatar + Identity */}
           <div className="flex-1 min-w-0 w-full relative rounded-2xl overflow-hidden border border-outline-variant/20 aspect-[16/9]">
-            <img src={bannerPerfil} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            <img src={profileBanner} alt="" className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/30 to-black/75"></div>
+
+            {roleInsignia && (
+              <img
+                src={roleInsignia}
+                alt={user.role === "admin" ? "Admin" : "Mod"}
+                className="absolute top-2 left-2 sm:top-4 sm:left-4 h-10 sm:h-16 w-auto object-contain drop-shadow-lg z-10"
+              />
+            )}
 
             {/* Status badge + settings gear */}
             <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center gap-2 sm:gap-3 z-10">

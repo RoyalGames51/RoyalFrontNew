@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import Swal from 'sweetalert2';
 import {
@@ -8,13 +8,23 @@ import {
   setUserBanStatus,
   setUserInactiveStatus,
   deleteUserAccount,
+  adminSetUserEmail,
+  adminSetUserPassword,
 } from '../../../redux/actions';
 
 const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
   const dispatch = useDispatch();
   const [chipsAmount, setChipsAmount] = useState('');
   const [newRole, setNewRole] = useState(user?.role || 'user');
+  const [newEmail, setNewEmail] = useState(user?.email || '');
+  const [newPassword, setNewPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // The modal is a single persistent instance reused for every user, so this keeps the
+  // email field from showing a stale value when the admin selects a different user.
+  useEffect(() => {
+    setNewEmail(user?.email || '');
+  }, [user?.id]);
 
   const handleAddChips = async () => {
     if (!chipsAmount || isNaN(chipsAmount) || Number(chipsAmount) <= 0) {
@@ -94,6 +104,60 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
       onUserUpdate();
     } catch (error) {
       Swal.fire('Error', 'No se pudo cambiar el rol del usuario', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChangeEmail = async () => {
+    if (!newEmail.trim() || newEmail.trim() === user?.email) {
+      Swal.fire('Info', 'Ingresá un correo distinto al actual', 'info');
+      return;
+    }
+    const confirm = await Swal.fire({
+      title: '¿Cambiar el correo de este usuario?',
+      text: `Se le va a notificar al nuevo correo (${newEmail.trim()}) que un administrador lo vinculó a esta cuenta.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, cambiar',
+      cancelButtonText: 'Cancelar',
+    });
+    if (!confirm.isConfirmed) return;
+
+    setLoading(true);
+    try {
+      await dispatch(adminSetUserEmail(user.id, newEmail.trim()));
+      Swal.fire('Éxito', 'Correo actualizado correctamente', 'success');
+      onUserUpdate();
+    } catch (error) {
+      Swal.fire('Error', error.response?.data?.message || 'No se pudo cambiar el correo', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSetPassword = async () => {
+    if (!newPassword || newPassword.length < 6) {
+      Swal.fire('Error', 'La contraseña debe tener al menos 6 caracteres', 'error');
+      return;
+    }
+    const confirm = await Swal.fire({
+      title: '¿Restablecer la contraseña de este usuario?',
+      text: 'Se le va a notificar por correo que un administrador restableció su contraseña.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, restablecer',
+      cancelButtonText: 'Cancelar',
+    });
+    if (!confirm.isConfirmed) return;
+
+    setLoading(true);
+    try {
+      await dispatch(adminSetUserPassword(user.id, newPassword));
+      Swal.fire('Éxito', 'Contraseña restablecida correctamente', 'success');
+      setNewPassword('');
+    } catch (error) {
+      Swal.fire('Error', error.response?.data?.message || 'No se pudo restablecer la contraseña', 'error');
     } finally {
       setLoading(false);
     }
@@ -311,6 +375,58 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                 >
                   {loading ? 'Cargando...' : 'Cambiar'}
                 </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Account Recovery */}
+          <div className="space-y-4">
+            <h4 className="font-label-lg text-label-lg text-on-surface uppercase tracking-wider">
+              Recuperación de Cuenta
+            </h4>
+            <p className="text-on-surface-variant text-xs -mt-2">
+              Usá esto solo si el usuario no puede recuperar su cuenta por sus propios medios (perdió acceso a su correo, etc).
+            </p>
+            <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-4 space-y-3">
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase tracking-widest text-on-surface-variant">Correo Electrónico</label>
+                <div className="flex gap-3">
+                  <input
+                    type="email"
+                    placeholder="nuevo@correo.com"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    className="flex-1 bg-background border border-outline-variant/30 rounded-lg px-4 py-2 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                    disabled={loading}
+                  />
+                  <button
+                    onClick={handleChangeEmail}
+                    disabled={loading || !newEmail.trim()}
+                    className="px-4 py-2 bg-primary text-on-primary rounded-lg font-semibold hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+                  >
+                    Cambiar Correo
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase tracking-widest text-on-surface-variant">Nueva Contraseña</label>
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    placeholder="Mínimo 6 caracteres"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="flex-1 bg-background border border-outline-variant/30 rounded-lg px-4 py-2 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                    disabled={loading}
+                  />
+                  <button
+                    onClick={handleSetPassword}
+                    disabled={loading || newPassword.length < 6}
+                    className="px-4 py-2 bg-primary text-on-primary rounded-lg font-semibold hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+                  >
+                    Restablecer
+                  </button>
+                </div>
               </div>
             </div>
           </div>

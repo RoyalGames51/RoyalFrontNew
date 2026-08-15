@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import axios from "axios";
 import API_URL from "../../api/rutaApi";
-import { getUserByNick } from "../../redux/actions";
+import { lookupEmailByNick } from "../../redux/actions";
 import { swalThemeConfig } from "../../utils/formatters";
 
 // Flag a nivel de módulo: garantiza que initialize() corra solo una vez por carga de página
@@ -43,7 +43,7 @@ export default function Login({ className, children }) {
             let email = input.email;
 
             if (!input.email.includes("@")) {
-                const userDataNick = await dispatch(getUserByNick(input.email));
+                const userDataNick = await dispatch(lookupEmailByNick(input.email));
                 const emailFromNick = userDataNick?.email;
                 if (!emailFromNick) {
                     throw new Error("No se encontró el email asociado al nickname.");
