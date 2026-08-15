@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { Box, Spinner, Center } from "@chakra-ui/react";
+import GameFrame from "../GameFrame/gameFrame";
 
 const Diamantes = () => {
   // Obtener el jugadorID del estado global
@@ -9,44 +9,8 @@ const Diamantes = () => {
 
   // URL del juego con el jugadorID
   const gameURL = `https://minasroyal.s3.us-east-2.amazonaws.com/minas22/index.html?jugadorID=${jugadorID}`;
-  
 
-  return (
-    <Box
-      w="100%"
-      h="calc(100vh - 80px)"
-      bg="gray.900"
-      display="flex"
-      flexDirection="column"
-      overflow="hidden"
-    >
-      {jugadorID ? (
-        <Box
-          flex="1"
-          position="relative"
-          w="100%"
-          h="100%"
-          bg="gray.800"
-          overflow="hidden"
-        >
-          <iframe
-            src={gameURL}
-            title="Juego Minas"
-            style={{
-              width: "100%",
-              height: "100%",
-              border: "none",
-              display: "block",
-            }}
-          />
-        </Box>
-      ) : (
-        <Center h="100%">
-          <Spinner size={{ base: "md", md: "xl" }} color="teal.300" />
-        </Center>
-      )}
-    </Box>
-  );
+  return <GameFrame src={jugadorID ? gameURL : null} title="Juego Minas" />;
 };
 
 export default Diamantes;
