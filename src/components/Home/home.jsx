@@ -573,6 +573,11 @@ export default function Home() {
                   </div>
                 ))}
               </div>
+
+              {/* Games Catalog by Category, filling the leftover height next to the taller sidebar */}
+              <div className="mt-10 pt-8 border-t border-outline-variant/10">
+                <GamesCatalog compact />
+              </div>
             </section>
 
             {/* Top Winners + Online Players */}
@@ -685,9 +690,6 @@ export default function Home() {
               </div>
             </aside>
           </div>
-
-          {/* Games Catalog by Category */}
-          <GamesCatalog />
         </main>
 
         {/* BottomNavBar (Mobile Only) */}
