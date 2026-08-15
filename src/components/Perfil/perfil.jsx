@@ -520,11 +520,13 @@ const Perfil = ({ isPublic = false }) => {
               <div className="flex items-center gap-2 min-w-0">
                 <h1 className="font-headline-sm sm:font-headline-md text-headline-sm sm:text-headline-md text-white truncate">{capitalize(user.nick)}</h1>
                 {roleInsignia && (
-                  <img
-                    src={roleInsignia}
-                    alt={user.role === "admin" ? "Admin" : "Mod"}
-                    className="h-6 sm:h-9 w-auto object-contain flex-shrink-0 drop-shadow-lg"
-                  />
+                  <div className="flex-shrink-0 bg-black/55 backdrop-blur-sm border border-white/15 rounded-lg p-1 sm:p-1.5 shadow-lg">
+                    <img
+                      src={roleInsignia}
+                      alt={user.role === "admin" ? "Admin" : "Mod"}
+                      className="h-9 sm:h-14 w-auto object-contain"
+                    />
+                  </div>
                 )}
               </div>
               <div className="flex flex-wrap items-center gap-2 sm:gap-3 bg-black/50 backdrop-blur-sm border border-white/10 rounded-full px-2.5 sm:px-3 py-1 sm:py-1.5 w-fit">
