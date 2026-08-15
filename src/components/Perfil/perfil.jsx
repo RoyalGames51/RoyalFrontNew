@@ -566,7 +566,7 @@ const Perfil = ({ isPublic = false }) => {
                     { label: "Comprar Fichas", icon: "paid", to: "/chips" },
                     { label: "Cambiar Avatar", icon: "face_retouching_natural", to: "/bazar" },
                     { label: "Ayuda", icon: "support_agent", to: "/ayuda" },
-                    ...(user.role === "admin"
+                    ...(user.role === "admin" || user.role === "mod"
                       ? [{ label: "Panel de Administración", icon: "admin_panel_settings", to: "/admin/dashboard" }]
                       : []),
                   ].map((item) => (

@@ -10,14 +10,10 @@ const RoyalPachinka = () => {
   return (
     <Box
       w="100%"
-      h="100vh"
+      h="calc(100vh - 80px)"
       bg="gray.900"
       display="flex"
       flexDirection="column"
-      position="fixed"
-      top="0"
-      left="0"
-      right="0"
       overflow="hidden"
     >
       {jugadorID ? (

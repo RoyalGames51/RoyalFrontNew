@@ -8,7 +8,8 @@ export default function Sidebar() {
   const { currentUser, messages } = useSelector((state) => state);
   const location = useLocation();
 
-  const isAdmin = currentUser?.role === "admin";
+  // Mods ven el panel de admin igual que los admins (todo excepto gestión de roles).
+  const canAccessAdminPanel = currentUser?.role === "admin" || currentUser?.role === "mod";
   const unreadTotal = (messages?.conversations || []).reduce((sum, c) => sum + (c.unreadCount || 0), 0);
 
   useEffect(() => {
@@ -90,7 +91,7 @@ export default function Sidebar() {
         {socialItems.map(renderLink)}
       </div>
 
-      {isAdmin && (
+      {canAccessAdminPanel && (
         <div className="flex flex-col gap-1">
           <p className="hidden lg:block px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
             Administración

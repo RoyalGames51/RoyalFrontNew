@@ -31,8 +31,9 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/" replace />;
   }
 
-  // Si el usuario no es admin, redirige a home
-  if (currentUser.role !== 'admin') {
+  // Mods tienen acceso al panel igual que los admins (solo gestión de roles queda admin-only,
+  // y eso ya lo bloquea el backend puntualmente donde corresponde).
+  if (currentUser.role !== 'admin' && currentUser.role !== 'mod') {
     return <Navigate to="/" replace />;
   }
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
 import {
   addUserChips,
@@ -14,6 +14,9 @@ import {
 
 const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
   const dispatch = useDispatch();
+  // Cambiar el rol de otro usuario sigue siendo solo para admins reales — todo lo demás en
+  // este panel ya está disponible para mods también.
+  const viewerIsAdmin = useSelector((state) => state.currentUser?.role) === 'admin';
   const [chipsAmount, setChipsAmount] = useState('');
   const [newRole, setNewRole] = useState(user?.role || 'user');
   const [newEmail, setNewEmail] = useState(user?.email || '');
@@ -351,33 +354,35 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
             </div>
           </div>
 
-          {/* Role Change */}
-          <div className="space-y-4">
-            <h4 className="font-label-lg text-label-lg text-on-surface uppercase tracking-wider">
-              Cambiar Rol
-            </h4>
-            <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-4">
-              <div className="flex gap-3">
-                <select
-                  value={newRole}
-                  onChange={(e) => setNewRole(e.target.value)}
-                  className="flex-1 bg-background border border-outline-variant/30 rounded-lg px-4 py-2 text-on-surface focus:border-primary outline-none appearance-none"
-                  disabled={loading}
-                >
-                  <option value="user">Usuario</option>
-                  <option value="mod">Mod</option>
-                  <option value="admin">Admin</option>
-                </select>
-                <button
-                  onClick={handleChangeRole}
-                  disabled={loading || newRole === user?.role}
-                  className="px-4 py-2 bg-primary text-on-primary rounded-lg font-semibold hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  {loading ? 'Cargando...' : 'Cambiar'}
-                </button>
+          {/* Role Change — solo admins reales pueden ascender/degradar roles */}
+          {viewerIsAdmin && (
+            <div className="space-y-4">
+              <h4 className="font-label-lg text-label-lg text-on-surface uppercase tracking-wider">
+                Cambiar Rol
+              </h4>
+              <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-4">
+                <div className="flex gap-3">
+                  <select
+                    value={newRole}
+                    onChange={(e) => setNewRole(e.target.value)}
+                    className="flex-1 bg-background border border-outline-variant/30 rounded-lg px-4 py-2 text-on-surface focus:border-primary outline-none appearance-none"
+                    disabled={loading}
+                  >
+                    <option value="user">Usuario</option>
+                    <option value="mod">Mod</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <button
+                    onClick={handleChangeRole}
+                    disabled={loading || newRole === user?.role}
+                    className="px-4 py-2 bg-primary text-on-primary rounded-lg font-semibold hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {loading ? 'Cargando...' : 'Cambiar'}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Account Recovery */}
           <div className="space-y-4">
