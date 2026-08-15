@@ -62,7 +62,7 @@ const TermsAndConditions = () => {
         {/* Introducción */}
         <section className="bg-surface-container rounded-xl border border-outline-variant/20 p-6 md:p-8">
           <p className="text-body-lg text-on-surface leading-relaxed">
-            Bienvenido a Royal Casino. Al acceder a esta plataforma y utilizar nuestros servicios,
+            Bienvenido a Royal Games. Al acceder a esta plataforma y utilizar nuestros servicios,
             aceptas los siguientes Términos y Condiciones de uso. Si no estás de acuerdo con alguna
             de las disposiciones, te pedimos que no utilices nuestros servicios.
           </p>

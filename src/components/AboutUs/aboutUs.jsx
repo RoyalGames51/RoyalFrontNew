@@ -8,17 +8,17 @@ const AboutUs = () => {
             Sobre Nosotros
           </h1>
           <p className="text-on-surface-variant text-body-lg">
-            Conoce la historia y valores de Royal Casino
+            Conoce la historia y valores de RoyalGames
           </p>
         </div>
 
         {/* Sección Introducción */}
         <section className="bg-surface-container rounded-xl border border-outline-variant/20 p-6 md:p-8 space-y-4">
           <h2 className="font-headline-md text-headline-md text-primary">
-            Bienvenido a Royal Casino
+            Bienvenido a RoyalGames
           </h2>
           <p className="text-body-lg text-on-surface leading-relaxed">
-            Royal Casino es la plataforma de entretenimiento más emocionante y segura de Latinoamérica.
+            RoyalGames es la plataforma de entretenimiento más emocionante y segura de Latinoamérica.
             Desde nuestros inicios, nos hemos dedicado a ofrecer la mejor experiencia de juego online a
             millones de jugadores en toda la región.
           </p>
@@ -34,7 +34,7 @@ const AboutUs = () => {
             Nuestra Misión
           </h2>
           <p className="text-body-lg text-on-surface leading-relaxed">
-            En Royal Casino, nos comprometemos a ser la plataforma de juegos online líder, ofreciendo
+            En RoyalGames, nos comprometemos a ser la plataforma de juegos online líder, ofreciendo
             entretenimiento responsable y seguro. Creemos en la transparencia, la integridad y el
             respeto hacia nuestros jugadores. Cada día trabajamos para mejorar y ofrecer la mejor
             experiencia posible.
@@ -159,7 +159,7 @@ const AboutUs = () => {
             Nuestra Historia
           </h2>
           <p className="text-body-lg text-on-surface leading-relaxed">
-            Royal Casino fue fundada con la visión de revolucionar la industria de los juegos online.
+            RoyalGames fue fundada con la visión de revolucionar la industria de los juegos online.
             Desde nuestros humildes comienzos hace más de una década, hemos crecido para servir a
             millones de jugadores satisfechos en toda Latinoamérica.
           </p>

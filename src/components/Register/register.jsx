@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Swal from "sweetalert2";
 import { useAuth } from "../../context/oauthContext";
@@ -21,6 +21,10 @@ const RegistroForm = ({ className, children }) => {
         confirmPassword: "",
         sexo: "",
     });
+
+    const [checking, setChecking] = useState({ nick: false, email: false });
+    const nickCheckSeq = useRef(0);
+    const emailCheckSeq = useRef(0);
 
     const [isRegisterOpen, setIsRegisterOpen] = useState(false);
     const [isTermsChecked, setIsTermsChecked] = useState(false);
@@ -61,6 +65,43 @@ const RegistroForm = ({ className, children }) => {
             ...input,
             [property]: value,
         });
+        // El error de nick/email queda obsoleto apenas se vuelve a escribir;
+        // se recalcula al salir del campo (onBlur).
+        if (property === "nick" || property === "email") {
+            setErrors((prev) => ({ ...prev, [property]: "" }));
+        }
+    };
+
+    // Verifica formato + disponibilidad del nick contra el backend al salir del campo.
+    const runNickCheck = async (nickValue) => {
+        if (!nickValue) return;
+        const seq = ++nickCheckSeq.current;
+        setChecking((prev) => ({ ...prev, nick: true }));
+        const nickError = await validateNick(nickValue);
+        if (seq !== nickCheckSeq.current) return; // el usuario ya cambió el valor, descartar
+        setErrors((prev) => ({ ...prev, nick: nickError || "" }));
+        setChecking((prev) => ({ ...prev, nick: false }));
+    };
+
+    // Verifica formato + coincidencia con el nick + disponibilidad del email.
+    const runEmailCheck = async (emailValue, nickValue) => {
+        if (!emailValue) return;
+        const seq = ++emailCheckSeq.current;
+        setChecking((prev) => ({ ...prev, email: true }));
+        const emailError = await validateEmail(emailValue, nickValue);
+        if (seq !== emailCheckSeq.current) return;
+        setErrors((prev) => ({ ...prev, email: emailError || "" }));
+        setChecking((prev) => ({ ...prev, email: false }));
+    };
+
+    const handleNickBlur = () => {
+        runNickCheck(input.nick);
+        // El nick recién validado puede cambiar si el email coincide con él.
+        if (input.email) runEmailCheck(input.email, input.nick);
+    };
+
+    const handleEmailBlur = () => {
+        runEmailCheck(input.email, input.nick);
     };
 
     const getPasswordStrength = (val) => {
@@ -85,7 +126,7 @@ const RegistroForm = ({ className, children }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const nickError = await validateNick(input.nick);
-        const emailError = validateEmail(input.email);
+        const emailError = await validateEmail(input.email, input.nick);
         const passwordError = validatePassword(input.password);
         const confirmPasswordError = input.password !== input.confirmPassword ? "Las contraseñas no coinciden" : "";
 
@@ -124,7 +165,20 @@ const RegistroForm = ({ className, children }) => {
             setIsRegisterOpen(false);
             navigate('/');
         } catch (error) {
-            Swal.fire("Oops...", "Hubo un error en el registro", "error");
+            // authService.signup rechaza con el body de error del backend
+            // ({ statusCode, message, error }), no con el error de axios crudo.
+            if (error?.statusCode === 409) {
+                const message = error.message || "";
+                if (/email/i.test(message)) {
+                    setErrors((prev) => ({ ...prev, email: "Este correo electrónico ya está registrado." }));
+                }
+                if (/nick/i.test(message)) {
+                    setErrors((prev) => ({ ...prev, nick: "Ese nombre de usuario ya está en uso." }));
+                }
+                Swal.fire("Oops...", "Ese usuario o correo ya está en uso.", "error");
+            } else {
+                Swal.fire("Oops...", "Hubo un error en el registro", "error");
+            }
         }
     };
 
@@ -171,7 +225,7 @@ const RegistroForm = ({ className, children }) => {
                         <div className="pt-6 px-6 flex flex-col items-center relative z-10">
                             <img alt="Logo RGAMES" className="h-12 w-auto mb-3 object-contain" src={logo} />
                             <h1 className="font-headline-sm text-headline-sm text-on-surface tracking-tight">Crea tu cuenta</h1>
-                            <p className="text-[12px] text-on-surface-variant mt-0.5">Únete al mundo de élite del juego premium</p>
+                            <p className="text-[12px] text-on-surface-variant mt-0.5">Únete a la mayor comunidad de jugadores, increibles premios te esperan</p>
                         </div>
 
                         {/* Form */}
@@ -187,8 +241,13 @@ const RegistroForm = ({ className, children }) => {
                                     name="nick"
                                     value={input.nick}
                                     onChange={handleInputChange}
+                                    onBlur={handleNickBlur}
                                 />
-                                {errors.nick && <p className="text-red-500 text-[11px] mt-0.5">{errors.nick}</p>}
+                                {errors.nick ? (
+                                    <p className="text-red-500 text-[11px] mt-0.5">{errors.nick}</p>
+                                ) : checking.nick ? (
+                                    <p className="text-on-surface-variant text-[11px] mt-0.5">Verificando disponibilidad...</p>
+                                ) : null}
                             </div>
 
                             {/* Email */}
@@ -202,8 +261,13 @@ const RegistroForm = ({ className, children }) => {
                                     name="email"
                                     value={input.email}
                                     onChange={handleInputChange}
+                                    onBlur={handleEmailBlur}
                                 />
-                                {errors.email && <p className="text-red-500 text-[11px] mt-0.5">{errors.email}</p>}
+                                {errors.email ? (
+                                    <p className="text-red-500 text-[11px] mt-0.5">{errors.email}</p>
+                                ) : checking.email ? (
+                                    <p className="text-on-surface-variant text-[11px] mt-0.5">Verificando disponibilidad...</p>
+                                ) : null}
                             </div>
 
                             {/* Password Container */}

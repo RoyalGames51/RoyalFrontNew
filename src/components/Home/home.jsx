@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
@@ -16,7 +16,12 @@ import { ShaderAnimation } from "../ui/shader-animation";
 import { formatChips, swalThemeConfig } from "../../utils/formatters";
 import GamesCatalog from "../GamesCatalog/gamesCatalog";
 import { GAMES_CATALOG, CATEGORY_META, getGameByPlayPath, getGameBySlug } from "../../data/gamesCatalog";
+import { generateFakeOnlinePlayers } from "../../data/fakeOnlinePlayers";
 import API_URL from "../../api/rutaApi";
+
+const SIMULATED_ONLINE_MIN = 18;
+const SIMULATED_ONLINE_MAX = 34;
+const ACTIVE_GAMES = GAMES_CATALOG.filter((g) => g.status === "active");
 
 export default function Home() {
   const navigate = useNavigate();
@@ -33,6 +38,11 @@ export default function Home() {
   const [topWinners, setTopWinners] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [recentWins, setRecentWins] = useState([]);
+  // Target headcount for the simulated players blended into "Jugadores Conectados"
+  // below (see fakeOnlinePlayers.js). Drifts slowly so the widget feels alive.
+  const [simulatedOnlineTarget, setSimulatedOnlineTarget] = useState(
+    () => SIMULATED_ONLINE_MIN + Math.floor(Math.random() * (SIMULATED_ONLINE_MAX - SIMULATED_ONLINE_MIN + 1))
+  );
 
   // Real recent wins (chips actually won in games) for the guest landing page ticker.
   useEffect(() => {
@@ -335,11 +345,29 @@ export default function Home() {
     const fetchWidgets = () => {
       axios.get(`${API_URL}/leaderboard/top-winners?limit=5`).then(({ data }) => setTopWinners(data)).catch(() => {});
       axios.get(`${API_URL}/users/online`).then(({ data }) => setOnlineUsers(data)).catch(() => {});
+      // Small random walk so the simulated headcount below feels like people are
+      // actually coming and going instead of a static number.
+      setSimulatedOnlineTarget((prev) => {
+        const drifted = prev + Math.floor(Math.random() * 7) - 3;
+        return Math.min(SIMULATED_ONLINE_MAX, Math.max(SIMULATED_ONLINE_MIN, drifted));
+      });
     };
     fetchWidgets();
     const interval = setInterval(fetchWidgets, 60 * 1000);
     return () => clearInterval(interval);
   }, [currentUser?.id]);
+
+  // Real online users blended with simulated ones so the widget hits simulatedOnlineTarget.
+  // Memoized so the simulated names/games only reshuffle when the target or real list
+  // actually changes, not on every unrelated re-render.
+  const otherOnlineUsers = useMemo(() => {
+    const realOnlineUsers = onlineUsers.filter((u) => u.id !== currentUser?.id);
+    const simulatedPlayers = generateFakeOnlinePlayers(
+      Math.max(0, simulatedOnlineTarget - realOnlineUsers.length),
+      ACTIVE_GAMES
+    );
+    return [...realOnlineUsers, ...simulatedPlayers];
+  }, [onlineUsers, simulatedOnlineTarget, currentUser?.id]);
 
   // Helper alerts and navigation functions
   const handlePlayGame = (path, title) => {
@@ -395,7 +423,6 @@ export default function Home() {
   // "Entrar como Invitado" preview)
   if (currentUser?.id || isGuestPreview) {
     const formattedChipsValue = formatChips(currentUser?.chips);
-    const otherOnlineUsers = onlineUsers.filter((u) => u.id !== currentUser?.id);
 
     let vipLevel = "Bronce I";
     if (currentUser?.chips >= 1000000) {
@@ -571,7 +598,13 @@ export default function Home() {
                           <span className={`font-bold flex-shrink-0 ${index === 0 ? "text-primary" : "text-on-surface-variant"}`}>
                             {index + 1}
                           </span>
-                          <span className="font-bold text-white truncate">{player.nick}</span>
+                          <button
+                            type="button"
+                            onClick={() => navigate(`/perfil/${player.nick}`)}
+                            className="font-bold text-white truncate hover:text-primary hover:underline cursor-pointer bg-transparent border-0 p-0 text-left"
+                          >
+                            {player.nick}
+                          </button>
                         </div>
                         <span className={`font-bold flex-shrink-0 ${index === 0 ? "text-primary" : "text-on-surface-variant"}`}>
                           {new Intl.NumberFormat('es-ES').format(player.totalWon)}
@@ -598,19 +631,29 @@ export default function Home() {
                   ) : (
                     otherOnlineUsers.map((player) => {
                       const activeGame = getGameByPlayPath(player.currentActivity);
+                      // Simulated players (see fakeOnlinePlayers.js) have no real profile behind
+                      // them, so only real players (real DB id) link out to /perfil/:nick.
+                      const isRealPlayer = !player.id.startsWith("sim-");
                       return (
                         <div key={player.id} className="flex items-center justify-between gap-3 p-3">
-                          <div className="flex items-center gap-3 min-w-0">
+                          <button
+                            type="button"
+                            disabled={!isRealPlayer}
+                            onClick={() => isRealPlayer && navigate(`/perfil/${player.nick}`)}
+                            className={`flex items-center gap-3 min-w-0 bg-transparent border-0 p-0 text-left ${isRealPlayer ? "cursor-pointer group" : "cursor-default"}`}
+                          >
                             <div className="w-9 h-9 rounded-full royal-gold-gradient flex items-center justify-center text-surface-container-lowest font-bold text-xs flex-shrink-0">
                               {(player.nick || "RG").slice(0, 2).toUpperCase()}
                             </div>
                             <div className="min-w-0">
-                              <p className="font-bold text-white text-sm truncate">{player.nick}</p>
+                              <p className={`font-bold text-white text-sm truncate ${isRealPlayer ? "group-hover:text-primary group-hover:underline" : ""}`}>
+                                {player.nick}
+                              </p>
                               <p className="text-[11px] text-on-surface-variant truncate">
                                 {activeGame ? <span className="text-primary">Jugando a {activeGame.name}</span> : "En el sitio"}
                               </p>
                             </div>
-                          </div>
+                          </button>
                           {activeGame && (
                             <button
                               onClick={() => handlePlayGame(activeGame.playPath, activeGame.name)}
