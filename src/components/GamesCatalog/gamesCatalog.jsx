@@ -57,14 +57,14 @@ export default function GamesCatalog() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-x-8 gap-y-12">
+      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-5 gap-x-8">
         {CATEGORY_ORDER.map((categoryKey) => {
           const meta = CATEGORY_META[categoryKey];
           const games = getGamesByCategory(categoryKey);
           if (games.length === 0) return null;
 
           return (
-            <div key={categoryKey}>
+            <div key={categoryKey} className="break-inside-avoid mb-12">
               <h3 className={`text-xs font-black uppercase tracking-widest mb-4 ${meta.className}`}>
                 {meta.label}
               </h3>
