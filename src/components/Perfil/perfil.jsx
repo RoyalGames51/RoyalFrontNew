@@ -420,7 +420,7 @@ const Perfil = ({ isPublic = false }) => {
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/30 to-black/75"></div>
 
             {roleInsignia && (
-              <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-10 bg-black/60 backdrop-blur-sm border border-white/15 rounded-xl p-1.5 sm:p-2 shadow-lg">
+              <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 z-10 bg-black/60 backdrop-blur-sm border border-white/15 rounded-xl p-1.5 sm:p-2 shadow-lg">
                 <img
                   src={roleInsignia}
                   alt={user.role === "admin" ? "Admin" : "Mod"}
