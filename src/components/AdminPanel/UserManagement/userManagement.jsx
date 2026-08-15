@@ -286,10 +286,21 @@ const UserManagement = () => {
                               )}
                               <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 border-2 border-surface rounded-full bg-green-500"></div>
                             </div>
-                            <div>
+                            <div className="min-w-0">
                               <p className="font-label-lg text-label-lg text-on-surface">{user.nick}</p>
-                              <p className="text-[10px] text-on-surface-variant uppercase tracking-tighter">
-                                ID: {user.id.substring(0, 8)}
+                              <p className="text-[10px] text-on-surface-variant tracking-tighter break-all flex items-center gap-1">
+                                ID: {user.id}
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigator.clipboard.writeText(user.id);
+                                  }}
+                                  title="Copiar ID completo"
+                                  className="material-symbols-outlined text-[12px] leading-none text-on-surface-variant hover:text-primary transition-colors cursor-pointer bg-transparent border-0 p-0 flex-shrink-0"
+                                >
+                                  content_copy
+                                </button>
                               </p>
                             </div>
                           </div>
