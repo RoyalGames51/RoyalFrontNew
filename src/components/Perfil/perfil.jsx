@@ -419,16 +419,6 @@ const Perfil = ({ isPublic = false }) => {
             <img src={profileBanner} alt="" className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/30 to-black/75"></div>
 
-            {roleInsignia && (
-              <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 z-10 bg-black/60 backdrop-blur-sm border border-white/15 rounded-xl p-1.5 sm:p-2 shadow-lg">
-                <img
-                  src={roleInsignia}
-                  alt={user.role === "admin" ? "Admin" : "Mod"}
-                  className="h-12 sm:h-20 w-auto object-contain"
-                />
-              </div>
-            )}
-
             {/* Status badge + settings gear */}
             <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center gap-2 sm:gap-3 z-10">
               {(() => {
@@ -527,8 +517,17 @@ const Perfil = ({ isPublic = false }) => {
 
             {/* Identity + Bio */}
             <div className="absolute inset-y-0 flex flex-col justify-center gap-1 sm:gap-2 text-left" style={{ left: "37%", right: "4%" }}>
-              <h1 className="font-headline-sm sm:font-headline-md text-headline-sm sm:text-headline-md text-white truncate">{capitalize(user.nick)}</h1>
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <h1 className="font-headline-sm sm:font-headline-md text-headline-sm sm:text-headline-md text-white truncate">{capitalize(user.nick)}</h1>
+                {roleInsignia && (
+                  <img
+                    src={roleInsignia}
+                    alt={user.role === "admin" ? "Admin" : "Mod"}
+                    className="h-6 sm:h-9 w-auto object-contain flex-shrink-0 drop-shadow-lg"
+                  />
+                )}
+              </div>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 bg-black/50 backdrop-blur-sm border border-white/10 rounded-full px-2.5 sm:px-3 py-1 sm:py-1.5 w-fit">
                 <RankBadge tier={user.rank} size="sm" />
                 <span className="hidden sm:inline text-on-surface-variant font-body-sm text-body-sm">
                   {getMemberSince(user.createdAt || user.created_at || user.created)}
