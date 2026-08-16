@@ -41,11 +41,13 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
     };
   }, []);
 
-  // A lingering scrollbar on the outer page (even a few px) shrinks the real viewport, so
-  // 100vh ends up taller than what's actually visible and the bottom of the game gets clipped.
-  // Locking document scroll while fullscreen removes that discrepancy.
+  // Game pages are meant to fill exactly the available viewport (calc(100vh - nav) or 100dvh in
+  // fullscreen) — there's never legitimate content to page-scroll to. But a stray sub-pixel
+  // rounding difference anywhere in the surrounding layout is enough to make the document a few
+  // px taller than the viewport, which shows a page scrollbar and lets the whole game shift under
+  // the nav when scrolled. Locking document scroll for as long as GameFrame is mounted (not just
+  // during fullscreen) removes that possibility outright instead of chasing the exact px source.
   useEffect(() => {
-    if (!isFullscreen) return;
     const { documentElement, body } = document;
     const prevHtmlOverflow = documentElement.style.overflow;
     const prevBodyOverflow = body.style.overflow;
@@ -55,7 +57,7 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
       documentElement.style.overflow = prevHtmlOverflow;
       body.style.overflow = prevBodyOverflow;
     };
-  }, [isFullscreen]);
+  }, []);
 
   // Recompute the scale factor whenever the available space changes (window resize, entering/
   // exiting fullscreen, sidebar collapsing, etc.) so the fixed-resolution game always fits exactly.
