@@ -110,7 +110,8 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
               <iframe
                 src={src}
                 title={title}
-                style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+                scrolling="no"
+                style={{ width: "100%", height: "100%", border: "none", display: "block", overflow: "hidden" }}
               />
             </div>
           ) : (
