@@ -84,32 +84,33 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
       flexDirection="column"
     >
       {src ? (
-        <Box flex="1" position="relative" w="100%" h="100%" bg="gray.800" overflow={hasFixedResolution ? "hidden" : "auto"}>
+        <Box
+          ref={scaleContainerRef}
+          flex="1"
+          position="relative"
+          w="100%"
+          h="100%"
+          bg="gray.800"
+          overflow={hasFixedResolution ? "hidden" : "auto"}
+        >
           {hasFixedResolution ? (
-            <Box
-              ref={scaleContainerRef}
-              position="absolute"
-              inset={0}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                width: nativeWidth,
+                height: nativeHeight,
+                transform: `translate(-50%, -50%) scale(${scale})`,
+                transformOrigin: "center center",
+              }}
             >
-              <div
-                style={{
-                  width: nativeWidth,
-                  height: nativeHeight,
-                  flexShrink: 0,
-                  transform: `scale(${scale})`,
-                  transformOrigin: "center center",
-                }}
-              >
-                <iframe
-                  src={src}
-                  title={title}
-                  style={{ width: "100%", height: "100%", border: "none", display: "block" }}
-                />
-              </div>
-            </Box>
+              <iframe
+                src={src}
+                title={title}
+                style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+              />
+            </div>
           ) : (
             <iframe
               src={src}
