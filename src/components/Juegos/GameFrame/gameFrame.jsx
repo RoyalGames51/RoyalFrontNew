@@ -36,11 +36,27 @@ export default function GameFrame({ src, title }) {
     };
   }, []);
 
+  // A lingering scrollbar on the outer page (even a few px) shrinks the real viewport, so
+  // 100vh ends up taller than what's actually visible and the bottom of the game gets clipped.
+  // Locking document scroll while fullscreen removes that discrepancy.
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const { documentElement, body } = document;
+    const prevHtmlOverflow = documentElement.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+    documentElement.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    return () => {
+      documentElement.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+    };
+  }, [isFullscreen]);
+
   return (
     <Box
       ref={wrapperRef}
       w="100%"
-      h={isFullscreen ? "100vh" : "calc(100vh - 80px)"}
+      h={isFullscreen ? "100dvh" : "calc(100vh - 80px)"}
       bg="gray.900"
       display="flex"
       flexDirection="column"
