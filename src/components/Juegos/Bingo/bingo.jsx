@@ -7,7 +7,7 @@ const Bingo = () => {
   const userId = currentUser?.id || "default-id";
   const gameURL = `https://bingoroyal.s3.us-east-2.amazonaws.com/Bingo/index.html?userId=${userId}`;
 
-  return <GameFrame src={userId ? gameURL : null} title="Bingo" />;
+  return <GameFrame src={userId ? gameURL : null} title="Bingo" nativeWidth={1920} nativeHeight={1080} />;
 };
 
 export default Bingo;

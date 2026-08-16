@@ -1,15 +1,20 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Box, Spinner, Center } from "@chakra-ui/react";
 
-// Shared wrapper for the externally-hosted game iframes (Minas, Royal Joker, Royal Pachinka).
-// We don't control those games' internal HTML/canvas, so we can't detect or resize their real
-// content (different origin — the browser blocks reading cross-origin iframe dimensions). Until
-// each game is made responsive at the source, this gives players the two things we *can*
-// guarantee from our side: a one-click way to maximize the browser's own viewport (Fullscreen
-// API), and a scrollable fallback instead of hard-clipping controls that don't fit on-screen.
-export default function GameFrame({ src, title }) {
+// Shared wrapper for the externally-hosted game iframes (Minas, Royal Joker, Royal Pachinka,
+// Bingo). We don't control those games' internal HTML/canvas, so we can't detect or resize their
+// real content (different origin — the browser blocks reading cross-origin iframe dimensions).
+// When a game's native pixel resolution is known (nativeWidth/nativeHeight), we can still scale
+// the iframe *element itself* (a black box from CSS's point of view, no cross-origin read needed)
+// with transform: scale() so the whole game always fits without clipping, letterboxed if the
+// screen's aspect ratio doesn't match. Games whose native resolution isn't known yet fall back to
+// the old 100%/scroll behavior, plus the Fullscreen API toggle either way.
+export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
   const wrapperRef = useRef(null);
+  const scaleContainerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [scale, setScale] = useState(1);
+  const hasFixedResolution = !!(nativeWidth && nativeHeight);
 
   const toggleFullscreen = useCallback(() => {
     const el = wrapperRef.current;
@@ -52,6 +57,23 @@ export default function GameFrame({ src, title }) {
     };
   }, [isFullscreen]);
 
+  // Recompute the scale factor whenever the available space changes (window resize, entering/
+  // exiting fullscreen, sidebar collapsing, etc.) so the fixed-resolution game always fits exactly.
+  useEffect(() => {
+    if (!hasFixedResolution) return;
+    const container = scaleContainerRef.current;
+    if (!container) return;
+    const updateScale = () => {
+      const { clientWidth, clientHeight } = container;
+      if (!clientWidth || !clientHeight) return;
+      setScale(Math.min(clientWidth / nativeWidth, clientHeight / nativeHeight));
+    };
+    updateScale();
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [hasFixedResolution, nativeWidth, nativeHeight, isFullscreen]);
+
   return (
     <Box
       ref={wrapperRef}
@@ -62,12 +84,39 @@ export default function GameFrame({ src, title }) {
       flexDirection="column"
     >
       {src ? (
-        <Box flex="1" position="relative" w="100%" h="100%" bg="gray.800" overflow="auto">
-          <iframe
-            src={src}
-            title={title}
-            style={{ width: "100%", height: "100%", border: "none", display: "block" }}
-          />
+        <Box flex="1" position="relative" w="100%" h="100%" bg="gray.800" overflow={hasFixedResolution ? "hidden" : "auto"}>
+          {hasFixedResolution ? (
+            <Box
+              ref={scaleContainerRef}
+              position="absolute"
+              inset={0}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <div
+                style={{
+                  width: nativeWidth,
+                  height: nativeHeight,
+                  flexShrink: 0,
+                  transform: `scale(${scale})`,
+                  transformOrigin: "center center",
+                }}
+              >
+                <iframe
+                  src={src}
+                  title={title}
+                  style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+                />
+              </div>
+            </Box>
+          ) : (
+            <iframe
+              src={src}
+              title={title}
+              style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+            />
+          )}
           <button
             type="button"
             onClick={toggleFullscreen}
