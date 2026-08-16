@@ -65,9 +65,11 @@ export const GAMES_CATALOG = [
     slug: "bingo",
     name: "Bingo",
     category: "bingo",
-    status: "soon",
+    status: "active",
     image: bingoImage,
     icon: "grid_on",
+    players: 2210,
+    playPath: "/play/bingo",
     description:
       "El bingo de toda la vida, ahora en salas en vivo con otros jugadores de RoyalGames. Canta línea, canta bingo y gana el pozo.",
   },
