@@ -46,7 +46,14 @@ const Diamantes = () => {
   // URL del juego con el jugadorID y el token de sesión
   const gameURL = `https://minasroyal.s3.us-east-2.amazonaws.com/minas22/index.html?jugadorID=${jugadorID}&sessionToken=${sessionToken}`;
 
-  return <GameFrame src={jugadorID && sessionToken ? gameURL : null} title="Juego Minas" />;
+  return (
+    <GameFrame
+      src={jugadorID && sessionToken ? gameURL : null}
+      title="Juego Minas"
+      nativeWidth={1920}
+      nativeHeight={1080}
+    />
+  );
 };
 
 export default Diamantes;
