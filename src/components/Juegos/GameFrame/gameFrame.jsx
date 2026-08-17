@@ -61,8 +61,12 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
 
   // Recompute the scale factor whenever the available space changes (window resize, entering/
   // exiting fullscreen, sidebar collapsing, etc.) so the fixed-resolution game always fits exactly.
+  // Also re-runs when `src` flips from null to a real URL: the scaled container only exists in the
+  // DOM once `src` is truthy (some games, like Minas, resolve it asynchronously after this effect's
+  // first run), so without `src` as a dependency the observer would attach to nothing and `scale`
+  // would stay stuck at its initial value once the container finally mounts.
   useEffect(() => {
-    if (!hasFixedResolution) return;
+    if (!hasFixedResolution || !src) return;
     const container = scaleContainerRef.current;
     if (!container) return;
     const updateScale = () => {
@@ -74,7 +78,7 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
     const observer = new ResizeObserver(updateScale);
     observer.observe(container);
     return () => observer.disconnect();
-  }, [hasFixedResolution, nativeWidth, nativeHeight, isFullscreen]);
+  }, [hasFixedResolution, nativeWidth, nativeHeight, isFullscreen, src]);
 
   return (
     <Box
