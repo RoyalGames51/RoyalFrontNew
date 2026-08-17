@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import GameFrame from "../GameFrame/gameFrame";
-import API_URL from "../../api/rutaApi";
-import { authService } from "../../services/authService";
+import API_URL from "../../../api/rutaApi";
+import { authService } from "../../../services/authService";
 
 const Diamantes = () => {
   // Obtener el jugadorID del estado global
