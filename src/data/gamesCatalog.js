@@ -5,11 +5,11 @@ import bingoImage from "../assets/bingoproxi.png";
 import ruletaImage from "../assets/ruleta.png";
 
 export const CATEGORY_META = {
-  bingo: { label: "Juegos de Bingo", className: "text-[#c9a84c]" },
-  casino: { label: "Juegos de Casino", className: "text-[#e05252]" },
-  cartas: { label: "Juegos de Cartas", className: "text-[#4f8fe0]" },
-  otros: { label: "Otros Juegos", className: "text-[#4caf7d]" },
-  slots: { label: "Juegos de Slots", className: "text-[#a855f7]" },
+  bingo: { label: "Bingo", className: "text-[#c9a84c]" },
+  casino: { label: "Casino", className: "text-[#e05252]" },
+  cartas: { label: "Cartas", className: "text-[#4f8fe0]" },
+  otros: { label: "Otros", className: "text-[#4caf7d]" },
+  slots: { label: "Slots", className: "text-[#a855f7]" },
 };
 
 export const CATEGORY_ORDER = ["bingo", "casino", "cartas", "otros", "slots"];
@@ -63,7 +63,7 @@ export const GAMES_CATALOG = [
   },
   {
     slug: "bingo",
-    name: "Bingo",
+    name: "Royal Bingo",
     category: "bingo",
     status: "active",
     image: bingoImage,

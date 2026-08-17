@@ -48,7 +48,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "¿Qué juegos están disponibles ahora mismo?",
-    a: "Minas, Royal Pachinka y Royal Joker ya están activos. El resto del catálogo (Bingo, Royal Ruleta, RoyalChristmas, UNO, Video Bingo, Jogo do Bicho, Crazy Time Royal, Blackjack, VideoSlots) figura como \"Próximamente\".",
+    a: "Minas, Royal Pachinka y Royal Joker ya están activos. El resto del catálogo (Royal Bingo, Royal Ruleta, RoyalChristmas, UNO, Video Bingo, Jogo do Bicho, Crazy Time Royal, Blackjack, VideoSlots) figura como \"Próximamente\".",
   },
   {
     q: "Tengo un problema que no está en esta lista, ¿qué hago?",

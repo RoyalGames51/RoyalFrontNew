@@ -274,7 +274,7 @@ const Perfil = ({ isPublic = false }) => {
   const handleRemoveFriend = async () => {
     if (!relationship?.friendshipId) return;
     const result = await Swal.fire({
-      title: `¿Eliminar a ${user.nick} de tus amigos?`,
+      title: `¿Eliminar a ${capitalize(user.nick)} de tus amigos?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Eliminar",
@@ -412,7 +412,7 @@ const Perfil = ({ isPublic = false }) => {
       <section className="relative mb-10">
         <div className="absolute inset-0 royal-gold-gradient opacity-5 blur-[100px] rounded-full -z-10 h-64 w-64 translate-x-1/2"></div>
 
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
+        <div className="flex flex-col lg:flex-row-reverse gap-8 items-start">
 
           {/* Banner + Avatar + Identity */}
           <div className="flex-1 min-w-0 w-full relative rounded-2xl overflow-hidden border border-outline-variant/20 aspect-[16/9]">
@@ -547,7 +547,7 @@ const Perfil = ({ isPublic = false }) => {
                   )}
                   <p className="text-on-surface text-xs leading-relaxed whitespace-pre-line line-clamp-3">
                     {user.description
-                      ? `Me gustaría decirles: ${user.description}`
+                      ? `${user.description}`
                       : "Este usuario todavía no escribió una biografía. Podés agregar la tuya desde Configuración."}
                   </p>
                 </div>
@@ -747,7 +747,7 @@ const Perfil = ({ isPublic = false }) => {
             )}
             <p className="text-on-surface text-sm leading-relaxed whitespace-pre-line">
               {user.description
-                ? `Me gustaría decirles: ${user.description}`
+                ? `${user.description}`
                 : "Este usuario todavía no escribió una biografía. Podés agregar la tuya desde Configuración."}
             </p>
           </div>
