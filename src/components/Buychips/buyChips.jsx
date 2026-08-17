@@ -29,6 +29,10 @@ const countryConfig = {
   "resto del mundo": { name: "Resto del Mundo (USD)", currency: "USD", exchangeRate: 1, symbol: "$" },
 };
 
+// Mercado Pago usa una cuenta vendedora distinta por país (cada una solo liquida
+// en su propia moneda) — mapeamos la moneda resuelta al código de país del backend.
+const CURRENCY_TO_MERCADOPAGO_COUNTRY = { COP: "co", ARS: "ar", MXN: "mx" };
+
 // Opciones de fichas disponibles
 const chipOptions = [
   { id: 1, basePrice: 1, amount: 500000, image: quinientosmil },
@@ -157,6 +161,20 @@ export default function BuyChips() {
       return;
     }
 
+    // Mercado Pago cobra siempre en la moneda real de la cuenta vendedora del país
+    // (no hay una sola cuenta "multi-moneda") — por eso mandamos el país a una ruta
+    // dedicada en vez del endpoint genérico, y el backend decide la moneda, no nosotros.
+    const mpCountry = CURRENCY_TO_MERCADOPAGO_COUNTRY[currency];
+    if (!mpCountry) {
+      Swal.fire({
+        icon: "warning",
+        title: "Mercado Pago no disponible",
+        text: "Mercado Pago no está disponible para tu país. Probá con PayPal.",
+        confirmButtonColor: "#C9A84C",
+      });
+      return;
+    }
+
     // Spec Requirement: price must be a string formatted with 2 decimal places
     const formattedPrice = (selectedChip.basePrice * exchangeRate).toFixed(2);
 
@@ -164,7 +182,6 @@ export default function BuyChips() {
       userId: currentUser.id,
       chips: parseInt(selectedChip.amount, 10), // Spec Requirement: integer
       price: formattedPrice, // Spec Requirement: string formatted
-      currency,
     };
 
     try {
@@ -176,8 +193,8 @@ export default function BuyChips() {
           Swal.showLoading();
         }
       });
-      const response = await axios.post(`${API_URL}/mepago/create-order`, payload);
-      
+      const response = await axios.post(`${API_URL}/mepago/create-order/${mpCountry}`, payload);
+
       // Spec Requirement: redirect frontend user to initPoint
       if (response.data && response.data.initPoint) {
         window.location.href = response.data.initPoint;
@@ -185,10 +202,15 @@ export default function BuyChips() {
         throw new Error("No initPoint returned from backend");
       }
     } catch (error) {
+      const backendMessage = error?.response?.data?.message;
+      const isAccountNotReady = error?.response?.status === 400 && typeof backendMessage === "string" && backendMessage.includes("todavía no está configurada");
+
       Swal.fire({
-        icon: "error",
-        title: "Error de Pasarela",
-        text: "Hubo un error al generar tu orden de pago. Inténtalo de nuevo.",
+        icon: isAccountNotReady ? "warning" : "error",
+        title: isAccountNotReady ? "Mercado Pago no disponible" : "Error de Pasarela",
+        text: isAccountNotReady
+          ? "Mercado Pago no está disponible para tu país todavía. Probá con PayPal mientras tanto."
+          : "Hubo un error al generar tu orden de pago. Inténtalo de nuevo.",
         confirmButtonColor: "#C9A84C",
       });
     }
@@ -628,8 +650,10 @@ export default function BuyChips() {
                           <PayPalButtons
                             style={{ layout: "vertical", shape: "pill", label: "pay" }}
                             createOrder={async (data, actions) => {
-                              // Spec Requirement: price must be a string ("10.00"), chips must be integer, real userId
-                              const priceStr = (selectedChip.basePrice * exchangeRate).toFixed(2);
+                              // PayPal siempre cobra en USD (ver backend: currency_code fijo en 'USD'),
+                              // así que acá NO se multiplica por exchangeRate — eso es solo para
+                              // convertir a moneda local en el flujo de Mercado Pago.
+                              const priceStr = selectedChip.basePrice.toFixed(2);
                               const chipsInt = parseInt(selectedChip.amount, 10);
                               
                               try {
@@ -651,7 +675,8 @@ export default function BuyChips() {
                             }}
                             onApprove={async (data, actions) => {
                               // Spec Requirement: Call /capture-paypal-order to close sale and credit chips
-                              const priceStr = (selectedChip.basePrice * exchangeRate).toFixed(2);
+                              // (mismo motivo que en createOrder: PayPal siempre cobra en USD)
+                              const priceStr = selectedChip.basePrice.toFixed(2);
                               const chipsInt = parseInt(selectedChip.amount, 10);
 
                               Swal.fire({
@@ -695,6 +720,14 @@ export default function BuyChips() {
                                   title: "Transacción Fallida",
                                   text: "Hubo un error con la pasarela de PayPal.",
                                   confirmButtonColor: "#C9A84C",
+                              });
+                            }}
+                            onCancel={() => {
+                              Swal.fire({
+                                icon: "info",
+                                title: "Pago cancelado",
+                                text: "Cancelaste el pago en PayPal. No se realizó ningún cargo.",
+                                confirmButtonColor: "#C9A84C",
                               });
                             }}
                           />
