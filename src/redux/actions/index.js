@@ -588,6 +588,26 @@ export const updateSiteContentImage = (key, file) => async (dispatch) => {
     dispatch({ type: SITE_CONTENT_SUCCESS, payload: { [key]: { type: 'image', imageUrl: data.imageUrl } } });
 };
 
+// ===== Banner carousel slides (the big "Bienvenida" banner on Home) =====
+
+export const fetchBannerSlides = () => async () => {
+    const { data } = await axios.get(`${API_URL}/banner-slides`);
+    return data;
+};
+
+export const createBannerSlide = (file) => async () => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const { data } = await axios.post(`${API_URL}/banner-slides`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return data;
+};
+
+export const deleteBannerSlide = (id) => async () => {
+    await axios.delete(`${API_URL}/banner-slides/${id}`);
+};
+
 // ===== News =====
 
 export const fetchNews = () => async (dispatch) => {

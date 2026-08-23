@@ -17,6 +17,7 @@ import { formatChips, swalThemeConfig } from "../../utils/formatters";
 import GamesCatalog from "../GamesCatalog/gamesCatalog";
 import EditableText from "../ui/EditableText";
 import EditableImage from "../ui/EditableImage";
+import BannerCarousel from "../ui/BannerCarousel";
 import { GAMES_CATALOG, CATEGORY_META, getGameByPlayPath, getGameBySlug } from "../../data/gamesCatalog";
 import { generateFakeOnlinePlayers } from "../../data/fakeOnlinePlayers";
 import API_URL from "../../api/rutaApi";
@@ -385,15 +386,6 @@ export default function Home() {
     }
   };
 
-  const handleClaimWelcomePackage = () => {
-    Swal.fire({
-      title: "Paquete de Bienvenida",
-      text: "¡Tu paquete de bienvenida del 100% hasta $1,000 ya está activo en tu cuenta!",
-      icon: "success",
-      ...swalThemeConfig,
-    });
-  };
-
   const handleClaimDailySpin = () => {
     Swal.fire({
       title: "Giro Diario VIP",
@@ -468,18 +460,11 @@ export default function Home() {
           {/* Promo Carousel Bento Grid */}
           <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:h-[400px]">
             {/* Main Slide */}
-            <div
-              onClick={handleClaimWelcomePackage}
-              className="lg:col-span-8 relative rounded-xl overflow-hidden border border-outline-variant/30 group cursor-pointer h-[320px] lg:h-full"
-            >
-              <EditableImage
-                contentKey="home.dashboard.banner1"
+            <div className="lg:col-span-8 relative rounded-xl overflow-hidden border border-outline-variant/30 group h-[320px] lg:h-full">
+              <BannerCarousel
                 fallbackSrc={banner1}
-                alt="Banner de Bienvenida"
-                className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700"
-                recommendedSize="1600×700px aprox., JPG o PNG"
+                className="absolute inset-0 w-full h-full object-cover object-center"
               />
-
             </div>
 
             {/* Secondary promo slides/widgets */}
