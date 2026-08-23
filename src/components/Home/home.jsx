@@ -16,6 +16,7 @@ import { ShaderAnimation } from "../ui/shader-animation";
 import { formatChips, swalThemeConfig } from "../../utils/formatters";
 import GamesCatalog from "../GamesCatalog/gamesCatalog";
 import EditableText from "../ui/EditableText";
+import EditableImage from "../ui/EditableImage";
 import { GAMES_CATALOG, CATEGORY_META, getGameByPlayPath, getGameBySlug } from "../../data/gamesCatalog";
 import { generateFakeOnlinePlayers } from "../../data/fakeOnlinePlayers";
 import API_URL from "../../api/rutaApi";
@@ -471,10 +472,12 @@ export default function Home() {
               onClick={handleClaimWelcomePackage}
               className="lg:col-span-8 relative rounded-xl overflow-hidden border border-outline-variant/30 group cursor-pointer h-[320px] lg:h-full"
             >
-              <img
+              <EditableImage
+                contentKey="home.dashboard.banner1"
+                fallbackSrc={banner1}
                 alt="Banner de Bienvenida"
                 className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700"
-                src={banner1}
+                recommendedSize="1600×700px aprox., JPG o PNG"
               />
 
             </div>
@@ -485,10 +488,12 @@ export default function Home() {
                 onClick={() => handleSoonAlert('Recarga Semanal')}
                 className="relative flex-1 rounded-xl overflow-hidden border border-outline-variant/30 group cursor-pointer"
               >
-                <img 
+                <EditableImage
+                  contentKey="home.dashboard.banner2"
+                  fallbackSrc={sportsBanner}
                   alt="Banner de Recarga Semanal"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                  src={sportsBanner} 
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  recommendedSize="800×400px aprox., JPG o PNG"
                 />
                 {/* <div className="absolute inset-0 bg-black/40 p-6 flex flex-col justify-end text-left">
                   <h3 className="font-headline-sm text-headline-sm text-white">Recarga Semanal</h3>
@@ -500,10 +505,12 @@ export default function Home() {
                 onClick={() => handleSoonAlert('Premios Pragmatic')}
                 className="relative flex-1 rounded-xl overflow-hidden border border-primary/40 group cursor-pointer gold-glow"
               >
-                <img 
+                <EditableImage
+                  contentKey="home.dashboard.banner3"
+                  fallbackSrc={bannercelu}
                   alt="Banner de Premios Pragmatic"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                  src={bannercelu} 
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  recommendedSize="800×400px aprox., JPG o PNG"
                 />
                 {/* <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent p-6 flex flex-col justify-end text-left">
                   <h3 className="font-headline-sm text-headline-sm text-primary">Premios de Pragmatic</h3>
@@ -519,7 +526,8 @@ export default function Home() {
             <section className="xl:col-span-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-headline-sm text-headline-sm flex items-center gap-2 text-white">
-                  <span className="material-symbols-outlined text-primary">star</span> Juegos Populares
+                  <span className="material-symbols-outlined text-primary">star</span>
+                  <EditableText contentKey="home.dashboard.popularGamesTitle" as="span">Juegos Populares</EditableText>
                 </h2>
                 <div className="flex gap-2">
                   <button
