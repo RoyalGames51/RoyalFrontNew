@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import API_URL from "../../../api/rutaApi";
 
 const STATUS_META = {
@@ -19,29 +20,59 @@ const PLATFORM_LABELS = {
 
 export default function AdminDeposits() {
   const navigate = useNavigate();
+  const viewerIsAdmin = useSelector((state) => state.currentUser?.role) === "admin";
   const [deposits, setDeposits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [forbidden, setForbidden] = useState(false);
 
   useEffect(() => {
+    if (!viewerIsAdmin) {
+      setLoading(false);
+      return;
+    }
     const fetchDeposits = async () => {
       try {
         setLoading(true);
         const { data } = await axios.get(`${API_URL}/admin/deposits`);
         setDeposits(data);
       } catch (error) {
+        if (error.response?.status === 403) setForbidden(true);
       } finally {
         setLoading(false);
       }
     };
     fetchDeposits();
-  }, []);
+  }, [viewerIsAdmin]);
 
   const filtered = statusFilter === "all" ? deposits : deposits.filter((d) => d.status === statusFilter);
 
   const approvedTotal = deposits
     .filter((d) => d.status === "approved")
     .reduce((sum, d) => sum + Number(d.chips || 0), 0);
+
+  // El listado global de cargas es un resumen de dinero de toda la plataforma — solo-admin.
+  // Los mods pueden seguir viendo los depósitos de UN cliente puntual, desde la sección
+  // "Actividad" en el detalle de ese usuario (UserDetailModal), no acá.
+  if (!viewerIsAdmin || forbidden) {
+    return (
+      <div className="bg-background text-on-background min-h-screen pt-20 pb-12 flex items-center justify-center">
+        <div className="text-center max-w-md px-6">
+          <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4 block">lock</span>
+          <h2 className="font-headline-md text-headline-md text-white mb-2">Acceso Restringido</h2>
+          <p className="text-on-surface-variant text-sm mb-6">
+            El listado completo de cargas es solo para administradores. Si necesitás ver los depósitos de un cliente puntual, buscalo en Usuarios y abrí su Actividad.
+          </p>
+          <button
+            onClick={() => navigate('/admin/dashboard')}
+            className="px-6 py-2.5 rounded-xl border border-outline-variant/30 text-on-surface font-label-lg hover:bg-surface-variant/20 transition-all"
+          >
+            Volver al Panel
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-background text-on-background min-h-screen pt-20 pb-12">

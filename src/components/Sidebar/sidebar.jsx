@@ -29,11 +29,14 @@ export default function Sidebar() {
     { to: "/ayuda", icon: "support_agent", label: "Ayuda" },
   ];
 
+  // "Cargas" es el listado global de depósitos de toda la plataforma (un resumen de dinero) —
+  // queda admin-only, igual que el backend. Los mods igual pueden ver los depósitos de UN
+  // cliente puntual, pero desde la sección "Actividad" del detalle de ese usuario, no acá.
   const adminItems = [
     { to: "/admin/dashboard", icon: "dashboard", label: "Panel Admin" },
     { to: "/admin/users", icon: "manage_accounts", label: "Usuarios" },
     { to: "/admin/tickets", icon: "support_agent", label: "Tickets" },
-    { to: "/admin/deposits", icon: "payments", label: "Cargas" },
+    ...(currentUser?.role === "admin" ? [{ to: "/admin/deposits", icon: "payments", label: "Cargas" }] : []),
     { to: "/admin/prizes", icon: "emoji_events", label: "Premios" },
     { to: "/admin/referrals", icon: "diversity_3", label: "Referidos" },
   ];

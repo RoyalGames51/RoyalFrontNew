@@ -10,7 +10,76 @@ import {
   deleteUserAccount,
   adminSetUserEmail,
   adminSetUserPassword,
+  adminSetUserDescription,
+  fetchUserActivitySummary,
+  fetchUserChipsHistory,
+  fetchUserMinesRounds,
+  fetchUserBingoActivity,
+  fetchUserPaymentsHistory,
+  fetchModAudit,
 } from '../../../redux/actions';
+
+const fmtChips = (n) => new Intl.NumberFormat('es-ES').format(Number(n) || 0);
+const fmtDate = (d) => (d ? new Date(d).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—');
+
+// Reused for every "Actividad"/"Auditoría" section — collapsed by default, only fetches its
+// detail data (via `fetchFn`) the first time it's expanded, so opening the modal itself stays
+// cheap regardless of how much history a user has.
+function ActivityAccordion({ title, badge, fetchFn, children: renderContent, defaultOpen = false }) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleToggle = async () => {
+    const willOpen = !isOpen;
+    setIsOpen(willOpen);
+    if (willOpen && data === null && !loading) {
+      setLoading(true);
+      setError(null);
+      try {
+        setData(await fetchFn());
+      } catch (err) {
+        setError('No se pudo cargar la información.');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  return (
+    <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl overflow-hidden">
+      <button
+        type="button"
+        onClick={handleToggle}
+        className="w-full flex items-center justify-between gap-4 px-4 py-3 text-left bg-transparent border-0 cursor-pointer"
+      >
+        <span className="font-semibold text-on-surface text-sm">{title}</span>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {badge != null && (
+            <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5">
+              {badge}
+            </span>
+          )}
+          <span className={`material-symbols-outlined text-on-surface-variant text-[18px] transition-transform ${isOpen ? 'rotate-180' : ''}`}>
+            expand_more
+          </span>
+        </div>
+      </button>
+      {isOpen && (
+        <div className="px-4 pb-4 border-t border-outline-variant/10 pt-3">
+          {loading && <p className="text-on-surface-variant text-xs">Cargando...</p>}
+          {error && <p className="text-error text-xs">{error}</p>}
+          {!loading && !error && data && renderContent(data)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EmptyRow({ text = 'Sin movimientos.' }) {
+  return <p className="text-on-surface-variant text-xs py-2">{text}</p>;
+}
 
 const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
   const dispatch = useDispatch();
@@ -21,13 +90,20 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
   const [newRole, setNewRole] = useState(user?.role || 'user');
   const [newEmail, setNewEmail] = useState(user?.email || '');
   const [newPassword, setNewPassword] = useState('');
+  const [newDescription, setNewDescription] = useState(user?.description || '');
   const [loading, setLoading] = useState(false);
+  const [activitySummary, setActivitySummary] = useState(null);
 
   // The modal is a single persistent instance reused for every user, so this keeps the
   // email field from showing a stale value when the admin selects a different user.
   useEffect(() => {
     setNewEmail(user?.email || '');
-  }, [user?.id]);
+    setNewDescription(user?.description || '');
+    setActivitySummary(null);
+    if (user?.id && isOpen) {
+      dispatch(fetchUserActivitySummary(user.id)).then(setActivitySummary).catch(() => {});
+    }
+  }, [user?.id, isOpen]);
 
   const handleAddChips = async () => {
     if (!chipsAmount || isNaN(chipsAmount) || Number(chipsAmount) <= 0) {
@@ -161,6 +237,24 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
       setNewPassword('');
     } catch (error) {
       Swal.fire('Error', error.response?.data?.message || 'No se pudo restablecer la contraseña', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChangeDescription = async () => {
+    if (newDescription.trim() === (user?.description || '')) {
+      Swal.fire('Info', 'No hay cambios en la descripción', 'info');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await dispatch(adminSetUserDescription(user.id, newDescription.trim()));
+      Swal.fire('Éxito', 'Descripción actualizada correctamente', 'success');
+      onUserUpdate();
+    } catch (error) {
+      Swal.fire('Error', error.response?.data?.message || 'No se pudo actualizar la descripción', 'error');
     } finally {
       setLoading(false);
     }
@@ -381,6 +475,218 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                   </button>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Description */}
+          <div className="space-y-4">
+            <h4 className="font-label-lg text-label-lg text-on-surface uppercase tracking-wider">
+              Descripción del Perfil
+            </h4>
+            <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-4 space-y-3">
+              <textarea
+                rows={3}
+                placeholder="Sin descripción"
+                value={newDescription}
+                onChange={(e) => setNewDescription(e.target.value)}
+                className="w-full bg-background border border-outline-variant/30 rounded-lg px-4 py-2 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-none"
+                disabled={loading}
+              />
+              <button
+                onClick={handleChangeDescription}
+                disabled={loading}
+                className="px-4 py-2 bg-primary text-on-primary rounded-lg font-semibold hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Guardar Descripción
+              </button>
+            </div>
+          </div>
+
+          {/* Activity — collapsed accordions, detail fetched lazily on first expand */}
+          <div className="space-y-4" key={`activity-${user.id}`}>
+            <h4 className="font-label-lg text-label-lg text-on-surface uppercase tracking-wider">
+              Actividad
+            </h4>
+            <div className="space-y-2">
+              <ActivityAccordion
+                title="Fichas"
+                badge={activitySummary ? `${activitySummary.chipsMovements} movimientos` : '...'}
+                fetchFn={() => dispatch(fetchUserChipsHistory(user.id))}
+              >
+                {(items) => (items.length === 0 ? <EmptyRow /> : (
+                  <div className="space-y-1.5 max-h-56 overflow-y-auto">
+                    {items.map((it) => (
+                      <div key={it.id} className="flex items-center justify-between text-xs gap-2 py-1 border-b border-outline-variant/5 last:border-0">
+                        <div className="min-w-0">
+                          <p className="text-on-surface capitalize truncate">{it.type.replace('_', ' ')}</p>
+                          <p className="text-on-surface-variant">{fmtDate(it.date)}</p>
+                        </div>
+                        <span className={`font-bold flex-shrink-0 ${it.chips >= 0 ? 'text-green-500' : 'text-error'}`}>
+                          {it.chips >= 0 ? '+' : ''}{fmtChips(it.chips)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </ActivityAccordion>
+
+              <ActivityAccordion
+                title="Minas"
+                badge={activitySummary ? `${activitySummary.mines.totalRounds} rondas` : '...'}
+                fetchFn={() => dispatch(fetchUserMinesRounds(user.id))}
+              >
+                {({ summary, rounds }) => (
+                  <>
+                    <div className="grid grid-cols-3 gap-2 mb-3 text-center">
+                      <div><p className="text-on-surface-variant text-[10px] uppercase">Rondas</p><p className="text-on-surface font-bold text-sm">{summary.totalRounds}</p></div>
+                      <div><p className="text-on-surface-variant text-[10px] uppercase">Apostado</p><p className="text-on-surface font-bold text-sm">{fmtChips(summary.totalWagered)}</p></div>
+                      <div><p className="text-on-surface-variant text-[10px] uppercase">Ganado</p><p className="text-green-500 font-bold text-sm">{fmtChips(summary.totalWon)}</p></div>
+                    </div>
+                    {rounds.length === 0 ? <EmptyRow /> : (
+                      <div className="space-y-1.5 max-h-56 overflow-y-auto">
+                        {rounds.map((r) => (
+                          <div key={r.id} className="flex items-center justify-between text-xs gap-2 py-1 border-b border-outline-variant/5 last:border-0">
+                            <div className="min-w-0">
+                              <p className="text-on-surface capitalize truncate">{r.status.replace('_', ' ')} · {fmtChips(r.betAmount)} fichas</p>
+                              <p className="text-on-surface-variant">{fmtDate(r.createdAt)}</p>
+                            </div>
+                            <span className={`font-bold flex-shrink-0 ${r.status === 'cashed_out' ? 'text-green-500' : 'text-on-surface-variant'}`}>
+                              {r.status === 'cashed_out' ? `+${fmtChips(r.accumulatedWinnings)}` : '—'}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </ActivityAccordion>
+
+              <ActivityAccordion
+                title="Bingo"
+                badge={activitySummary ? `${activitySummary.bingo.cardsGiftedSent} cartones regalados` : '...'}
+                fetchFn={() => dispatch(fetchUserBingoActivity(user.id))}
+              >
+                {({ summary, winnings, giftsSent, giftsReceived }) => (
+                  <>
+                    <div className="grid grid-cols-3 gap-2 mb-3 text-center">
+                      <div><p className="text-on-surface-variant text-[10px] uppercase">Ganado</p><p className="text-green-500 font-bold text-sm">{fmtChips(summary.totalWon)}</p></div>
+                      <div><p className="text-on-surface-variant text-[10px] uppercase">Cartones dados</p><p className="text-on-surface font-bold text-sm">{summary.cardsGiftedSent}</p></div>
+                      <div><p className="text-on-surface-variant text-[10px] uppercase">Cartones recibidos</p><p className="text-on-surface font-bold text-sm">{summary.cardsGiftedReceived}</p></div>
+                    </div>
+                    {winnings.length === 0 && giftsSent.length === 0 && giftsReceived.length === 0 ? <EmptyRow /> : (
+                      <div className="space-y-1.5 max-h-56 overflow-y-auto">
+                        {winnings.map((w) => (
+                          <div key={w.id} className="flex items-center justify-between text-xs gap-2 py-1 border-b border-outline-variant/5 last:border-0">
+                            <div className="min-w-0"><p className="text-on-surface capitalize truncate">Premio · {w.winType}</p><p className="text-on-surface-variant">{fmtDate(w.createdAt)}</p></div>
+                            <span className="font-bold text-green-500 flex-shrink-0">+{fmtChips(w.prizeAmount)}</span>
+                          </div>
+                        ))}
+                        {giftsSent.map((g) => (
+                          <div key={g.id} className="flex items-center justify-between text-xs gap-2 py-1 border-b border-outline-variant/5 last:border-0">
+                            <div className="min-w-0"><p className="text-on-surface truncate">Regaló {g.payload?.quantity} cartones</p><p className="text-on-surface-variant">{fmtDate(g.createdAt)}</p></div>
+                          </div>
+                        ))}
+                        {giftsReceived.map((g) => (
+                          <div key={g.id} className="flex items-center justify-between text-xs gap-2 py-1 border-b border-outline-variant/5 last:border-0">
+                            <div className="min-w-0"><p className="text-on-surface truncate">Recibió {g.payload?.quantity} cartones</p><p className="text-on-surface-variant">{fmtDate(g.createdAt)}</p></div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </ActivityAccordion>
+
+              <ActivityAccordion
+                title="Depósitos"
+                badge={activitySummary ? `${activitySummary.paymentsCount} pagos` : '...'}
+                fetchFn={() => dispatch(fetchUserPaymentsHistory(user.id))}
+              >
+                {(payments) => (payments.length === 0 ? <EmptyRow text="Sin depósitos registrados." /> : (
+                  <div className="space-y-1.5 max-h-56 overflow-y-auto">
+                    {payments.map((p) => (
+                      <div key={p.id} className="flex items-center justify-between text-xs gap-2 py-1 border-b border-outline-variant/5 last:border-0">
+                        <div className="min-w-0">
+                          <p className="text-on-surface truncate">{p.paymentPlatform} · {fmtChips(p.chips)} fichas</p>
+                          <p className="text-on-surface-variant">{fmtDate(p.createdAt)}</p>
+                        </div>
+                        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full flex-shrink-0 ${
+                          p.status === 'approved' ? 'text-green-500 bg-green-500/10' : p.status === 'pending' ? 'text-yellow-500 bg-yellow-500/10' : 'text-error bg-error/10'
+                        }`}>
+                          {p.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </ActivityAccordion>
+            </div>
+          </div>
+
+          {/* Moderator Audit — admin-only, only shown when viewing a mod's own account */}
+          {viewerIsAdmin && user.role === 'mod' && (
+            <div className="space-y-4">
+              <h4 className="font-label-lg text-label-lg text-primary uppercase tracking-wider flex items-center gap-2">
+                <span className="material-symbols-outlined text-[18px]">shield_person</span>
+                Auditoría de Moderador
+              </h4>
+              <p className="text-on-surface-variant text-xs -mt-2">
+                Solo vos como admin ves esto: lo que este mod hizo desde el panel y jugando.
+              </p>
+              <ActivityAccordion
+                title="Movimientos de este mod"
+                badge={null}
+                fetchFn={() => dispatch(fetchModAudit(user.id))}
+                defaultOpen={false}
+              >
+                {({ panelGrants, selfGifts, cardGifts }) => (
+                  panelGrants.length === 0 && selfGifts.length === 0 && cardGifts.length === 0 ? (
+                    <EmptyRow text="Este mod no tiene movimientos registrados." />
+                  ) : (
+                    <div className="space-y-3">
+                      {panelGrants.length > 0 && (
+                        <div>
+                          <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Fichas cargadas/quitadas desde el panel</p>
+                          <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                            {panelGrants.map((g) => (
+                              <div key={g.id} className="flex items-center justify-between text-xs gap-2 py-1 border-b border-outline-variant/5 last:border-0">
+                                <div className="min-w-0"><p className="text-on-surface truncate">A {g.recipientNick || 'usuario eliminado'}</p><p className="text-on-surface-variant">{fmtDate(g.createdAt)}</p></div>
+                                <span className={`font-bold flex-shrink-0 ${g.amount >= 0 ? 'text-green-500' : 'text-error'}`}>{g.amount >= 0 ? '+' : ''}{fmtChips(g.amount)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {selfGifts.length > 0 && (
+                        <div>
+                          <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Fichas que se regaló él/ella mismo/a jugando</p>
+                          <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                            {selfGifts.map((g) => (
+                              <div key={g.id} className="flex items-center justify-between text-xs gap-2 py-1 border-b border-outline-variant/5 last:border-0">
+                                <p className="text-on-surface-variant">{fmtDate(g.createdAt)}</p>
+                                <span className="font-bold text-error flex-shrink-0">{fmtChips(g.amount)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {cardGifts.length > 0 && (
+                        <div>
+                          <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Cartones de bingo que regaló</p>
+                          <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                            {cardGifts.map((g) => (
+                              <div key={g.id} className="flex items-center justify-between text-xs gap-2 py-1 border-b border-outline-variant/5 last:border-0">
+                                <p className="text-on-surface-variant">{fmtDate(g.createdAt)}</p>
+                                <span className="font-bold text-on-surface flex-shrink-0">{g.payload?.quantity} cartones</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                )}
+              </ActivityAccordion>
             </div>
           )}
 

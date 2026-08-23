@@ -13,7 +13,8 @@ import LogOut from './components/Logout/logout';
 import GameGrid from './components/Juegos/juegos';
 import News from './components/News/news';
 import regaloBienvenida from '../src/assets/regalobienvenida.png';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchSiteContent } from './redux/actions';
 import TermsAndConditions from './components/termsyConds/terminosYCondiciones';
 import axios from 'axios';
 import Diamantes from './components/Juegos/Diamantes/diamantes';
@@ -49,6 +50,13 @@ function App() {
   const [showWelcomeGift, setShowWelcomeGift] = useState(false);
   const { currentUser } = useSelector((state) => state);
   const location = useLocation();
+  const dispatch = useDispatch();
+
+  // Site-wide editable text/image overrides (Inicio, Nosotros, etc.) — public, needed even
+  // for guests, fetched once on app load.
+  useEffect(() => {
+    dispatch(fetchSiteContent());
+  }, [dispatch]);
 
   useEffect(() => {
     const checkWelcomeGift = async () => {

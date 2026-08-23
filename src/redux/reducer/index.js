@@ -10,6 +10,8 @@ import {
     ADMIN_OVERVIEW_SUCCESS, ADMIN_ACTION_ERROR,
     SUPPORT_TICKETS_SUCCESS, SUPPORT_ALL_TICKETS_SUCCESS, SUPPORT_TICKET_DETAIL_SUCCESS, SUPPORT_ACTION_ERROR,
     BLOCKS_STATUS_SUCCESS, BLOCKS_LIST_SUCCESS, BLOCKS_ACTION_ERROR,
+    SITE_CONTENT_SUCCESS, SITE_CONTENT_ACTION_ERROR,
+    NEWS_LIST_SUCCESS, NEWS_ACTION_ERROR,
 } from "../actions/action.types";
 
 const initialState = {
@@ -44,6 +46,11 @@ const initialState = {
     },
     blocks: {
         status: {},
+        list: [],
+        error: null,
+    },
+    siteContent: {},
+    news: {
         list: [],
         error: null,
     },
@@ -234,6 +241,20 @@ const reducer = (state = initialState, action) => {
 
         case BLOCKS_ACTION_ERROR:
             return { ...state, blocks: { ...state.blocks, error: action.payload } };
+
+        // Manejo de contenido editable del sitio
+        case SITE_CONTENT_SUCCESS:
+            return { ...state, siteContent: { ...state.siteContent, ...action.payload } };
+
+        case SITE_CONTENT_ACTION_ERROR:
+            return state;
+
+        // Manejo de noticias
+        case NEWS_LIST_SUCCESS:
+            return { ...state, news: { ...state.news, list: action.payload, error: null } };
+
+        case NEWS_ACTION_ERROR:
+            return { ...state, news: { ...state.news, error: action.payload } };
 
         default:
             return state;

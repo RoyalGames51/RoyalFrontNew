@@ -15,6 +15,7 @@ import RegistroForm from "../Register/register";
 import { ShaderAnimation } from "../ui/shader-animation";
 import { formatChips, swalThemeConfig } from "../../utils/formatters";
 import GamesCatalog from "../GamesCatalog/gamesCatalog";
+import EditableText from "../ui/EditableText";
 import { GAMES_CATALOG, CATEGORY_META, getGameByPlayPath, getGameBySlug } from "../../data/gamesCatalog";
 import { generateFakeOnlinePlayers } from "../../data/fakeOnlinePlayers";
 import API_URL from "../../api/rutaApi";
@@ -742,9 +743,12 @@ export default function Home() {
                 <div ref={threeDChipRef} id="three-d-chip" className="absolute inset-0 w-full h-full pointer-events-auto" />
               </span>
             </h1>
-            <p className="text-on-surface-variant text-lg md:text-xl font-light tracking-tight mb-6">
+            <EditableText
+              contentKey="home.heroTagline"
+              className="text-on-surface-variant text-lg md:text-xl font-light tracking-tight mb-6"
+            >
               La mejor pagina de juegos
-            </p>
+            </EditableText>
             <div className="flex flex-col items-center gap-6 relative">
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                 <RegistroForm className="px-14 py-5 rounded-full gold-gradient text-black font-bold text-sm uppercase tracking-[0.2em] shadow-2xl btn-hover-glow transition-all cursor-pointer border-0">
@@ -803,26 +807,32 @@ export default function Home() {
         <div className="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-3 gap-20">
           <div className="text-center reveal" style={{ transitionDelay: "0.1s" }}>
             <span className="material-symbols-outlined text-primary text-5xl mb-6">casino</span>
-            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Juego Limpio y Parejo</h4>
-            <p className="text-on-surface-variant font-light text-sm leading-relaxed">
+            <EditableText contentKey="home.why1.title" as="h4" className="text-white font-bold text-xl mb-4 tracking-tight">
+              Juego Limpio y Parejo
+            </EditableText>
+            <EditableText contentKey="home.why1.text" className="text-on-surface-variant font-light text-sm leading-relaxed">
               Los resultados son siempre al azar, iguales para todos. Acá se juega por diversión, sin trampas de la casa.
-            </p>
+            </EditableText>
           </div>
 
           <div className="text-center reveal" style={{ transitionDelay: "0.2s" }}>
             <span className="material-symbols-outlined text-primary text-5xl mb-6">shield_lock</span>
-            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Tu Cuenta, Segura</h4>
-            <p className="text-on-surface-variant font-light text-sm leading-relaxed">
+            <EditableText contentKey="home.why2.title" as="h4" className="text-white font-bold text-xl mb-4 tracking-tight">
+              Tu Cuenta, Segura
+            </EditableText>
+            <EditableText contentKey="home.why2.text" className="text-on-surface-variant font-light text-sm leading-relaxed">
               Cuidamos tus datos y tu progreso con buenas prácticas de seguridad, para que solo te preocupes por jugar.
-            </p>
+            </EditableText>
           </div>
 
           <div className="text-center reveal" style={{ transitionDelay: "0.3s" }}>
             <span className="material-symbols-outlined text-primary text-5xl mb-6">support_agent</span>
-            <h4 className="text-white font-bold text-xl mb-4 tracking-tight">Te Acompañamos Siempre</h4>
-            <p className="text-on-surface-variant font-light text-sm leading-relaxed">
+            <EditableText contentKey="home.why3.title" as="h4" className="text-white font-bold text-xl mb-4 tracking-tight">
+              Te Acompañamos Siempre
+            </EditableText>
+            <EditableText contentKey="home.why3.text" className="text-on-surface-variant font-light text-sm leading-relaxed">
               ¿Dudas o algún problema? Nuestro equipo real está a un mensaje de distancia, mandanos tu consulta y responderemos enseguida.
-            </p>
+            </EditableText>
           </div>
         </div>
       </section>

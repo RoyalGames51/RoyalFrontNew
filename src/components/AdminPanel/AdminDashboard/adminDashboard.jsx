@@ -21,6 +21,10 @@ const AdminDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const overview = useSelector((state) => state.adminOverview);
+  // Money summaries (circulation/deposited totals, recent-payments feed) are admin-only — the
+  // backend already strips them from the response for mods, this just keeps the UI from trying
+  // to render fields that no longer exist instead of duplicating the role check pointlessly.
+  const viewerIsAdmin = useSelector((state) => state.currentUser?.role) === 'admin';
 
   useEffect(() => {
     dispatch(fetchAdminOverview());
@@ -32,8 +36,12 @@ const AdminDashboard = () => {
         { id: 2, title: 'Conectados Ahora', value: numberFormat(overview.onlineUsers), icon: 'bolt', isPositive: true },
         { id: 3, title: 'Nuevos Hoy', value: numberFormat(overview.newSignupsToday), icon: 'person_add', isPositive: true },
         { id: 4, title: 'Usuarios Baneados', value: numberFormat(overview.bannedUsers), icon: 'block', isPositive: false },
-        { id: 5, title: 'Fichas en Circulación', value: numberFormat(overview.totalChipsInCirculation), icon: 'payments' },
-        { id: 6, title: 'Fichas Depositadas (Total)', value: numberFormat(overview.totalChipsDeposited), icon: 'account_balance_wallet' },
+        ...(viewerIsAdmin
+          ? [
+              { id: 5, title: 'Fichas en Circulación', value: numberFormat(overview.totalChipsInCirculation), icon: 'payments' },
+              { id: 6, title: 'Fichas Depositadas (Total)', value: numberFormat(overview.totalChipsDeposited), icon: 'account_balance_wallet' },
+            ]
+          : []),
       ]
     : [];
 
@@ -98,10 +106,12 @@ const AdminDashboard = () => {
                 <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Transacciones</p>
                 <p className="font-headline-md text-headline-md text-primary">{numberFormat(overview.depositsTodayCount)}</p>
               </div>
-              <div className="text-right">
-                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Fichas Depositadas</p>
-                <p className="font-headline-md text-headline-md text-primary">{numberFormat(overview.depositsTodayChips)}</p>
-              </div>
+              {viewerIsAdmin && (
+                <div className="text-right">
+                  <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Fichas Depositadas</p>
+                  <p className="font-headline-md text-headline-md text-primary">{numberFormat(overview.depositsTodayChips)}</p>
+                </div>
+              )}
             </div>
           </div>
           <div className="bg-surface-container border border-outline-variant/20 rounded-xl p-6">
@@ -124,38 +134,40 @@ const AdminDashboard = () => {
         </div>
 
         {/* Activity & Top Players */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Recent Activity */}
-          <div className="bg-surface-container border border-outline-variant/20 rounded-xl flex flex-col overflow-hidden">
-            <div className="p-6 border-b border-outline-variant/10">
-              <h4 className="font-headline-sm text-headline-sm text-on-surface">
-                Depósitos Recientes
-              </h4>
-            </div>
+        <div className={`grid grid-cols-1 ${viewerIsAdmin ? 'lg:grid-cols-2' : ''} gap-4`}>
+          {/* Recent Activity — a platform-wide money feed, admin-only */}
+          {viewerIsAdmin && (
+            <div className="bg-surface-container border border-outline-variant/20 rounded-xl flex flex-col overflow-hidden">
+              <div className="p-6 border-b border-outline-variant/10">
+                <h4 className="font-headline-sm text-headline-sm text-on-surface">
+                  Depósitos Recientes
+                </h4>
+              </div>
 
-            <div className="flex-grow overflow-y-auto p-6 space-y-6 max-h-[420px]">
-              {overview.recentPayments.length === 0 ? (
-                <p className="text-on-surface-variant text-sm">Todavía no hay depósitos registrados.</p>
-              ) : (
-                overview.recentPayments.map((payment, index) => (
-                  <div key={index} className="flex gap-4">
-                    <div className="w-10 h-10 rounded-full border border-outline-variant/20 flex items-center justify-center shrink-0 bg-surface-container-high">
-                      <span className="material-symbols-outlined text-[18px] text-primary">payments</span>
+              <div className="flex-grow overflow-y-auto p-6 space-y-6 max-h-[420px]">
+                {overview.recentPayments.length === 0 ? (
+                  <p className="text-on-surface-variant text-sm">Todavía no hay depósitos registrados.</p>
+                ) : (
+                  overview.recentPayments.map((payment, index) => (
+                    <div key={index} className="flex gap-4">
+                      <div className="w-10 h-10 rounded-full border border-outline-variant/20 flex items-center justify-center shrink-0 bg-surface-container-high">
+                        <span className="material-symbols-outlined text-[18px] text-primary">payments</span>
+                      </div>
+                      <div>
+                        <p className="text-body-sm text-on-surface">
+                          <span className="font-bold text-primary">{payment.nick}</span>{' '}
+                          depositó{' '}
+                          <span className="text-primary font-bold">{numberFormat(payment.chips)} fichas</span>
+                          {' '}vía {payment.paymentPlatform}
+                        </p>
+                        <p className="text-[11px] text-on-surface-variant mt-1">{timeAgo(payment.createdAt)}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-body-sm text-on-surface">
-                        <span className="font-bold text-primary">{payment.nick}</span>{' '}
-                        depositó{' '}
-                        <span className="text-primary font-bold">{numberFormat(payment.chips)} fichas</span>
-                        {' '}vía {payment.paymentPlatform}
-                      </p>
-                      <p className="text-[11px] text-on-surface-variant mt-1">{timeAgo(payment.createdAt)}</p>
-                    </div>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Top Players by Chips */}
           <div className="bg-surface-container border border-outline-variant/20 rounded-xl flex flex-col overflow-hidden">

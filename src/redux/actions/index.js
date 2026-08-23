@@ -36,6 +36,10 @@ import {
     BLOCKS_STATUS_SUCCESS,
     BLOCKS_LIST_SUCCESS,
     BLOCKS_ACTION_ERROR,
+    SITE_CONTENT_SUCCESS,
+    SITE_CONTENT_ACTION_ERROR,
+    NEWS_LIST_SUCCESS,
+    NEWS_ACTION_ERROR,
 } from "./action.types";
 import axios from 'axios';
 
@@ -467,6 +471,45 @@ export const adminSetUserPassword = (userId, newPassword) => async () => {
     await axios.patch(`${API_URL}/admin/users/${userId}/password`, { newPassword });
 };
 
+export const adminSetUserDescription = (userId, description) => async () => {
+    const { data } = await axios.patch(`${API_URL}/admin/users/${userId}/description`, { description });
+    return data;
+};
+
+// ===== User activity + mod audit (admin/mod panel) =====
+// These return data directly instead of dispatching — the data is per-open-modal, kept in
+// local component state, not global Redux state.
+
+export const fetchUserActivitySummary = (userId) => async () => {
+    const { data } = await axios.get(`${API_URL}/admin/users/${userId}/activity-summary`);
+    return data;
+};
+
+export const fetchUserChipsHistory = (userId) => async () => {
+    const { data } = await axios.get(`${API_URL}/admin/users/${userId}/chips-history`);
+    return data;
+};
+
+export const fetchUserMinesRounds = (userId) => async () => {
+    const { data } = await axios.get(`${API_URL}/admin/users/${userId}/mines-rounds`);
+    return data;
+};
+
+export const fetchUserBingoActivity = (userId) => async () => {
+    const { data } = await axios.get(`${API_URL}/admin/users/${userId}/bingo-activity`);
+    return data;
+};
+
+export const fetchUserPaymentsHistory = (userId) => async () => {
+    const { data } = await axios.get(`${API_URL}/payments/user/${userId}`);
+    return data;
+};
+
+export const fetchModAudit = (modId) => async () => {
+    const { data } = await axios.get(`${API_URL}/admin/mods/${modId}/audit`);
+    return data;
+};
+
 // ===== Support Tickets =====
 
 export const fetchMyTickets = () => async (dispatch) => {
@@ -518,4 +561,59 @@ export const updateTicketStatus = (ticketId, status) => async (dispatch) => {
     await axios.patch(`${API_URL}/support/tickets/${ticketId}/status`, { status });
     dispatch(fetchTicketDetail(ticketId));
     dispatch(fetchAllTickets());
+};
+
+// ===== Site Content (admin/mod inline editing) =====
+
+export const fetchSiteContent = () => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`${API_URL}/site-content`);
+        dispatch({ type: SITE_CONTENT_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({ type: SITE_CONTENT_ACTION_ERROR, payload: error.message });
+    }
+};
+
+export const updateSiteContentText = (key, text) => async (dispatch) => {
+    await axios.patch(`${API_URL}/site-content/${key}`, { text });
+    dispatch({ type: SITE_CONTENT_SUCCESS, payload: { [key]: { type: 'text', text } } });
+};
+
+export const updateSiteContentImage = (key, file) => async (dispatch) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const { data } = await axios.put(`${API_URL}/site-content/${key}/image`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    dispatch({ type: SITE_CONTENT_SUCCESS, payload: { [key]: { type: 'image', imageUrl: data.imageUrl } } });
+};
+
+// ===== News =====
+
+export const fetchNews = () => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`${API_URL}/news`);
+        dispatch({ type: NEWS_LIST_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({ type: NEWS_ACTION_ERROR, payload: error.message });
+    }
+};
+
+export const createNewsArticle = (formData) => async (dispatch) => {
+    await axios.post(`${API_URL}/news`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    dispatch(fetchNews());
+};
+
+export const updateNewsArticle = (id, formData) => async (dispatch) => {
+    await axios.patch(`${API_URL}/news/${id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    dispatch(fetchNews());
+};
+
+export const deleteNewsArticle = (id) => async (dispatch) => {
+    await axios.delete(`${API_URL}/news/${id}`);
+    dispatch(fetchNews());
 };
