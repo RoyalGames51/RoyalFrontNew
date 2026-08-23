@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import FavoriteButton from "./FavoriteButton";
 import { fetchFavoriteGames } from "../../redux/actions";
 import { GAMES_CATALOG, CATEGORY_META, CATEGORY_ORDER } from "../../data/gamesCatalog";
+import EditableImage from "../ui/EditableImage";
 
 export default function GameGrid() {
   const navigate = useNavigate();
@@ -83,10 +84,12 @@ export default function GameGrid() {
               >
                 <div className={`aspect-square overflow-hidden flex items-center justify-center bg-gradient-to-br from-surface-container-high to-surface-container-low ${!isActive ? "grayscale" : ""}`}>
                   {game.image ? (
-                    <img
-                      src={game.image}
+                    <EditableImage
+                      contentKey={`games.${game.slug}.cover`}
+                      fallbackSrc={game.image}
                       alt={game.name}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      recommendedSize="600×800px aprox. (vertical), JPG o PNG"
                     />
                   ) : (
                     <span className="material-symbols-outlined text-[64px] text-on-surface-variant/40">

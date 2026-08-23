@@ -552,10 +552,12 @@ export default function Home() {
                     className="group relative bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant/20 hover:border-primary/50 transition-all hover:-translate-y-1"
                   >
                     <div className="aspect-[3/4] overflow-hidden">
-                      <img
-                        className="w-full h-full object-cover"
-                        src={game.image}
+                      <EditableImage
+                        contentKey={`games.${game.slug}.cover`}
+                        fallbackSrc={game.image}
                         alt={game.name}
+                        className="w-full h-full object-cover"
+                        recommendedSize="600×800px aprox. (vertical), JPG o PNG"
                       />
                     </div>
                     <div className="p-3 text-left">

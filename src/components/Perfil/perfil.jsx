@@ -63,6 +63,14 @@ const Perfil = ({ isPublic = false }) => {
   // get here, so editing controls can never be exposed while looking at someone else's data.
   const isOwnProfile = !!currentUser?.id && !!user?.id && currentUser.id === user.id;
 
+  // Declared this early (not further down with the other helpers) because the "Usuario
+  // Baneado" branch below returns before reaching a later declaration — a `const` referenced
+  // before its own line runs is a ReferenceError (temporal dead zone), not just "undefined".
+  const capitalize = (text) => {
+    if (!text) return text;
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  };
+
   // Form states for updates
   const [formData, setFormData] = useState({
     nick: "",
@@ -355,11 +363,6 @@ const Perfil = ({ isPublic = false }) => {
   const getInitials = (nickName) => {
     if (!nickName) return "RG";
     return nickName.slice(0, 2).toUpperCase();
-  };
-
-  const capitalize = (text) => {
-    if (!text) return text;
-    return text.charAt(0).toUpperCase() + text.slice(1);
   };
 
   const totalChips = user.chips || 0;

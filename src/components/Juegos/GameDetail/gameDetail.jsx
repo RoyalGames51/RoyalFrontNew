@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import { CATEGORY_META, getGameBySlug } from "../../../data/gamesCatalog";
 import { swalThemeConfig } from "../../../utils/formatters";
 import API_URL from "../../../api/rutaApi";
+import EditableImage from "../../ui/EditableImage";
 
 export default function GameDetail() {
   const { slug } = useParams();
@@ -63,7 +64,13 @@ export default function GameDetail() {
       {/* Banner */}
       <div className="relative w-full h-56 md:h-80 rounded-xl overflow-hidden border border-outline-variant/20 mb-8">
         {game.image ? (
-          <img src={game.image} alt={game.name} className="w-full h-full object-cover" />
+          <EditableImage
+            contentKey={`games.${game.slug}.cover`}
+            fallbackSrc={game.image}
+            alt={game.name}
+            className="w-full h-full object-cover"
+            recommendedSize="600×800px aprox. (vertical), JPG o PNG"
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-surface-container-high to-surface-container-low">
             <span className="material-symbols-outlined text-[96px] text-on-surface-variant/40">
