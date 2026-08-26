@@ -7,7 +7,7 @@ const RoyalJoker = () => {
   const jugadorID = currentUser?.id || "default-id";
   const gameURL = `https://royaljoker1.s3.us-east-2.amazonaws.com/Royaljoker/index.html?jugadorID=${jugadorID}`;
 
-  return <GameFrame src={jugadorID ? gameURL : null} title="Royal Joker" />;
+  return <GameFrame src={jugadorID ? gameURL : null} title="Royal Joker" nativeWidth={1920} nativeHeight={1080} />;
 };
 
 export default RoyalJoker;
