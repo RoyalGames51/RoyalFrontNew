@@ -21,6 +21,7 @@ import Diamantes from './components/Juegos/Diamantes/diamantes';
 import RoyalJoker from './components/Juegos/RoyalJoker/royaljoker';
 import RoyalPachinka from './components/Juegos/royalpachinka/royalpachinka';
 import Bingo from './components/Juegos/Bingo/bingo';
+import SantaWilds from './components/Juegos/SantaWilds/santawilds';
 import API_URL from './api/rutaApi';
 import AboutUs from './components/AboutUs/aboutUs';
 import UserManagement from './components/AdminPanel/UserManagement/userManagement';
@@ -138,6 +139,7 @@ function App() {
             <Route path="/play/royaljoker" element={<RequireAuth><RoyalJoker /></RequireAuth>} />
             <Route path="/play/royalpachinka" element={<RequireAuth><RoyalPachinka /></RequireAuth>} />
             <Route path="/play/bingo" element={<RequireAuth><Bingo /></RequireAuth>} />
+            <Route path="/play/santawilds" element={<RequireAuth><SantaWilds /></RequireAuth>} />
             <Route path="/bazar" element={<Bazar />} />
             <Route path="/amigos" element={<Friends />} />
             <Route path="/mensajes" element={<Messages />} />

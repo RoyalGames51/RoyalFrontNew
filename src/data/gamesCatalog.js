@@ -62,6 +62,17 @@ export const GAMES_CATALOG = [
       "El clásico juego de pachinko con estilo Royal: deja caer la bola y observa cómo rebota entre los pines hasta encontrar tu multiplicador.",
   },
   {
+    slug: "santawilds",
+    name: "Santa Wilds",
+    category: "slots",
+    status: "active",
+    icon: "ac_unit",
+    players: 1820,
+    playPath: "/play/santawilds",
+    description:
+      "Tragamonedas navideña con símbolos wild que se expanden y multiplican tus ganancias. Encontrá a Santa y desbloqueá rondas bonus llenas de regalos.",
+  },
+  {
     slug: "bingo",
     name: "Royal Bingo",
     category: "bingo",
