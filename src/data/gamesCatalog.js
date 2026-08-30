@@ -62,6 +62,17 @@ export const GAMES_CATALOG = [
       "El clásico juego de pachinko con estilo Royal: deja caer la bola y observa cómo rebota entre los pines hasta encontrar tu multiplicador.",
   },
   {
+    slug: "royalslots",
+    name: "Royal Slots",
+    category: "slots",
+    status: "active",
+    icon: "diamond",
+    players: 1650,
+    playPath: "/play/royalslots",
+    description:
+      "La tragamonedas clásica de RoyalGames: rodillos cargados de símbolos dorados, multiplicadores y la chance de llevarte el premio mayor en cualquier giro.",
+  },
+  {
     slug: "santawilds",
     name: "Santa Wilds",
     category: "slots",
