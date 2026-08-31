@@ -17,7 +17,7 @@ function Avatar({ userId, nick, size = "w-11 h-11" }) {
         <img
           src={avatarSrc}
           alt={nick}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-top"
           onError={(e) => {
             e.currentTarget.style.display = "none";
           }}

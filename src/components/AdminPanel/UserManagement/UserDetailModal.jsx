@@ -346,7 +346,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                 <img
                   src={user.avatar}
                   alt={user.nick}
-                  className="w-24 h-24 rounded-full border-2 border-primary/30 object-cover"
+                  className="w-24 h-24 rounded-full border-2 border-primary/30 object-cover object-top"
                 />
               ) : (
                 <div className="w-24 h-24 rounded-full border-2 border-primary/30 bg-primary/10 flex items-center justify-center">

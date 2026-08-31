@@ -277,7 +277,7 @@ const UserManagement = () => {
                                 <img
                                   src={user.avatar}
                                   alt={user.nick}
-                                  className="w-10 h-10 rounded-full border border-outline-variant/50 object-cover"
+                                  className="w-10 h-10 rounded-full border border-outline-variant/50 object-cover object-top"
                                 />
                               ) : (
                                 <div className="w-10 h-10 rounded-full border border-outline-variant/50 bg-primary/20 flex items-center justify-center">

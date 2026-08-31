@@ -172,7 +172,7 @@ export default function Navbar() {
                 >
                   <img
                     alt="Avatar de Usuario"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-top"
                     src={avatarSrc}
                     onError={(e) => {
                       const target = e.currentTarget;
