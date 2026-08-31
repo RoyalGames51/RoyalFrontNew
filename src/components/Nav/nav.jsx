@@ -168,7 +168,7 @@ export default function Navbar() {
                   type="button"
                   onClick={() => navigate('/bazar')}
                   className="w-16 h-16 overflow-hidden transition-all duration-200 focus:outline-none"
-                  style={{ width: '5rem', height: '5rem' }}
+                  style={{ width: '4rem', height: '4rem' }}
                 >
                   <img
                     alt="Avatar de Usuario"
