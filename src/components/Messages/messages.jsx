@@ -9,7 +9,7 @@ import { fetchConversations, fetchThread, sendMessage } from "../../redux/action
 const POLL_INTERVAL_MS = 30000;
 
 function Avatar({ userId, nick, size = "w-11 h-11" }) {
-  const avatarSrc = userId ? `${API_URL}/user/${userId}/avatar-image` : null;
+  const avatarSrc = userId ? `${API_URL}/user/${userId}/avatar-thumbnail` : null;
   const initials = (nick || "RG").slice(0, 2).toUpperCase();
   return (
     <div className={`${size} rounded-full overflow-hidden flex-shrink-0 royal-gold-gradient flex items-center justify-center text-surface-container-lowest font-bold text-sm`}>

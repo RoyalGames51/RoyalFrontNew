@@ -18,7 +18,7 @@ import {
 
 function UserRow({ user, children }) {
   const navigate = useNavigate();
-  const avatarSrc = user?.id ? `${API_URL}/user/${user.id}/avatar-image` : null;
+  const avatarSrc = user?.id ? `${API_URL}/user/${user.id}/avatar-thumbnail` : null;
   const initials = (user?.nick || "RG").slice(0, 2).toUpperCase();
 
   return (
