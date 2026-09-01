@@ -51,7 +51,7 @@ export default function Navbar() {
   const formattedChips = formatChips(currentUser?.chips);
 
   const avatarSrc = currentUser?.id
-    ? `${API_URL}/user/${currentUser.id}/avatar-thumbnail`
+    ? `${API_URL}/user/${currentUser.id}/avatar-image`
     : "https://lh3.googleusercontent.com/aida-public/AB6AXuCpCcNDDLhupT0iOwy1efwVKGf6ATUKCy6U7q50kyjk86DZ0ESSWDYB3IrG_VbQ2nLajCDmLvXOct59w89ERq7kJydta4x2rtj18hF3ffoEPNHFxRiAJHXOp4-joRLAss2GIpXRWXEpfCcn17eLUjcdKtMQDo4p-lNCzppHIIyPmM_WXToorkNt3NbXKLAfPkWDm4ln0gxkOhUv8fxWHOTdBFnPxsnTABAi2RPFBg9hCCwRzQGJ6YIBJ6Bvk8_pA9vPVUZpUJk60PQ";
 
   return (
