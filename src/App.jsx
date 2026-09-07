@@ -14,7 +14,7 @@ import GameGrid from './components/Juegos/juegos';
 import News from './components/News/news';
 import regaloBienvenida from '../src/assets/regalobienvenida.png';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchSiteContent } from './redux/actions';
+import { fetchSiteContent, getUserByEmail } from './redux/actions';
 import TermsAndConditions from './components/termsyConds/terminosYCondiciones';
 import axios from 'axios';
 import Diamantes from './components/Juegos/Diamantes/diamantes';
@@ -89,6 +89,17 @@ function App() {
     const interval = setInterval(sendHeartbeat, 2 * 60 * 1000);
     return () => clearInterval(interval);
   }, [currentUser?.id, location.pathname]);
+
+  // Chips, avatar, etc. can change from OUTSIDE this app's own Redux flow — the external
+  // games settle bets directly against the backend with no JWT, and the Bazar (avatar editor)
+  // is its own separate app — so this tab's cached currentUser silently goes stale. Re-fetching
+  // on every route change (not on a timer) means you always see fresh data by the time you land
+  // on a new page, without forcing a full page reload just to bust the client-side cache.
+  useEffect(() => {
+    if (!currentUser?.email) return;
+    dispatch(getUserByEmail(currentUser.email)).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
 
   const handleCloseGift = () => {
     setShowWelcomeGift(false);
