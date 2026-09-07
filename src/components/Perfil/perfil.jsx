@@ -464,7 +464,7 @@ const Perfil = ({ isPublic = false }) => {
                 {avatarSrc ? (
                   <img
                     alt="Avatar de Usuario"
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain object-bottom"
                     src={avatarSrc}
                     onError={(e) => {
                       const target = e.currentTarget;
@@ -475,7 +475,7 @@ const Perfil = ({ isPublic = false }) => {
                 ) : user.image ? (
                   <img
                     alt="Avatar de Usuario"
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain object-bottom"
                     src={user.image}
                   />
                 ) : (
