@@ -39,15 +39,6 @@ export default function Navbar() {
     }
   };
 
-  const handleNotificationAlert = () => {
-    Swal.fire({
-      title: "Notificaciones",
-      text: "No tienes notificaciones pendientes en este momento.",
-      icon: "info",
-      ...swalThemeConfig,
-    });
-  };
-
   const formattedChips = formatChips(currentUser?.chips);
 
   // The avatar bytes live behind a plain, unversioned URL — without a cache-buster the browser
@@ -60,9 +51,9 @@ export default function Navbar() {
 
   return (
     <header className={`sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm h-20 transition-all duration-300 pt-1` }>
-      <div className="flex justify-between items-center h-16 pl-0 pr-4 md:pr-margin-desktop w-full">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 pl-0 pr-4 md:pr-margin-desktop w-full gap-2">
         {/* Left Section: Logo & Nav Links */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 justify-self-start min-w-0">
           <Link to="/" className="flex items-center">
             <img src={rgamesLogo} className="h-12 md:h-14 w-auto object-contain pl-4 md:pl-6" alt="RGAMES" />
           </Link>
@@ -163,66 +154,57 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Right Section: Notification, Buy Chips / User Profile / Login */}
-            <div className="flex items-center gap-2 sm:gap-3">
-          {currentUser?.id ? (
-        <div className="flex items-center gap-2 sm:gap-3">
-              {/* Notifications */}
+        {/* Center Section: User chip (avatar + nick/rank + fichas), centered on the whole bar */}
+        <div className="flex items-center justify-self-center">
+          {currentUser?.id && (
+            <div className="hidden sm:flex items-center gap-2.5 bg-surface-container-high border border-primary/20 rounded-full pl-1.5 pr-4 py-1.5 max-w-[15.5rem] hover:border-primary/40 transition-colors">
               <button
                 type="button"
-                onClick={handleNotificationAlert}
-                title="Notificaciones"
-                className="hidden sm:flex w-10 h-10 rounded-full items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-variant/40 transition-colors bg-transparent border-0 cursor-pointer flex-shrink-0"
+                onClick={() => navigate('/bazar')}
+                title="Cambiar avatar"
+                className="w-11 h-11 rounded-full overflow-hidden border-2 border-primary/60 flex-shrink-0 bg-surface-container-lowest transition-transform hover:scale-105 focus:outline-none cursor-pointer p-0"
               >
-                <span className="material-symbols-outlined text-[20px]">notifications</span>
+                <img
+                  alt="Avatar de Usuario"
+                  className="w-full h-full object-cover object-top"
+                  src={avatarSrc}
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    target.onerror = null;
+                    target.src = currentUser.image || "https://via.placeholder.com/150";
+                  }}
+                />
               </button>
-
-              {/* User chip: avatar + nick/rank + fichas, all in one clean pill */}
-              <div className="hidden sm:flex items-center gap-2.5 bg-surface-container-high border border-primary/20 rounded-full pl-1.5 pr-4 py-1.5 max-w-[15.5rem] hover:border-primary/40 transition-colors">
-                <button
-                  type="button"
-                  onClick={() => navigate('/bazar')}
-                  title="Cambiar avatar"
-                  className="w-11 h-11 rounded-full overflow-hidden border-2 border-primary/60 flex-shrink-0 bg-surface-container-lowest transition-transform hover:scale-105 focus:outline-none cursor-pointer p-0"
-                >
-                  <img
-                    alt="Avatar de Usuario"
-                    className="w-full h-full object-cover object-top"
-                    src={avatarSrc}
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      target.onerror = null;
-                      target.src = currentUser.image || "https://via.placeholder.com/150";
-                    }}
-                  />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate(currentUser.nick ? `/perfil/${currentUser.nick}` : '/perfil')}
-                  className="flex flex-col items-start min-w-0 flex-1 bg-transparent border-0 cursor-pointer p-0 text-left"
-                >
-                  <span className="flex items-center gap-1.5 min-w-0 max-w-full">
-                    <span className="text-on-surface font-bold text-sm truncate">
-                      {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "Usuario"}
-                    </span>
-                    <RankBadge tier={currentUser.rank} size="sm" />
-                  </span>
-                  <span className="flex items-center gap-1 text-primary text-[11px] font-bold tracking-wide mt-0.5">
-                    <img src={chips} alt="Fichas" className="w-3.5 h-3.5" />
-                    {formattedChips}
-                  </span>
-                </button>
-              </div>
-
-              {/* Logout button */}
               <button
-                onClick={handleLogOut}
-                title="Cerrar Sesión"
-                className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors bg-transparent border-0 cursor-pointer flex-shrink-0"
+                type="button"
+                onClick={() => navigate(currentUser.nick ? `/perfil/${currentUser.nick}` : '/perfil')}
+                className="flex flex-col items-start min-w-0 flex-1 bg-transparent border-0 cursor-pointer p-0 text-left"
               >
-                <span className="material-symbols-outlined text-[20px]">logout</span>
+                <span className="flex items-center gap-1.5 min-w-0 max-w-full">
+                  <span className="text-on-surface font-bold text-sm truncate">
+                    {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "Usuario"}
+                  </span>
+                  <RankBadge tier={currentUser.rank} size="sm" />
+                </span>
+                <span className="flex items-center gap-1 text-primary text-[11px] font-bold tracking-wide mt-0.5">
+                  <img src={chips} alt="Fichas" className="w-3.5 h-3.5" />
+                  {formattedChips}
+                </span>
               </button>
             </div>
+          )}
+        </div>
+
+        {/* Right Section: Logout / Login-Registrarse */}
+        <div className="flex items-center gap-2 sm:gap-3 justify-self-end">
+          {currentUser?.id ? (
+            <button
+              onClick={handleLogOut}
+              title="Cerrar Sesión"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors bg-transparent border-0 cursor-pointer flex-shrink-0"
+            >
+              <span className="material-symbols-outlined text-[20px]">logout</span>
+            </button>
           ) : (
             <div className="flex gap-3">
               <Login className="px-6 py-2.5 rounded-sm border border-primary/40 text-primary text-xs font-bold uppercase tracking-widest hover:bg-primary/10 transition-all btn-hover-glow cursor-pointer bg-transparent">
