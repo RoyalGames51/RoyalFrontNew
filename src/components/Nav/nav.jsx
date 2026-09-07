@@ -164,15 +164,26 @@ export default function Navbar() {
         </div>
 
         {/* Right Section: Notification, Buy Chips / User Profile / Login */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-3">
           {currentUser?.id ? (
-        <div className="flex items-center gap-4">
-              <div className="hidden sm:flex items-center gap-3 bg-[#222326] border border-blue-500/15 rounded-full px-3 py-2 shadow-[0_10px_25px_rgba(12,25,60,0.35)] max-w-[15.2rem] mt-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+              {/* Notifications */}
+              <button
+                type="button"
+                onClick={handleNotificationAlert}
+                title="Notificaciones"
+                className="hidden sm:flex w-10 h-10 rounded-full items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-variant/40 transition-colors bg-transparent border-0 cursor-pointer flex-shrink-0"
+              >
+                <span className="material-symbols-outlined text-[20px]">notifications</span>
+              </button>
+
+              {/* User chip: avatar + nick/rank + fichas, all in one clean pill */}
+              <div className="hidden sm:flex items-center gap-2.5 bg-surface-container-high border border-primary/20 rounded-full pl-1.5 pr-4 py-1.5 max-w-[15.5rem] hover:border-primary/40 transition-colors">
                 <button
                   type="button"
                   onClick={() => navigate('/bazar')}
-                  className="w-16 h-16 overflow-hidden transition-all duration-200 focus:outline-none"
-                  style={{ width: '4rem', height: '4rem' }}
+                  title="Cambiar avatar"
+                  className="w-11 h-11 rounded-full overflow-hidden border-2 border-primary/60 flex-shrink-0 bg-surface-container-lowest transition-transform hover:scale-105 focus:outline-none cursor-pointer p-0"
                 >
                   <img
                     alt="Avatar de Usuario"
@@ -185,29 +196,29 @@ export default function Navbar() {
                     }}
                   />
                 </button>
-                <div className="flex-1 min-w-0">
-                  <button
-                    type="button"
-                    onClick={() => navigate(currentUser.nick ? `/perfil/${currentUser.nick}` : '/perfil')}
-                    className="w-full text-left text-white font-semibold text-sm truncate hover:text-blue-100 flex items-center gap-1.5"
-                  >
-                    <span className="truncate">
+                <button
+                  type="button"
+                  onClick={() => navigate(currentUser.nick ? `/perfil/${currentUser.nick}` : '/perfil')}
+                  className="flex flex-col items-start min-w-0 flex-1 bg-transparent border-0 cursor-pointer p-0 text-left"
+                >
+                  <span className="flex items-center gap-1.5 min-w-0 max-w-full">
+                    <span className="text-on-surface font-bold text-sm truncate">
                       {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "Usuario"}
                     </span>
                     <RankBadge tier={currentUser.rank} size="sm" />
-                  </button>
-                  <div className="inline-flex items-center gap-2 text-blue-100 text-[11px] tracking-[0.08em] uppercase mt-1">
+                  </span>
+                  <span className="flex items-center gap-1 text-primary text-[11px] font-bold tracking-wide mt-0.5">
                     <img src={chips} alt="Fichas" className="w-3.5 h-3.5" />
-                    <span>{formattedChips} fichas</span>
-                  </div>
-                </div>
+                    {formattedChips}
+                  </span>
+                </button>
               </div>
 
               {/* Logout button */}
               <button
                 onClick={handleLogOut}
-                className="text-on-surface-variant hover:text-primary transition-colors bg-transparent border-0 cursor-pointer flex items-center p-1"
                 title="Cerrar Sesión"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors bg-transparent border-0 cursor-pointer flex-shrink-0"
               >
                 <span className="material-symbols-outlined text-[20px]">logout</span>
               </button>
