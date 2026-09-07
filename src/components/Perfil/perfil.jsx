@@ -110,7 +110,11 @@ const Perfil = ({ isPublic = false }) => {
     }
   }, [dispatch, isPublic, viewedUser?.id, currentUser?.id]);
 
-  const avatarSrc = user?.id ? `${API_URL}/user/${user.id}/avatar-image` : null;
+  // Cache-bust with lastSeen (refreshed on every navigation) so an avatar edit shows up right
+  // away instead of the browser serving the old bytes forever from this unversioned URL.
+  const avatarSrc = user?.id
+    ? `${API_URL}/user/${user.id}/avatar-image?v=${user.lastSeen ? new Date(user.lastSeen).getTime() : 0}`
+    : null;
 
   useEffect(() => {
     if (user) {
@@ -454,7 +458,7 @@ const Perfil = ({ isPublic = false }) => {
             {/* Avatar / Photo, positioned inside the banner's frame */}
             <div
               className="absolute group"
-              style={{ left: "21%", top: "50%", width: "24%", transform: "translate(-50%, -50%)" }}
+              style={{ left: "21%", top: "50%", width: "20%", transform: "translate(-50%, -50%)" }}
             >
               <div className="relative aspect-square w-full flex items-center justify-center bg-transparent overflow-visible">
                 {avatarSrc ? (
