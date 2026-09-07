@@ -157,12 +157,12 @@ export default function Navbar() {
         {/* Center Section: User chip (avatar + nick/rank + fichas), centered on the whole bar */}
         <div className="flex items-center justify-self-center">
           {currentUser?.id && (
-            <div className="hidden sm:flex items-center gap-2.5 bg-surface-container-high border border-primary/20 rounded-full pl-1.5 pr-4 py-1.5 max-w-[15.5rem] hover:border-primary/40 transition-colors">
+            <div className="hidden sm:flex items-center gap-3 bg-surface-container-high border border-primary/20 rounded-full pl-1 pr-5 py-1 max-w-[18rem] h-16 hover:border-primary/40 transition-colors">
               <button
                 type="button"
                 onClick={() => navigate('/bazar')}
                 title="Cambiar avatar"
-                className="w-11 h-11 rounded-full overflow-hidden border-2 border-primary/60 flex-shrink-0 bg-surface-container-lowest transition-transform hover:scale-105 focus:outline-none cursor-pointer p-0"
+                className="w-14 h-14 rounded-full overflow-hidden border-2 border-primary/60 flex-shrink-0 bg-surface-container-lowest transition-transform hover:scale-105 focus:outline-none cursor-pointer p-0"
               >
                 <img
                   alt="Avatar de Usuario"
@@ -180,14 +180,14 @@ export default function Navbar() {
                 onClick={() => navigate(currentUser.nick ? `/perfil/${currentUser.nick}` : '/perfil')}
                 className="flex flex-col items-start min-w-0 flex-1 bg-transparent border-0 cursor-pointer p-0 text-left"
               >
-                <span className="flex items-center gap-1.5 min-w-0 max-w-full">
-                  <span className="text-on-surface font-bold text-sm truncate">
+                <span className="flex items-center gap-2 min-w-0 max-w-full">
+                  <span className="text-on-surface font-bold text-base truncate">
                     {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "Usuario"}
                   </span>
-                  <RankBadge tier={currentUser.rank} size="sm" />
+                  <RankBadge tier={currentUser.rank} size="md" />
                 </span>
-                <span className="flex items-center gap-1 text-primary text-[11px] font-bold tracking-wide mt-0.5">
-                  <img src={chips} alt="Fichas" className="w-3.5 h-3.5" />
+                <span className="flex items-center gap-1.5 text-primary text-sm font-bold tracking-wide mt-1">
+                  <img src={chips} alt="Fichas" className="w-4 h-4" />
                   {formattedChips}
                 </span>
               </button>
