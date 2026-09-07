@@ -157,7 +157,7 @@ export default function Navbar() {
         {/* Center Section: User chip (avatar + nick/rank + fichas), centered on the whole bar */}
         <div className="flex items-center justify-self-center">
           {currentUser?.id && (
-            <div className="hidden sm:flex items-center gap-3 bg-surface-container-high border border-primary/20 rounded-full pl-1 pr-2.5 py-1 max-w-[18rem] h-16 hover:border-primary/40 transition-colors">
+            <div className="hidden sm:flex items-center gap-3 bg-surface-container-high border border-primary/20 rounded-full pl-1 pr-1 py-1 max-w-[18rem] h-16 hover:border-primary/40 transition-colors">
               <button
                 type="button"
                 onClick={() => navigate('/bazar')}
