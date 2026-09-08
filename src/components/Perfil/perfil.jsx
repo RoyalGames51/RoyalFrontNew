@@ -458,7 +458,7 @@ const Perfil = ({ isPublic = false }) => {
             {/* Avatar / Photo, positioned inside the banner's frame */}
             <div
               className="absolute group"
-              style={{ left: "21%", bottom: "28.5%", width: "20%", transform: "translateX(-50%)" }}
+              style={{ left: "21%", bottom: "30%", width: "20%", transform: "translateX(-50%)" }}
             >
               <div className="relative aspect-square w-full flex items-center justify-center bg-transparent overflow-visible">
                 {avatarSrc ? (
