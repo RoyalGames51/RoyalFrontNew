@@ -1,4 +1,4 @@
-import logo from '../../assets/LogoOficial.png';
+import logo from '../../assets/LogoOficial.PNG';
 import rgamesLogo from '../../assets/rgames.png';
 import chips from '../../assets/chips.png';
 import { useSelector, useDispatch } from "react-redux";
