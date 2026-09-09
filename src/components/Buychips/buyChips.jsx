@@ -59,7 +59,7 @@ export default function BuyChips() {
     : 100;
   const [selectedChip, setSelectedChip] = useState(chipOptions[0]);
   
-  // Navigation tabs state: "deposit", "withdraw", "history"
+  // Navigation tabs state: "deposit", "history"
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") === "history" ? "history" : "deposit");
   
   // Active payment method: "paypal", "mercadopago", "visa", "crypto"
@@ -421,16 +421,6 @@ export default function BuyChips() {
               }`}
             >
               Depositar Fondos
-            </button>
-            <button
-              onClick={() => setActiveTab("withdraw")}
-              className={`flex-1 py-4 font-label-lg text-label-lg transition-all border-b-2 font-bold ${
-                activeTab === "withdraw"
-                  ? "text-primary border-primary bg-primary/5"
-                  : "text-on-surface-variant hover:text-on-surface border-transparent"
-              }`}
-            >
-              Retirar Ganancias
             </button>
             <button
               onClick={() => setActiveTab("history")}
@@ -847,102 +837,7 @@ export default function BuyChips() {
               </div>
             )}
 
-            {/* VIEW 2: WITHDRAWAL FORM */}
-            {activeTab === "withdraw" && (
-              <div className="max-w-3xl mx-auto text-left space-y-8">
-                
-                {/* VIP Rule warning */}
-                <div className="glass-card p-6 rounded-2xl border-l-4 border-l-primary flex items-start gap-4">
-                  <span className="material-symbols-outlined text-primary text-3xl">info</span>
-                  <div>
-                    <h4 className="font-headline-sm text-headline-sm text-white mb-2">Retiros de Casino VIP Express</h4>
-                    <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-                      Como miembro VIP activo, disfrutas de retiros con verificación automatizada en un plazo máximo de 12 horas.
-                      Por favor, ten en cuenta que las fichas ganadas en partidas promocionales de bienvenida deben cumplir con un volumen de juego mínimo.
-                    </p>
-                  </div>
-                </div>
-
-                <form onSubmit={handleWithdrawalSubmit} className="space-y-6">
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Amount to withdraw */}
-                    <div className="space-y-2">
-                      <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">
-                        Monto del Retiro ({currency})
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-primary font-bold">
-                          {symbol}
-                        </div>
-                        <input
-                          type="number"
-                          placeholder="0.00"
-                          value={withdrawalAmount}
-                          onChange={(e) => setWithdrawalAmount(e.target.value)}
-                          className="w-full bg-[#0A0A0F] border border-outline-variant/30 rounded-xl py-4 pl-10 pr-4 text-lg font-bold text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
-                        />
-                      </div>
-                      <span className="text-[10px] text-on-surface-variant">Tasa de equivalencia: 1,000 fichas = 1.00 USD</span>
-                    </div>
-
-                    {/* Withdrawal Method */}
-                    <div className="space-y-2">
-                      <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">
-                        Método de Retiro
-                      </label>
-                      <div className="relative">
-                        <select
-                          value={withdrawalMethod}
-                          onChange={(e) => setWithdrawalMethod(e.target.value)}
-                          className="w-full bg-[#0A0A0F] border border-outline-variant/30 rounded-xl py-4 px-4 text-body-md text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all cursor-pointer appearance-none"
-                        >
-                          <option value="bank">Transferencia Bancaria Local</option>
-                          <option value="paypal">PayPal Express Checkout</option>
-                          <option value="btc">Bitcoin Wallet</option>
-                          <option value="usdt">USDT Wallet (TRC20)</option>
-                        </select>
-                        <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-primary">
-                          <span className="material-symbols-outlined">expand_more</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Transfer details / wallets */}
-                  <div className="space-y-2">
-                    <label className="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">
-                      Datos de la Cuenta / Wallet de Destino
-                    </label>
-                    <textarea
-                      rows="3"
-                      placeholder={
-                        withdrawalMethod === "bank"
-                          ? "Escribe tu Banco, CBU, CVU, Alias o Número de cuenta con titular..."
-                          : withdrawalMethod === "paypal"
-                          ? "Escribe tu correo electrónico de PayPal..."
-                          : "Escribe tu dirección de Wallet criptomonedas..."
-                      }
-                      value={withdrawalDetails}
-                      onChange={(e) => setWithdrawalDetails(e.target.value)}
-                      className="w-full bg-[#0A0A0F] border border-outline-variant/30 rounded-xl py-4 px-4 text-body-md text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full royal-gold-gradient py-5 rounded-xl text-[#0A0A0F] font-bold text-md uppercase tracking-wider hover:brightness-110 active:scale-[0.98] transition-all shadow-lg royal-gold-glow flex items-center justify-center gap-2 cursor-pointer border-0 mt-4"
-                  >
-                    <span className="material-symbols-outlined text-[20px] font-bold">outbox</span>
-                    Enviar Solicitud de Retiro Express
-                  </button>
-
-                </form>
-
-              </div>
-            )}
-
-            {/* VIEW 3: TRANSACTION LOGS */}
+            {/* VIEW 2: TRANSACTION LOGS */}
             {activeTab === "history" && (
               <div className="space-y-6">
                 
