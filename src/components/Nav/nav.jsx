@@ -1,5 +1,4 @@
 import logo from '../../assets/LogoOficial.PNG';
-import rgamesLogo from '../../assets/rgames.png';
 import chips from '../../assets/chips.png';
 import { useSelector, useDispatch } from "react-redux";
 import Login from "../Login/login";
@@ -55,7 +54,7 @@ export default function Navbar() {
         {/* Left Section: Logo & Nav Links */}
         <div className="flex items-center gap-6 justify-self-start min-w-0">
           <Link to="/" className="flex items-center">
-            <img src={rgamesLogo} className="h-12 md:h-14 w-auto object-contain pl-4 md:pl-6" alt="RGAMES" />
+            <img src={logo} className="h-12 md:h-14 w-auto object-contain pl-4 md:pl-6" alt="RGAMES" />
           </Link>
            
           {currentUser?.id ? (
