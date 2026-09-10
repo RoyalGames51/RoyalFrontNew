@@ -63,7 +63,7 @@ export default function Messages() {
     }
 
     let cancelled = false;
-    axios.get(`${API_URL}/user-nick?nick=${nick}`).then(({ data }) => {
+    axios.get(`${API_URL}/user-nick?nick=${encodeURIComponent(nick)}`).then(({ data }) => {
       if (!cancelled && data?.id) {
         setActivePartner({ id: data.id, nick: data.nick, rank: data.rank });
       }

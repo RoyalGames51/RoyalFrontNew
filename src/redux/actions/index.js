@@ -90,7 +90,7 @@ export const signupAndLogin = (userData) => {
 export const getUserByEmail = (email) => {
     return async (dispatch) => {
         try {
-            const { data } = await axios.get(`${API_URL}/user-email?email=${email}`);
+            const { data } = await axios.get(`${API_URL}/user-email?email=${encodeURIComponent(email)}`);
             if (data.banned) return data;
             dispatch({ type: USER_BY_EMAIL, payload: data });
             return data;
@@ -103,7 +103,7 @@ export const getUserByEmail = (email) => {
 export const getUserByNick = (nick) => {
     return async (dispatch) => {
         try {
-            const { data } = await axios.get(`${API_URL}/user-nick?nick=${nick}`);
+            const { data } = await axios.get(`${API_URL}/user-nick?nick=${encodeURIComponent(nick)}`);
             if (data.banned) throw new Error("El usuario se encuentra bloqueado.");
             dispatch({ type: USER_BY_NICK, payload: data });
             return data;
@@ -121,7 +121,7 @@ export const getUserByNick = (nick) => {
 export const lookupEmailByNick = (nick) => {
     return async () => {
         try {
-            const { data } = await axios.get(`${API_URL}/user-nick?nick=${nick}`);
+            const { data } = await axios.get(`${API_URL}/user-nick?nick=${encodeURIComponent(nick)}`);
             if (data.banned) throw new Error("El usuario se encuentra bloqueado.");
             return data;
         } catch (error) {
@@ -132,7 +132,7 @@ export const lookupEmailByNick = (nick) => {
 
 export const viewedUserProfile = (nick) => async (dispatch) => {
     try {
-        const response = await axios.get(`${API_URL}/user-nick?nick=${nick}`);
+        const response = await axios.get(`${API_URL}/user-nick?nick=${encodeURIComponent(nick)}`);
         dispatch({ type: VIEW_USER_PROFILE, payload: response.data });
     } catch (error) {
         throw new Error(`Usuario no encontrado: ${error.message}`);
@@ -166,7 +166,7 @@ export const updateUserProfile = (userId, updatedData) => async (dispatch) => {
 export const administrarUser = (nick) => {
     return async (dispatch) => {
         try {
-            const { data } = await axios.get(`${API_URL}/user-nick?nick=${nick}`);
+            const { data } = await axios.get(`${API_URL}/user-nick?nick=${encodeURIComponent(nick)}`);
             dispatch({ type: ADMINISTRAR_USER, payload: data });
         } catch (error) {
             throw new Error(`Error de sesion: ${error.message}`);
