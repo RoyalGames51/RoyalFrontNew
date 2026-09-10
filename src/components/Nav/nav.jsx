@@ -1,5 +1,6 @@
 import logo from '../../assets/LogoOficial.PNG';
 import chips from '../../assets/chips.png';
+import defaultAvatar from '../../assets/defaultAvatar.png';
 import { useSelector, useDispatch } from "react-redux";
 import Login from "../Login/login";
 import RegistroForm from "../Register/register";
@@ -168,9 +169,15 @@ export default function Navbar() {
                   className="w-full h-full object-cover object-top"
                   src={avatarSrc}
                   onError={(e) => {
+                    // Un solo swap, a un asset local que no puede fallar. El guard con
+                    // dataset es lo único fiable: React vuelve a enganchar el listener
+                    // de error en cada render, así que `target.onerror = null` no sirve
+                    // para cortar el bucle (por eso antes se disparaba en loop contra
+                    // la foto de Google hasta comerse un 429).
                     const target = e.currentTarget;
-                    target.onerror = null;
-                    target.src = currentUser.image || "https://via.placeholder.com/150";
+                    if (target.dataset.fellBack) return;
+                    target.dataset.fellBack = "1";
+                    target.src = defaultAvatar;
                   }}
                 />
               </button>

@@ -10,6 +10,7 @@ import bannerPerfilDorado from "../../assets/BannerPerfilDorado.png";
 import bannerPerfilVerde from "../../assets/BannerPerfilVerde.png";
 import insigniaAdmin from "../../assets/InsigniaAdmin.png";
 import insigniaMod from "../../assets/InsigniaMod.png";
+import defaultAvatar from "../../assets/defaultAvatar.png";
 import {
   viewedUserProfile,
   updateUserProfile,
@@ -475,9 +476,14 @@ const Perfil = ({ isPublic = false }) => {
                     className="w-full h-full object-contain object-bottom"
                     src={avatarSrc}
                     onError={(e) => {
+                      // Un solo swap, a un asset local que no puede fallar. El guard con
+                      // dataset es lo único fiable: React re-engancha el listener de error
+                      // en cada render, así que `target.onerror = null` no corta el bucle
+                      // (antes loopeaba contra user.image / placeholder remoto → 429).
                       const target = e.currentTarget;
-                      target.onerror = null;
-                      target.src = user.image || "https://via.placeholder.com/300";
+                      if (target.dataset.fellBack) return;
+                      target.dataset.fellBack = "1";
+                      target.src = defaultAvatar;
                     }}
                   />
                 ) : user.image ? (
@@ -485,6 +491,12 @@ const Perfil = ({ isPublic = false }) => {
                     alt="Avatar de Usuario"
                     className="w-full h-full object-contain object-bottom"
                     src={user.image}
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (target.dataset.fellBack) return;
+                      target.dataset.fellBack = "1";
+                      target.src = defaultAvatar;
+                    }}
                   />
                 ) : (
                   <div className="w-full h-full rounded-full royal-gold-gradient flex items-center justify-center text-surface-container-lowest text-2xl sm:text-4xl font-bold">
