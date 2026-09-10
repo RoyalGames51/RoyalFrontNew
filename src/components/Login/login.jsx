@@ -14,6 +14,46 @@ import { swalThemeConfig } from "../../utils/formatters";
 // (resiste React StrictMode que ejecuta efectos dos veces en desarrollo)
 let gsiInitialized = false;
 
+/**
+ * Traduce el error de un intento de login a un mensaje entendible.
+ * `authService.login` puede lanzar: un string (error.message de axios, p.ej. "Network Error"),
+ * un Error (lanzado a mano en el flujo de nick), o el body JSON de NestJS
+ * ({ statusCode, message, error }). Antes todo esto se mostraba como
+ * "Contraseña incorrecta", lo que confundía a usuarios y a soporte.
+ */
+const getLoginErrorMessage = (error) => {
+    if (!error) return "No pudimos iniciar sesión. Intentá de nuevo.";
+
+    // axios sin respuesta del servidor -> error.message es un string
+    if (typeof error === "string") {
+        if (/network|failed to fetch/i.test(error)) {
+            return "No pudimos conectar con el servidor. Revisá tu conexión e intentá de nuevo.";
+        }
+        if (/timeout/i.test(error)) {
+            return "El servidor tardó demasiado en responder. Probá de nuevo en un momento.";
+        }
+        return error;
+    }
+
+    // Error lanzado a mano (flujo de resolución de nick)
+    if (error instanceof Error && error.message) return error.message;
+
+    // Body de error de NestJS
+    const status = error.statusCode || error.status;
+    const backendMsg = Array.isArray(error.message) ? error.message[0] : error.message;
+
+    if (status === 401) {
+        // El backend avisa aparte cuando la cuenta se creó con Google (sin password)
+        if (backendMsg && /google/i.test(backendMsg)) return backendMsg;
+        return "Email/usuario o contraseña incorrectos.";
+    }
+    if (status === 403) return backendMsg || "Tu cuenta no tiene permiso para ingresar.";
+    if (status === 404) return "No encontramos una cuenta con esos datos.";
+    if (status >= 500) return "El servidor tuvo un problema. Probá de nuevo en unos minutos.";
+
+    return backendMsg || "No pudimos iniciar sesión. Intentá de nuevo.";
+};
+
 export default function Login({ className, children }) {
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const auth = useAuth();
@@ -43,10 +83,15 @@ export default function Login({ className, children }) {
             let email = input.email;
 
             if (!input.email.includes("@")) {
-                const userDataNick = await dispatch(lookupEmailByNick(input.email));
+                let userDataNick;
+                try {
+                    userDataNick = await dispatch(lookupEmailByNick(input.email));
+                } catch {
+                    throw new Error("No encontramos una cuenta con ese nombre de usuario.");
+                }
                 const emailFromNick = userDataNick?.email;
                 if (!emailFromNick) {
-                    throw new Error("No se encontró el email asociado al nickname.");
+                    throw new Error("No encontramos una cuenta con ese nombre de usuario.");
                 }
                 await auth.login(emailFromNick, input.password);
             } else {
@@ -64,10 +109,12 @@ export default function Login({ className, children }) {
             });
 
         } catch (error) {
+            console.error("Error al iniciar sesión:", error);
             Swal.fire({
                 icon: "error",
-                title: "Oops...",
-                text: "Contraseña incorrecta, intenta nuevamente",
+                title: "No pudimos iniciar sesión",
+                text: getLoginErrorMessage(error),
+                ...swalThemeConfig,
             });
         }
     };
