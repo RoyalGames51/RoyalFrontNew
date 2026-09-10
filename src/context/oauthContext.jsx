@@ -1,7 +1,10 @@
 import { useContext, createContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import { authService } from "../services/authService";
-import { getUserByEmail, cleanCurrentUser } from "../redux/actions";
+import { getUserByEmail, cleanCurrentUser, logout } from "../redux/actions";
 import { useDispatch } from "react-redux";
+import { swalThemeConfig } from "../utils/formatters";
 import axios from "axios";
 
 /**
@@ -54,9 +57,39 @@ const isTokenExpired = (payload) => {
 
 export function AuthProvider({ children }) {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    /**
+     * Sesión expirada/rechazada por el backend (evento emitido desde el
+     * interceptor global de axios ante un 401). Limpia todo el estado de auth,
+     * avisa al usuario y lo lleva al login.
+     */
+    useEffect(() => {
+        const handleSessionExpired = () => {
+            authService.clearSession();
+            dispatch(logout());
+            dispatch(cleanCurrentUser());
+            setIsAuthenticated(false);
+            setUser(null);
+
+            Swal.fire({
+                icon: "info",
+                title: "Tu sesión expiró",
+                text: "Por seguridad cerramos tu sesión. Iniciá sesión de nuevo para continuar.",
+                ...swalThemeConfig,
+            }).then(() => {
+                window.dispatchEvent(new Event("open-login-modal"));
+            });
+
+            navigate("/");
+        };
+
+        window.addEventListener("auth:session-expired", handleSessionExpired);
+        return () => window.removeEventListener("auth:session-expired", handleSessionExpired);
+    }, [dispatch, navigate]);
 
     /**
      * Verifica si hay un token válido al cargar la aplicación
