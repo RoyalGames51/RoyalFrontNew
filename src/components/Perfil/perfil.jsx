@@ -374,6 +374,11 @@ const Perfil = ({ isPublic = false }) => {
   const rankMeta = getRankMeta(user.rank);
   const profileBanner = user.role === "admin" ? bannerPerfilDorado : user.role === "mod" ? bannerPerfilVerde : bannerPerfil;
   const roleInsignia = user.role === "admin" ? insigniaAdmin : user.role === "mod" ? insigniaMod : null;
+  // Female Bazar avatars are rendered taller/closer to the camera than male ones, so in the
+  // profile frame they need to be a touch smaller. We shrink from the TOP only (padding-top
+  // on the square box) so the feet stay pinned to the same floor line (object-bottom) and it's
+  // just the head that comes down. Male avatars are left exactly as-is.
+  const isFemaleAvatar = user.sexo === "M";
   const nextRank = getNextRank(user.rank);
   const rankProgressPercentage = nextRank
     ? Math.min(Math.round((totalChipsDeposited / nextRank.threshold) * 100), 100)
@@ -458,9 +463,12 @@ const Perfil = ({ isPublic = false }) => {
             {/* Avatar / Photo, positioned inside the banner's frame */}
             <div
               className="absolute group"
-              style={{ left: "21%", bottom: "29.2%", width: "24%", transform: "translateX(-50%)" }}
+              style={{ left: "21%", bottom: "29.2%", width: isFemaleAvatar ? "22%" : "24%", transform: "translateX(-50%)" }}
             >
-              <div className="relative aspect-square w-full flex items-center justify-center bg-transparent overflow-visible">
+              <div
+                className="relative aspect-square w-full flex items-center justify-center bg-transparent overflow-visible"
+                style={{ paddingTop: isFemaleAvatar ? "14%" : 0 }}
+              >
                 {avatarSrc ? (
                   <img
                     alt="Avatar de Usuario"
