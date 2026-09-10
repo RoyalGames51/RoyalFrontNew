@@ -48,9 +48,12 @@ const decodeJwt = (token) => {
     }
 };
 
-// Chequea localmente el claim `exp` del JWT, sin pegarle al backend
+// Chequea localmente el claim `exp` del JWT, sin pegarle al backend.
+// Un token que no se pudo decodificar, o que no trae un `exp` numérico, se trata
+// como inválido (return true): el backend SIEMPRE firma con expiración (24h), así
+// que la ausencia de `exp` sólo pasa con un token corrupto o manipulado.
 const isTokenExpired = (payload) => {
-    if (!payload?.exp) return false;
+    if (!payload || typeof payload.exp !== 'number') return true;
     return payload.exp * 1000 <= Date.now();
 };
 
