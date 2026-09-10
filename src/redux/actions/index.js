@@ -43,20 +43,16 @@ import {
 } from "./action.types";
 import axios from 'axios';
 
+// El header Authorization lo adjunta el request interceptor global
+// (src/api/axiosInterceptors.js) leyendo este token de localStorage en cada
+// request. Acá sólo persistimos / borramos el token.
 export const setAuthToken = (token) => {
     if (token) {
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         localStorage.setItem('token', token);
     } else {
-        delete axios.defaults.headers.common['Authorization'];
         localStorage.removeItem('token');
     }
 };
-
-const token = localStorage.getItem('token');
-if (token) {
-    setAuthToken(token);
-}
 
 export const cleanCurrentUser = () => ({
     type: CLEAN_USER_BY_EMAIL,
@@ -155,12 +151,10 @@ export const fetchUserProfile = () => async (dispatch) => {
 
 export const updateUserProfile = (userId, updatedData) => async (dispatch) => {
     try {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error("No se pudo obtener el token de autenticación");
+        if (!localStorage.getItem('token')) throw new Error("No se pudo obtener el token de autenticación");
 
-        const response = await axios.patch(`${API_URL}/actualizar-usuario/${userId}`, updatedData, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
+        // El header Authorization lo adjunta el request interceptor global.
+        const response = await axios.patch(`${API_URL}/actualizar-usuario/${userId}`, updatedData);
 
         dispatch({ type: UPDATE_USER_PROFILE, payload: response.data });
     } catch (error) {

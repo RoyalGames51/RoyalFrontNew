@@ -5,7 +5,6 @@ import { authService } from "../services/authService";
 import { getUserByEmail, cleanCurrentUser, logout } from "../redux/actions";
 import { useDispatch } from "react-redux";
 import { swalThemeConfig } from "../utils/formatters";
-import axios from "axios";
 
 /**
  * Contexto de autenticación
@@ -137,8 +136,8 @@ export function AuthProvider({ children }) {
                 }
             }
 
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
+            // El header Authorization lo adjunta el request interceptor global
+            // (src/api/axiosInterceptors.js) leyendo el token de localStorage.
             const isValid = await authService.validateStoredSession();
             if (!isValid) {
                 dispatch(cleanCurrentUser());

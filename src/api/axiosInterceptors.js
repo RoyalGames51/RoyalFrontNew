@@ -23,6 +23,21 @@ const isIgnoredAuthEndpoint = (url = '') =>
   AUTH_ENDPOINTS_IGNORED.some((endpoint) => url.includes(endpoint));
 
 export function setupAxiosInterceptors() {
+  // Request: única fuente de verdad del header Authorization. Se lee el token de
+  // localStorage en CADA request, así que no importa el orden de carga de módulos
+  // ni hace falta setear `axios.defaults` desde varios lados. Tras un logout /
+  // clearSession el token ya no está y el header deja de viajar automáticamente.
+  axios.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token && !config.headers?.Authorization) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    } else if (!token && config.headers?.Authorization) {
+      delete config.headers.Authorization;
+    }
+    return config;
+  });
+
   axios.interceptors.response.use(
     (response) => response,
     (error) => {

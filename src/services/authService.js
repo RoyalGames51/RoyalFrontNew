@@ -34,14 +34,13 @@ export const authService = {
         password,
       });
       const { access_token, user } = response.data;
-      
-      // Guardar token y email en localStorage para persistencia
+
+      // Guardar token y email en localStorage para persistencia.
+      // El header Authorization lo adjunta el request interceptor global
+      // (src/api/axiosInterceptors.js) leyendo este mismo token.
       localStorage.setItem('token', access_token);
       localStorage.setItem('userEmail', email);
-      
-      // Configurar el header de autenticación
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      
+
       return { access_token, user };
     } catch (error) {
       throw error.response?.data || error.message;
@@ -63,7 +62,7 @@ export const authService = {
       if (user && user.email) {
         localStorage.setItem('userEmail', user.email);
       }
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      // El header Authorization lo adjunta el request interceptor global.
 
       return response.data; // Retornamos todo el response.data para tener access_token, user y firstChipsReceived
     } catch (error) {
@@ -78,7 +77,6 @@ export const authService = {
   logout: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userEmail');
-    delete axios.defaults.headers.common['Authorization'];
   },
 
   /**
@@ -97,7 +95,6 @@ export const authService = {
   clearSession: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userEmail');
-    delete axios.defaults.headers.common['Authorization'];
   },
 
   validateStoredSession: async () => {
@@ -110,11 +107,8 @@ export const authService = {
     }
 
     try {
-      await axios.get(`${API_URL}/user-email?email=${encodeURIComponent(userEmail)}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // El header Authorization lo adjunta el request interceptor global.
+      await axios.get(`${API_URL}/user-email?email=${encodeURIComponent(userEmail)}`);
       return true;
     } catch (error) {
       authService.clearSession();
