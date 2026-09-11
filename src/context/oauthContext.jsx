@@ -48,15 +48,6 @@ const decodeJwt = (token) => {
     }
 };
 
-// Chequea localmente el claim `exp` del JWT, sin pegarle al backend.
-// Un token que no se pudo decodificar, o que no trae un `exp` numérico, se trata
-// como inválido (return true): el backend SIEMPRE firma con expiración (24h), así
-// que la ausencia de `exp` sólo pasa con un token corrupto o manipulado.
-const isTokenExpired = (payload) => {
-    if (!payload || typeof payload.exp !== 'number') return true;
-    return payload.exp * 1000 <= Date.now();
-};
-
 export function AuthProvider({ children }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -94,16 +85,18 @@ export function AuthProvider({ children }) {
     }, [dispatch, navigate]);
 
     /**
-     * Verifica si hay un token válido al cargar la aplicación
-     * Si existe token, también carga los datos del usuario
+     * Restaura la sesión al arrancar la app cambiando el refresh token (cookie
+     * httpOnly, invisible para JS) por un access token nuevo. No hay nada que leer
+     * de localStorage: si no hay cookie de sesión (o venció, o fue rotada/robada),
+     * el backend responde 401 y quedamos como invitado. El backend es la única
+     * fuente de verdad — no hay chequeo local de expiración que mantener.
      */
     useEffect(() => {
         const restoreSession = async () => {
-            const token = authService.getToken();
-            let userEmail = localStorage.getItem('userEmail');
-
-            // Si el token es inválido o no existe, limpiar sesión
-            if (!token) {
+            let accessToken;
+            try {
+                accessToken = await authService.refreshSession();
+            } catch (error) {
                 authService.clearSession();
                 dispatch(cleanCurrentUser());
                 setIsAuthenticated(false);
@@ -112,37 +105,9 @@ export function AuthProvider({ children }) {
                 return;
             }
 
-            // Chequeo local de expiración: evita mostrar una sesión "fantasma" mientras
-            // se espera la respuesta del backend (y funciona aunque el backend esté caído).
-            const decodedToken = decodeJwt(token);
-            if (isTokenExpired(decodedToken)) {
+            const email = decodeJwt(accessToken)?.email;
+            if (!email) {
                 authService.clearSession();
-                dispatch(cleanCurrentUser());
-                setIsAuthenticated(false);
-                setUser(null);
-                setLoading(false);
-                return;
-            }
-
-            // Fallback robusto: si el email es nulo o el string "undefined", lo extraemos del JWT
-            if (!userEmail || userEmail === "undefined") {
-                if (decodedToken?.email) {
-                    userEmail = decodedToken.email;
-                    localStorage.setItem('userEmail', userEmail);
-                } else {
-                    authService.clearSession();
-                    dispatch(cleanCurrentUser());
-                    setIsAuthenticated(false);
-                    setUser(null);
-                    setLoading(false);
-                    return;
-                }
-            }
-
-            // El header Authorization lo adjunta el request interceptor global
-            // (src/api/axiosInterceptors.js) leyendo el token de localStorage.
-            const isValid = await authService.validateStoredSession();
-            if (!isValid) {
                 dispatch(cleanCurrentUser());
                 setIsAuthenticated(false);
                 setUser(null);
@@ -152,7 +117,7 @@ export function AuthProvider({ children }) {
 
             setIsAuthenticated(true);
             try {
-                const refreshedUser = await dispatch(getUserByEmail(userEmail));
+                const refreshedUser = await dispatch(getUserByEmail(email));
                 setUser(refreshedUser || null);
             } catch (error) {
                 authService.clearSession();
@@ -210,22 +175,15 @@ export function AuthProvider({ children }) {
             const { access_token, user: userData, firstChipsReceived } = await authService.loginWithGoogle(googleToken);
             setIsAuthenticated(true);
 
-            // Obtener email con fallback robusto (userData -> localStorage -> JWT decoding)
+            // Obtener email con fallback robusto (userData -> JWT decoding)
             let email = userData?.email;
             if (!email || email === "undefined") {
-                email = localStorage.getItem('userEmail');
-            }
-            if (!email || email === "undefined") {
-                const payload = decodeJwt(access_token);
-                email = payload?.email;
+                email = decodeJwt(access_token)?.email;
             }
 
             if (!email || email === "undefined") {
                 throw new Error('No se pudo extraer el email del token de Google o del backend');
             }
-
-            // Aseguramos que quede bien guardado en localStorage
-            localStorage.setItem('userEmail', email);
 
             const refreshedUser = await dispatch(getUserByEmail(email));
             setUser(refreshedUser || userData);
@@ -243,8 +201,7 @@ export function AuthProvider({ children }) {
      */
     const logOut = async () => {
         try {
-            authService.logout();
-            authService.clearSession();
+            await authService.logout();
             setUser(null);
             setIsAuthenticated(false);
         } catch (error) {

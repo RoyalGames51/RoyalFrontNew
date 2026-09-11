@@ -1,4 +1,5 @@
 import API_URL from "../../api/rutaApi";
+import { tokenStore } from "../../api/tokenStore";
 import {
     CLEAN_USER_BY_EMAIL,
     PROMO1K,
@@ -42,14 +43,10 @@ import {
 import axios from 'axios';
 
 // El header Authorization lo adjunta el request interceptor global
-// (src/api/axiosInterceptors.js) leyendo este token de localStorage en cada
-// request. Acá sólo persistimos / borramos el token.
+// (src/api/axiosInterceptors.js) leyendo el access token de memoria (tokenStore) en
+// cada request. Acá sólo persistimos / borramos ese valor en memoria.
 export const setAuthToken = (token) => {
-    if (token) {
-        localStorage.setItem('token', token);
-    } else {
-        localStorage.removeItem('token');
-    }
+    tokenStore.set(token);
 };
 
 export const cleanCurrentUser = () => ({
@@ -124,7 +121,7 @@ export const fetchUserProfile = () => async (dispatch) => {
 
 export const updateUserProfile = (userId, updatedData) => async (dispatch) => {
     try {
-        if (!localStorage.getItem('token')) throw new Error("No se pudo obtener el token de autenticación");
+        if (!tokenStore.get()) throw new Error("No se pudo obtener el token de autenticación");
 
         // El header Authorization lo adjunta el request interceptor global.
         const response = await axios.patch(`${API_URL}/actualizar-usuario/${userId}`, updatedData);

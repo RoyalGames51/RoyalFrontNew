@@ -23,7 +23,9 @@ const initialState = {
     currentUser: null,
     viewedUserProfile: [],
     counterUser: {},
-    authToken: localStorage.getItem('token') || null,
+    // El access token real vive en memoria (src/api/tokenStore.js), no acá — este campo
+    // no se lee en ningún lado, queda por compat con SET_AUTH_TOKEN/CLEAR_AUTH_TOKEN.
+    authToken: null,
     friends: {
         list: [],
         incoming: [],
