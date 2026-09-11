@@ -22,15 +22,12 @@ const Diamantes = () => {
 
     if (!currentUser?.id) return undefined;
 
-    const token = authService.getToken();
-    if (!token) return undefined;
+    // Sin sesión no tiene sentido pedir el token de Minas. El header Authorization
+    // lo adjunta el request interceptor global (src/api/axiosInterceptors.js).
+    if (!authService.getToken()) return undefined;
 
     axios
-      .post(
-        `${API_URL}/games/mines/session-token`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } },
-      )
+      .post(`${API_URL}/games/mines/session-token`, {})
       .then((response) => {
         if (!cancelled) setSessionToken(response.data.token);
       })

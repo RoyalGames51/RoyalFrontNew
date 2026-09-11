@@ -1,10 +1,15 @@
 import { useSelector } from "react-redux";
 import { Box, Spinner, Center } from "@chakra-ui/react";
+import { tokenStore } from "../../api/tokenStore";
 
 const Bazar = () => {
   const currentUser = useSelector((state) => state.currentUser);
   const jugadorID = currentUser?.id || "default-id";
-  const token = localStorage.getItem("token") || "";
+  // El access token vive en memoria (tokenStore), no en localStorage — ver Tarea 10.
+  // TODO: si en algún momento se puede actualizar la app de Bazar (S3, fuera de este
+  // repo), migrar esto a un token corto scopeado vía POST /bazar/session-token, igual
+  // que hace Diamantes/Minas con /games/mines/session-token.
+  const token = tokenStore.get() || "";
   const bazarURL = `https://baazaar.s3.us-east-2.amazonaws.com/bazar/index.html?jugadorID=${jugadorID}&token=${encodeURIComponent(token)}`;
 
   return (

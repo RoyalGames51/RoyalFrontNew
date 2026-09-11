@@ -2,22 +2,57 @@ import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import logo from "../../assets/logo.png";
 import { useAuth } from "../../context/oauthContext";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import axios from "axios";
 import API_URL from "../../api/rutaApi";
-import { lookupEmailByNick } from "../../redux/actions";
 import { swalThemeConfig } from "../../utils/formatters";
 
 // Flag a nivel de módulo: garantiza que initialize() corra solo una vez por carga de página
 // (resiste React StrictMode que ejecuta efectos dos veces en desarrollo)
 let gsiInitialized = false;
 
+/**
+ * Traduce el error de un intento de login a un mensaje entendible.
+ * `authService.login` puede lanzar: un string (error.message de axios, p.ej. "Network Error"),
+ * un Error de JS, o el body JSON de NestJS ({ statusCode, message, error }). Antes todo
+ * esto se mostraba como "Contraseña incorrecta", lo que confundía a usuarios y a soporte.
+ */
+const getLoginErrorMessage = (error) => {
+    if (!error) return "No pudimos iniciar sesión. Intentá de nuevo.";
+
+    // axios sin respuesta del servidor -> error.message es un string
+    if (typeof error === "string") {
+        if (/network|failed to fetch/i.test(error)) {
+            return "No pudimos conectar con el servidor. Revisá tu conexión e intentá de nuevo.";
+        }
+        if (/timeout/i.test(error)) {
+            return "El servidor tardó demasiado en responder. Probá de nuevo en un momento.";
+        }
+        return error;
+    }
+
+    if (error instanceof Error && error.message) return error.message;
+
+    // Body de error de NestJS
+    const status = error.statusCode || error.status;
+    const backendMsg = Array.isArray(error.message) ? error.message[0] : error.message;
+
+    if (status === 401) {
+        // El backend avisa aparte cuando la cuenta se creó con Google (sin password)
+        if (backendMsg && /google/i.test(backendMsg)) return backendMsg;
+        return "Email/usuario o contraseña incorrectos.";
+    }
+    if (status === 403) return backendMsg || "Tu cuenta no tiene permiso para ingresar.";
+    if (status === 404) return "No encontramos una cuenta con esos datos.";
+    if (status >= 500) return "El servidor tuvo un problema. Probá de nuevo en unos minutos.";
+
+    return backendMsg || "No pudimos iniciar sesión. Intentá de nuevo.";
+};
+
 export default function Login({ className, children }) {
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const auth = useAuth();
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     
     const [input, setInput] = useState({
@@ -40,18 +75,8 @@ export default function Login({ className, children }) {
         event.preventDefault();
 
         try {
-            let email = input.email;
-
-            if (!input.email.includes("@")) {
-                const userDataNick = await dispatch(lookupEmailByNick(input.email));
-                const emailFromNick = userDataNick?.email;
-                if (!emailFromNick) {
-                    throw new Error("No se encontró el email asociado al nickname.");
-                }
-                await auth.login(emailFromNick, input.password);
-            } else {
-                await auth.login(email, input.password);
-            }
+            // `input.email` puede ser un email o un nick: el backend lo resuelve.
+            await auth.login(input.email.trim(), input.password);
 
             setIsLoginOpen(false); // Cierra el modal
             navigate('/');
@@ -64,10 +89,12 @@ export default function Login({ className, children }) {
             });
 
         } catch (error) {
+            console.error("Error al iniciar sesión:", error);
             Swal.fire({
                 icon: "error",
-                title: "Oops...",
-                text: "Contraseña incorrecta, intenta nuevamente",
+                title: "No pudimos iniciar sesión",
+                text: getLoginErrorMessage(error),
+                ...swalThemeConfig,
             });
         }
     };

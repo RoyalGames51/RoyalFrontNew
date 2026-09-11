@@ -1,5 +1,5 @@
 import {
-    USER_BY_EMAIL, CLEAN_USER_BY_EMAIL, USER_BY_NICK, ADMINISTRAR_USER, PROMO1K,
+    USER_BY_EMAIL, CLEAN_USER_BY_EMAIL, PROMO1K,
     FETCH_PUBLIC_FAVORITES, REMOVE_FAVORITE_SUCCESS, ADD_FAVORITE_SUCCESS,
     FETCH_FAVORITES_FAILURE, FETCH_FAVORITES_SUCCESS, FETCH_USER_PROFILE,
     UPDATE_USER_PROFILE, USER_ACTION_ERROR, CREATE_GAME_REQUEST, CREATE_GAME_SUCCESS,
@@ -22,9 +22,10 @@ const initialState = {
     error: null,
     currentUser: null,
     viewedUserProfile: [],
-    administradorUser: {},
     counterUser: {},
-    authToken: localStorage.getItem('token') || null,
+    // El access token real vive en memoria (src/api/tokenStore.js), no acá — este campo
+    // no se lee en ningún lado, queda por compat con SET_AUTH_TOKEN/CLEAR_AUTH_TOKEN.
+    authToken: null,
     friends: {
         list: [],
         incoming: [],
@@ -66,7 +67,6 @@ const reducer = (state = initialState, action) => {
             };
 
         case USER_BY_EMAIL:
-        case USER_BY_NICK:
         case FETCH_USER_PROFILE:
             return {
                 ...state,
@@ -104,13 +104,6 @@ const reducer = (state = initialState, action) => {
 
         case CREATE_GAME_FAILURE:
             return { ...state, loading: false, error: action.payload };
-
-        // Administración de usuarios
-        case ADMINISTRAR_USER:
-            return {
-                ...state,
-                administradorUser: action.payload,
-            };
 
         case PROMO1K:
             return {

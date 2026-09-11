@@ -1,8 +1,10 @@
 import { useContext, createContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import { authService } from "../services/authService";
-import { getUserByEmail, cleanCurrentUser } from "../redux/actions";
+import { getUserByEmail, cleanCurrentUser, logout } from "../redux/actions";
 import { useDispatch } from "react-redux";
-import axios from "axios";
+import { swalThemeConfig } from "../utils/formatters";
 
 /**
  * Contexto de autenticación
@@ -46,29 +48,55 @@ const decodeJwt = (token) => {
     }
 };
 
-// Chequea localmente el claim `exp` del JWT, sin pegarle al backend
-const isTokenExpired = (payload) => {
-    if (!payload?.exp) return false;
-    return payload.exp * 1000 <= Date.now();
-};
-
 export function AuthProvider({ children }) {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     /**
-     * Verifica si hay un token válido al cargar la aplicación
-     * Si existe token, también carga los datos del usuario
+     * Sesión expirada/rechazada por el backend (evento emitido desde el
+     * interceptor global de axios ante un 401). Limpia todo el estado de auth,
+     * avisa al usuario y lo lleva al login.
+     */
+    useEffect(() => {
+        const handleSessionExpired = () => {
+            authService.clearSession();
+            dispatch(logout());
+            dispatch(cleanCurrentUser());
+            setIsAuthenticated(false);
+            setUser(null);
+
+            Swal.fire({
+                icon: "info",
+                title: "Tu sesión expiró",
+                text: "Por seguridad cerramos tu sesión. Iniciá sesión de nuevo para continuar.",
+                ...swalThemeConfig,
+            }).then(() => {
+                window.dispatchEvent(new Event("open-login-modal"));
+            });
+
+            navigate("/");
+        };
+
+        window.addEventListener("auth:session-expired", handleSessionExpired);
+        return () => window.removeEventListener("auth:session-expired", handleSessionExpired);
+    }, [dispatch, navigate]);
+
+    /**
+     * Restaura la sesión al arrancar la app cambiando el refresh token (cookie
+     * httpOnly, invisible para JS) por un access token nuevo. No hay nada que leer
+     * de localStorage: si no hay cookie de sesión (o venció, o fue rotada/robada),
+     * el backend responde 401 y quedamos como invitado. El backend es la única
+     * fuente de verdad — no hay chequeo local de expiración que mantener.
      */
     useEffect(() => {
         const restoreSession = async () => {
-            const token = authService.getToken();
-            let userEmail = localStorage.getItem('userEmail');
-
-            // Si el token es inválido o no existe, limpiar sesión
-            if (!token) {
+            let accessToken;
+            try {
+                accessToken = await authService.refreshSession();
+            } catch (error) {
                 authService.clearSession();
                 dispatch(cleanCurrentUser());
                 setIsAuthenticated(false);
@@ -77,37 +105,9 @@ export function AuthProvider({ children }) {
                 return;
             }
 
-            // Chequeo local de expiración: evita mostrar una sesión "fantasma" mientras
-            // se espera la respuesta del backend (y funciona aunque el backend esté caído).
-            const decodedToken = decodeJwt(token);
-            if (isTokenExpired(decodedToken)) {
+            const email = decodeJwt(accessToken)?.email;
+            if (!email) {
                 authService.clearSession();
-                dispatch(cleanCurrentUser());
-                setIsAuthenticated(false);
-                setUser(null);
-                setLoading(false);
-                return;
-            }
-
-            // Fallback robusto: si el email es nulo o el string "undefined", lo extraemos del JWT
-            if (!userEmail || userEmail === "undefined") {
-                if (decodedToken?.email) {
-                    userEmail = decodedToken.email;
-                    localStorage.setItem('userEmail', userEmail);
-                } else {
-                    authService.clearSession();
-                    dispatch(cleanCurrentUser());
-                    setIsAuthenticated(false);
-                    setUser(null);
-                    setLoading(false);
-                    return;
-                }
-            }
-
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-            const isValid = await authService.validateStoredSession();
-            if (!isValid) {
                 dispatch(cleanCurrentUser());
                 setIsAuthenticated(false);
                 setUser(null);
@@ -117,7 +117,7 @@ export function AuthProvider({ children }) {
 
             setIsAuthenticated(true);
             try {
-                const refreshedUser = await dispatch(getUserByEmail(userEmail));
+                const refreshedUser = await dispatch(getUserByEmail(email));
                 setUser(refreshedUser || null);
             } catch (error) {
                 authService.clearSession();
@@ -146,17 +146,20 @@ export function AuthProvider({ children }) {
     };
 
     /**
-     * Login con email y contraseña
+     * Login con email o nick + contraseña
      */
-    const login = async (email, password) => {
+    const login = async (identifier, password) => {
         try {
-            const { access_token, user: userData } = await authService.login(email, password);
+            const { access_token, user: userData } = await authService.login(identifier, password);
             setIsAuthenticated(true);
-            
+
+            // `identifier` puede ser un nick; el email real viene en la respuesta del backend.
+            const email = userData?.email || identifier;
+
             // Cargar datos del usuario en Redux y usar el perfil actualizado
             const refreshedUser = await dispatch(getUserByEmail(email));
             setUser(refreshedUser || userData);
-            
+
             return { access_token, user: refreshedUser || userData };
         } catch (error) {
             console.error("Error al iniciar sesión:", error);
@@ -172,22 +175,15 @@ export function AuthProvider({ children }) {
             const { access_token, user: userData, firstChipsReceived } = await authService.loginWithGoogle(googleToken);
             setIsAuthenticated(true);
 
-            // Obtener email con fallback robusto (userData -> localStorage -> JWT decoding)
+            // Obtener email con fallback robusto (userData -> JWT decoding)
             let email = userData?.email;
             if (!email || email === "undefined") {
-                email = localStorage.getItem('userEmail');
-            }
-            if (!email || email === "undefined") {
-                const payload = decodeJwt(access_token);
-                email = payload?.email;
+                email = decodeJwt(access_token)?.email;
             }
 
             if (!email || email === "undefined") {
                 throw new Error('No se pudo extraer el email del token de Google o del backend');
             }
-
-            // Aseguramos que quede bien guardado en localStorage
-            localStorage.setItem('userEmail', email);
 
             const refreshedUser = await dispatch(getUserByEmail(email));
             setUser(refreshedUser || userData);
@@ -205,8 +201,7 @@ export function AuthProvider({ children }) {
      */
     const logOut = async () => {
         try {
-            authService.logout();
-            authService.clearSession();
+            await authService.logout();
             setUser(null);
             setIsAuthenticated(false);
         } catch (error) {
