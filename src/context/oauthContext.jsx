@@ -181,17 +181,20 @@ export function AuthProvider({ children }) {
     };
 
     /**
-     * Login con email y contraseña
+     * Login con email o nick + contraseña
      */
-    const login = async (email, password) => {
+    const login = async (identifier, password) => {
         try {
-            const { access_token, user: userData } = await authService.login(email, password);
+            const { access_token, user: userData } = await authService.login(identifier, password);
             setIsAuthenticated(true);
-            
+
+            // `identifier` puede ser un nick; el email real viene en la respuesta del backend.
+            const email = userData?.email || identifier;
+
             // Cargar datos del usuario en Redux y usar el perfil actualizado
             const refreshedUser = await dispatch(getUserByEmail(email));
             setUser(refreshedUser || userData);
-            
+
             return { access_token, user: refreshedUser || userData };
         } catch (error) {
             console.error("Error al iniciar sesión:", error);

@@ -25,12 +25,14 @@ export const authService = {
   },
 
   /**
-   * Login con email y contraseña
+   * Login con email o nick + contraseña.
+   * `identifier` puede ser un email o un nick: el backend resuelve nick→email
+   * (así el front ya no necesita pedir el email de una cuenta antes de loguearse).
    */
-  login: async (email, password) => {
+  login: async (identifier, password) => {
     try {
       const response = await axios.post(`${API_URL}/auth/login`, {
-        email,
+        identifier,
         password,
       });
       const { access_token, user } = response.data;
@@ -38,8 +40,9 @@ export const authService = {
       // Guardar token y email en localStorage para persistencia.
       // El header Authorization lo adjunta el request interceptor global
       // (src/api/axiosInterceptors.js) leyendo este mismo token.
+      // `identifier` puede ser un nick, así que el email real sale de la respuesta.
       localStorage.setItem('token', access_token);
-      localStorage.setItem('userEmail', email);
+      if (user?.email) localStorage.setItem('userEmail', user.email);
 
       return { access_token, user };
     } catch (error) {

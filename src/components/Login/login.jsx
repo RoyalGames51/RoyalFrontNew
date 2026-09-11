@@ -2,12 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import logo from "../../assets/logo.png";
 import { useAuth } from "../../context/oauthContext";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import axios from "axios";
 import API_URL from "../../api/rutaApi";
-import { lookupEmailByNick } from "../../redux/actions";
 import { swalThemeConfig } from "../../utils/formatters";
 
 // Flag a nivel de módulo: garantiza que initialize() corra solo una vez por carga de página
@@ -17,9 +15,8 @@ let gsiInitialized = false;
 /**
  * Traduce el error de un intento de login a un mensaje entendible.
  * `authService.login` puede lanzar: un string (error.message de axios, p.ej. "Network Error"),
- * un Error (lanzado a mano en el flujo de nick), o el body JSON de NestJS
- * ({ statusCode, message, error }). Antes todo esto se mostraba como
- * "Contraseña incorrecta", lo que confundía a usuarios y a soporte.
+ * un Error de JS, o el body JSON de NestJS ({ statusCode, message, error }). Antes todo
+ * esto se mostraba como "Contraseña incorrecta", lo que confundía a usuarios y a soporte.
  */
 const getLoginErrorMessage = (error) => {
     if (!error) return "No pudimos iniciar sesión. Intentá de nuevo.";
@@ -35,7 +32,6 @@ const getLoginErrorMessage = (error) => {
         return error;
     }
 
-    // Error lanzado a mano (flujo de resolución de nick)
     if (error instanceof Error && error.message) return error.message;
 
     // Body de error de NestJS
@@ -57,7 +53,6 @@ const getLoginErrorMessage = (error) => {
 export default function Login({ className, children }) {
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const auth = useAuth();
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     
     const [input, setInput] = useState({
@@ -80,23 +75,8 @@ export default function Login({ className, children }) {
         event.preventDefault();
 
         try {
-            let email = input.email;
-
-            if (!input.email.includes("@")) {
-                let userDataNick;
-                try {
-                    userDataNick = await dispatch(lookupEmailByNick(input.email));
-                } catch {
-                    throw new Error("No encontramos una cuenta con ese nombre de usuario.");
-                }
-                const emailFromNick = userDataNick?.email;
-                if (!emailFromNick) {
-                    throw new Error("No encontramos una cuenta con ese nombre de usuario.");
-                }
-                await auth.login(emailFromNick, input.password);
-            } else {
-                await auth.login(email, input.password);
-            }
+            // `input.email` puede ser un email o un nick: el backend lo resuelve.
+            await auth.login(input.email.trim(), input.password);
 
             setIsLoginOpen(false); // Cierra el modal
             navigate('/');

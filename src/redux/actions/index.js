@@ -1,10 +1,8 @@
 import API_URL from "../../api/rutaApi";
 import {
-    ADMINISTRAR_USER,
     CLEAN_USER_BY_EMAIL,
     PROMO1K,
     USER_BY_EMAIL,
-    USER_BY_NICK,
     FETCH_USER_PROFILE,
     UPDATE_USER_PROFILE,
     USER_ACTION_ERROR,
@@ -69,7 +67,7 @@ export const signupAndLogin = (userData) => {
         try {
             const signupResponse = await axios.post(`${API_URL}/signup`, userData);
             const loginResponse = await axios.post(`${API_URL}/auth/login`, {
-                email: userData.email,
+                identifier: userData.email,
                 password: userData.password,
             });
 
@@ -100,35 +98,10 @@ export const getUserByEmail = (email) => {
     };
 };
 
-export const getUserByNick = (nick) => {
-    return async (dispatch) => {
-        try {
-            const { data } = await axios.get(`${API_URL}/user-nick?nick=${encodeURIComponent(nick)}`);
-            if (data.banned) throw new Error("El usuario se encuentra bloqueado.");
-            dispatch({ type: USER_BY_NICK, payload: data });
-            return data;
-        } catch (error) {
-            throw new Error(`Error al buscar usuario: ${error.message}`);
-        }
-    };
-};
-
-// Read-only nick lookup that does NOT touch currentUser in the store. Used to resolve a nick
-// to its email before a login attempt — dispatching getUserByNick there would populate
-// currentUser with a full account's data before the password is ever checked, which is exactly
-// what let anyone "log in" as any known nick with a wrong password (the UI would then render as
-// that user even though the real auth.login() call below failed and no token was ever issued).
-export const lookupEmailByNick = (nick) => {
-    return async () => {
-        try {
-            const { data } = await axios.get(`${API_URL}/user-nick?nick=${encodeURIComponent(nick)}`);
-            if (data.banned) throw new Error("El usuario se encuentra bloqueado.");
-            return data;
-        } catch (error) {
-            throw new Error(`Error al buscar usuario: ${error.message}`);
-        }
-    };
-};
+// La resolución nick→email para el login la hace ahora el backend (POST /auth/login
+// acepta `identifier` = nick o email). El endpoint público /user-nick devuelve solo
+// una proyección segura (sin email), así que ya no sirve para eso ni para poblar
+// currentUser — usar getUserByEmail (con guard) para los datos completos del propio user.
 
 export const viewedUserProfile = (nick) => async (dispatch) => {
     try {
@@ -161,17 +134,6 @@ export const updateUserProfile = (userId, updatedData) => async (dispatch) => {
         dispatch({ type: USER_ACTION_ERROR, payload: error.message });
         throw error;
     }
-};
-
-export const administrarUser = (nick) => {
-    return async (dispatch) => {
-        try {
-            const { data } = await axios.get(`${API_URL}/user-nick?nick=${encodeURIComponent(nick)}`);
-            dispatch({ type: ADMINISTRAR_USER, payload: data });
-        } catch (error) {
-            throw new Error(`Error de sesion: ${error.message}`);
-        }
-    };
 };
 
 export const fetchFavoriteGames = (userId) => async (dispatch) => {
@@ -414,8 +376,10 @@ export const unblockUser = (userId) => async (dispatch) => {
 export const giftChips = (toUserId, amount) => async (dispatch, getState) => {
     try {
         await axios.post(`${API_URL}/chips/gift`, { toUserId, amount });
-        const nick = getState().currentUser?.nick;
-        if (nick) dispatch(getUserByNick(nick));
+        // Refrescar el saldo propio tras regalar fichas. Vía email (endpoint con guard,
+        // datos completos), no vía /user-nick que ahora es una proyección pública.
+        const email = getState().currentUser?.email;
+        if (email) dispatch(getUserByEmail(email));
     } catch (error) {
         throw error;
     }
